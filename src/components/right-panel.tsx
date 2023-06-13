@@ -2,7 +2,6 @@ import { observer } from "mobx-react";
 import React, { useState } from "react";
 import { RightPanelTab, TabType } from "./right-panel-tab";
 import { useStores } from "../use-stores";
-import { Graph } from "./graph";
 import { log } from "@concord-consortium/lara-interactive-api";
 import css from "./right-panel.scss";
 
@@ -32,7 +31,7 @@ export const RightPanel = observer(function WrappedComponent() {
   return (
     <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-testid="right-panel">
       <div className={css.rightPanelContent}>
-        <Graph />
+        GRAPH TODO
       </div>
       <ul className={css.rightPanelTabs}>
         <li>

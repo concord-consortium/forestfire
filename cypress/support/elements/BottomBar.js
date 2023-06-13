@@ -15,11 +15,5 @@ export class BottomBar {
   getStartButton() {
     return cy.get('[data-testid="start-button"]');
   }
-  getFireLineButton() {
-    return cy.get('[data-testid="fireline-button"]');
-  }
-  getHelitackButton() {
-    return cy.get('[data-testid="helitack-button"]');
-  }
 }
 
