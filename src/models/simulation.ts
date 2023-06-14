@@ -1,17 +1,12 @@
 import { action, computed, observable, makeObservable } from "mobx";
 import { IWindProps, Town } from "../types";
-import {  Cell, CellOptions, FireState } from "./cell";
+import {  Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
 import { getElevationData, getRiverData, getUnburntIslandsData, getZoneIndex } from "./utils/data-loaders";
 import { Zone } from "./zone";
 import { FireEngine } from "./engine/fire-engine";
-import { getGridIndexForLocation, forEachPointBetween, dist } from "./utils/grid-utils";
-
-interface ICoords {
-  x: number;
-  y: number;
-}
+import { getGridIndexForLocation } from "./utils/grid-utils";
 
 // When config.changeWindOnDay is defined, but config.newWindSpeed is not, the model will use random value limited
 // by this constant.
@@ -46,13 +41,10 @@ export class SimulationModel {
   @observable public dataReady = false;
   @observable public wind: IWindProps;
   @observable public sparks: Vector2[] = [];
-  @observable public fireLineMarkers: Vector2[] = [];
   @observable public townMarkers: Town[] = [];
   @observable public zones: Zone[] = [];
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
-  @observable public lastFireLineTimestamp = -Infinity;
-  @observable public lastHelitackTimestamp = -Infinity;
   @observable public totalCellCountByZone: {[key: number]: number} = {};
   @observable public burnedCellsInZone: {[key: number]: number} = {};
   // These flags can be used by view to trigger appropriate rendering. Theoretically, view could/should check
@@ -102,26 +94,6 @@ export class SimulationModel {
   @computed public get remainingSparks() {
     // There's an assumption that number of sparks should be smaller than number of zones.
     return this.zonesCount - this.sparks.length;
-  }
-
-  @computed public get canAddFireLineMarker() {
-    // Only one fire line can be added at given time.
-    if (!this.config.fireLineAvailable) {
-      return false;
-    }
-    else {
-      return this.fireLineMarkers.length < 2 && this.time - this.lastFireLineTimestamp > this.config.fireLineDelay;
-    }
-  }
-
-  @computed public get canUseHelitack() {
-    if (!this.config.helitackAvailable) {
-      return false;
-    }
-    else {
-      // Helitack has waiting period before it can be used subsequent times
-      return this.time - this.lastHelitackTimestamp > this.config.helitackDelay;
-    }
   }
 
   public getZoneBurnPercentage(zoneIdx: number) {
@@ -224,8 +196,6 @@ export class SimulationModel {
       this.engine = new FireEngine(this.cells, this.wind, this.sparks, this.config);
     }
 
-    this.applyFireLineMarkers();
-
     this.simulationRunning = true;
     this.prevTickTime = null;
 
@@ -240,9 +210,6 @@ export class SimulationModel {
     this.simulationRunning = false;
     this.simulationStarted = false;
     this.cells.forEach(cell => cell.reset());
-    this.fireLineMarkers.length = 0;
-    this.lastFireLineTimestamp = -Infinity;
-    this.lastHelitackTimestamp = -Infinity;
     this.updateCellsStateFlag();
     this.updateCellsElevationFlag();
     this.time = 0;
@@ -372,121 +339,11 @@ export class SimulationModel {
     this.sparks[idx] = new Vector2(x, y);
   }
 
-  @action.bound public addFireLineMarker(x: number, y: number) {
-    if (this.canAddFireLineMarker) {
-      this.fireLineMarkers.push(new Vector2(x, y));
-      const count = this.fireLineMarkers.length;
-      if (count % 2 === 0) {
-        this.markFireLineUnderConstruction(this.fireLineMarkers[count - 2], this.fireLineMarkers[count - 1], true);
-      }
-    }
-  }
-
-  @action.bound public setFireLineMarker(idx: number, x: number, y: number) {
-    if (idx % 2 === 1 && idx - 1 >= 0) {
-      // Erase old line.
-      this.markFireLineUnderConstruction(this.fireLineMarkers[idx - 1], this.fireLineMarkers[idx], false);
-      // Update point.
-      this.fireLineMarkers[idx] = new Vector2(x, y);
-      this.limitFireLineLength(this.fireLineMarkers[idx - 1], this.fireLineMarkers[idx]);
-      // Draw a new line.
-      this.markFireLineUnderConstruction(this.fireLineMarkers[idx - 1], this.fireLineMarkers[idx], true);
-    }
-    if (idx % 2 === 0 && idx + 1 < this.fireLineMarkers.length) {
-      this.markFireLineUnderConstruction(this.fireLineMarkers[idx], this.fireLineMarkers[idx + 1], false);
-      this.fireLineMarkers[idx] = new Vector2(x, y);
-      this.limitFireLineLength(this.fireLineMarkers[idx + 1], this.fireLineMarkers[idx]);
-      this.markFireLineUnderConstruction(this.fireLineMarkers[idx], this.fireLineMarkers[idx + 1], true);
-    }
-  }
-
-  @action.bound public markFireLineUnderConstruction(start: ICoords, end: ICoords, value: boolean) {
-    const startGridX = Math.floor(start.x / this.config.cellSize);
-    const startGridY = Math.floor(start.y / this.config.cellSize);
-    const endGridX = Math.floor(end.x / this.config.cellSize);
-    const endGridY = Math.floor(end.y / this.config.cellSize);
-    forEachPointBetween(startGridX, startGridY, endGridX, endGridY, (x: number, y: number, idx: number) => {
-      if (idx % 2 === 0) {
-        // idx % 2 === 0 to make dashed line.
-        this.cells[getGridIndexForLocation(x, y, this.gridWidth)].isFireLineUnderConstruction = value;
-      }
-    });
-    this.updateCellsStateFlag();
-  }
-
-  // Note that this function modifies "end" point coordinates.
-  @action.bound public limitFireLineLength(start: ICoords, end: ICoords) {
-    const dRatio = dist(start.x, start.y, end.x, end.y) / this.config.maxFireLineLength;
-    if (dRatio > 1) {
-      end.x = start.x + (end.x - start.x) / dRatio;
-      end.y = start.y + (end.y - start.y) / dRatio;
-    }
-  }
-
-  @action.bound public applyFireLineMarkers() {
-    if (this.fireLineMarkers.length === 0) {
-      return;
-    }
-    for (let i = 0; i < this.fireLineMarkers.length; i += 2) {
-      if (i + 1 < this.fireLineMarkers.length) {
-        this.markFireLineUnderConstruction(this.fireLineMarkers[i], this.fireLineMarkers[i + 1], false);
-        this.buildFireLine(this.fireLineMarkers[i], this.fireLineMarkers[i + 1]);
-      }
-    }
-    this.fireLineMarkers.length = 0;
-    this.updateCellsStateFlag();
-    this.updateCellsElevationFlag();
-  }
-
-  @action.bound public buildFireLine(start: ICoords, end: ICoords) {
-    const startGridX = Math.floor(start.x / this.config.cellSize);
-    const startGridY = Math.floor(start.y / this.config.cellSize);
-    const endGridX = Math.floor(end.x / this.config.cellSize);
-    const endGridY = Math.floor(end.y / this.config.cellSize);
-    forEachPointBetween(startGridX, startGridY, endGridX, endGridY, (x: number, y: number) => {
-      const cell = this.cells[getGridIndexForLocation(x, y, this.gridWidth)];
-      cell.isFireLine = true;
-      cell.ignitionTime = Infinity;
-    });
-    this.lastFireLineTimestamp = this.time;
-  }
-
-  @action.bound public setHelitackPoint(px: number, py: number) {
-    const startGridX = Math.floor(px / this.config.cellSize);
-    const startGridY = Math.floor(py / this.config.cellSize);
-    const cell = this.cells[getGridIndexForLocation(startGridX, startGridY, this.gridWidth)];
-    const radius = Math.round(this.config.helitackDropRadius / this.config.cellSize);
-    for (let x = cell.x - radius; x < cell.x + radius; x++) {
-      for (let y = cell.y - radius ; y <= cell.y + radius; y++) {
-        if ((x - cell.x) * (x - cell.x) + (y - cell.y) * (y - cell.y) <= radius * radius) {
-          const nextCellX = cell.x - (x - cell.x);
-          const nextCellY = cell.y - (y - cell.y);
-          if (nextCellX < this.gridWidth && nextCellY < this.gridHeight) {
-            const targetCell = this.cells[getGridIndexForLocation(nextCellX, nextCellY, this.gridWidth)];
-            targetCell.helitackDropCount++;
-            targetCell.ignitionTime = Infinity;
-            if (targetCell.fireState === FireState.Burning) targetCell.fireState = FireState.Unburnt;
-          }
-        }
-      }
-    }
-    this.lastHelitackTimestamp = this.time;
-  }
-
   @action.bound public setWindDirection(direction: number) {
     this.wind.direction = direction;
   }
 
   @action.bound public setWindSpeed(speed: number) {
     this.wind.speed = speed;
-  }
-
-  @action.bound public updateZones(zones: Zone[]) {
-    this.zones = zones.map(z => z.clone());
-    this.zoneIndex = DEFAULT_ZONE_DIVISION[this.zones.length as (2 | 3)];
-    if (this.sparks.length > this.zones.length) {
-      this.sparks.length = this.zones.length;
-    }
-    this.populateCellsData();
   }
 }

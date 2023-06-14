@@ -12,20 +12,22 @@ interface IProps {
 
 export const SparksContainer: React.FC<IProps> = observer(function WrappedComponent({ dragPlane }) {
   const { simulation } = useStores();
-  return <>
-    {
-      simulation.sparks.map((s, idx) => {
-        const onDrag = (x: number, y: number) => simulation.setSpark(idx, x, y);
-        return <Marker
-          key={idx}
-          markerImg={sparkImg}
-          markerHighlightImg={sparkHighlightImg}
-          position={s}
-          onDrag={onDrag}
-          dragPlane={dragPlane}
-          lockOnSimStart={true}
-        />;
-      })
-    }
-         </>;
+  return (
+    <>
+      {
+        simulation.sparks.map((s, idx) => {
+          const onDrag = (x: number, y: number) => simulation.setSpark(idx, x, y);
+          return <Marker
+            key={idx}
+            markerImg={sparkImg}
+            markerHighlightImg={sparkHighlightImg}
+            position={s}
+            onDrag={onDrag}
+            dragPlane={dragPlane}
+            lockOnSimStart={true}
+          />;
+        })
+      }
+    </>
+  );
 });

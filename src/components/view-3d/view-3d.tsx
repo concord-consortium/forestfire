@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls , PerspectiveCamera } from "@react-three/drei";
 import { Provider } from "mobx-react";
@@ -7,7 +7,6 @@ import { DEFAULT_UP, PLANE_WIDTH, planeHeight } from "./helpers";
 import { Terrain } from "./terrain";
 import { SparksContainer } from "./spark";
 import * as THREE from "three";
-import { FireLineMarkersContainer } from "./fire-line-marker";
 import { TownMarkersContainer } from "./town-marker";
 import Shutterbug from "shutterbug";
 
@@ -57,7 +56,6 @@ export const View3d = () => {
         <hemisphereLight args={[0xC6C2B6, 0x3A403B, 1.2]} up={DEFAULT_UP}/>
         <Terrain ref={terrainRef}/>
         <SparksContainer dragPlane={terrainRef}/>
-        <FireLineMarkersContainer dragPlane={terrainRef}/>
         <TownMarkersContainer/>
         <ShutterbugSupport/>
       </Provider>
