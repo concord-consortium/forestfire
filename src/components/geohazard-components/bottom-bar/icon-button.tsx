@@ -20,10 +20,10 @@ export const IconButton = ({ icon, highlightIcon, onClick, disabled, buttonText,
     disableTouchRipple={true}
     disabled={disabled}
   >
-        <span>
-          <span className={css.iconButtonHighlightSvg}>{highlightIcon}</span>
-          {icon}
-          <span className={css.iconButtonText}>{buttonText}</span>
-        </span>
+    <span>
+      <span className={css.iconButtonHighlightSvg}>{highlightIcon}</span>
+      {icon}
+      <span className={css.iconButtonText}>{buttonText}</span>
+    </span>
   </Button>
 );

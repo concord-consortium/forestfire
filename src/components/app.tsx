@@ -5,13 +5,13 @@ import { SimulationInfo } from "./simulation-info";
 import { RightPanel } from "./right-panel";
 import { BottomBar } from "./bottom-bar";
 import { useStores } from "../use-stores";
-import { TopBar } from "./top-bar/top-bar";
-import { AboutDialogContent } from "./top-bar/about-dialog-content";
-import { ShareDialogContent } from "./top-bar/share-dialog-content";
+import { TopBar } from "./geohazard-components/top-bar/top-bar";
+import { AboutDialogContent } from "./about-dialog-content";
+import { ShareDialogContent } from "./share-dialog-content";
+import { useCustomCursor } from "./use-custom-cursors";
 import Shutterbug from "shutterbug";
 
 import css from "./app.scss";
-import { useCustomCursor } from "./use-custom-cursors";
 
 export const AppComponent = observer(function WrappedComponent() {
   const { simulation, ui } = useStores();
@@ -50,7 +50,9 @@ export const AppComponent = observer(function WrappedComponent() {
       <div className={`${css.rightContent} ${ui.showChart && css.grow}`}>
         <RightPanel />
       </div>
-      <BottomBar />
+      <div className={css.bottomBar}>
+        <BottomBar />
+      </div>
     </div>
   );
 });
