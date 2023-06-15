@@ -97,9 +97,12 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         playing={simulation.simulationRunning}
         startStopDisabled={!simulation.ready}
       />
-      <BottomBarWidgetGroup title="Fire Intensity Scale">
-        <FireIntensityScale />
-      </BottomBarWidgetGroup>
+      {
+        simulation.config.showBurnIndex &&
+        <BottomBarWidgetGroup title="Fire Intensity Scale">
+          <FireIntensityScale />
+        </BottomBarWidgetGroup>
+      }
     </BottomBarContainer>
   );
 });

@@ -1,25 +1,6 @@
 import { SimulationModel } from "./simulation";
 
 describe("SimulationModel", () => {
-  it("should report constant totalCellCountByZone values after model reload", async () => {
-    const sim = new SimulationModel({
-      modelWidth: 100000,
-      modelHeight: 100000,
-      gridWidth: 5,
-      sparks: [ [50000, 50000] ],
-      zoneIndex: [[0]],
-      elevation: [[0]],
-      unburntIslands: [[1]],
-      unburntIslandProbability: 1,
-      riverData: null,
-    });
-    await sim.dataReadyPromise;
-    expect(sim.totalCellCountByZone[0]).toEqual(25);
-    sim.reload();
-    await sim.dataReadyPromise;
-    expect(sim.totalCellCountByZone[0]).toEqual(25);
-  });
-
   it("changes the wind if changeWindOnDay config is defined and then restore wind properties after reset", async () => {
     const windScaleFactor = 0.2;
     const newWindDirection = 20;

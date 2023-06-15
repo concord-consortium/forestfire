@@ -13,7 +13,7 @@ export class BottomBar {
     return cy.get('[data-testid="restart-button"]');
   }
   getStartButton() {
-    return cy.get('[data-testid="start-button"]');
+    return cy.get('[data-testid="start-stop-button"]');
   }
 }
 

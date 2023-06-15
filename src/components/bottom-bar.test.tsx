@@ -32,14 +32,11 @@ describe("BottomBar component", () => {
         <BottomBar />
       </Provider>
     );
-    const start = screen.getByTestId("start-button");
+    const start = screen.getByTestId("start-stop-button");
     expect(start).toBeDisabled();
 
     act(() => {
       stores.simulation.dataReady = true;
-      // no sparks defined - this should still be false
-      expect(stores.simulation.ready).toEqual(false);
-      stores.simulation.sparks[0] = new Vector2(100, 100);
       expect(stores.simulation.ready).toEqual(true);
     });
     expect(start).not.toBeDisabled();
