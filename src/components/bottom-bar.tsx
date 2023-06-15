@@ -56,6 +56,8 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
   };
 
   const sparkBtnDisabled = !simulation.isFireEventActive || !simulation.canAddSpark || ui.interaction === Interaction.PlaceSpark;
+  // User cannot start the sim until he adds at least one spark during the fire event setup.
+  const startButtonDisabled = !simulation.ready || (simulation.isFireEventSetupActive && simulation.sparks.length === 0);
 
   const FireEventIcon = () => (
     <div className={css.fireEventIcon}>
@@ -95,7 +97,7 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         onStart={handleStart}
         onStop={handleStop}
         playing={simulation.simulationRunning}
-        startStopDisabled={!simulation.ready}
+        startStopDisabled={startButtonDisabled}
       />
       {
         simulation.config.showBurnIndex &&
