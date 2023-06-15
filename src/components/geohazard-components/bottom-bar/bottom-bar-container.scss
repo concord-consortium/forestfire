@@ -73,11 +73,17 @@
       align-items: center;
       justify-content: center;
       padding: 4px 6px 3px 6px;
-
     }
 
     &.hoverable:hover {
       background: rgba(223, 223, 223, 1);
+    }
+
+    & > *:first-child {
+      border-top-left-radius: $bottomBarBorderRadius - 1px;
+    }
+    & > *:last-child {
+      border-top-right-radius: $bottomBarBorderRadius - 1px;
     }
   }
 

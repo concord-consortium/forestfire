@@ -1,5 +1,5 @@
-import { action, computed, observable, makeObservable } from "mobx";
-import { IWindProps, Town } from "../types";
+import { action, computed, observable, makeObservable, reaction } from "mobx";
+import { IWindProps, Town, IFireEvent, ISpark } from "../types";
 import {  Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
@@ -40,13 +40,14 @@ export class SimulationModel {
   @observable public time = 0;
   @observable public dataReady = false;
   @observable public wind: IWindProps;
-  @observable public sparks: Vector2[] = [];
+  @observable public sparks: ISpark[] = [];
   @observable public townMarkers: Town[] = [];
   @observable public zones: Zone[] = [];
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
-  @observable public totalCellCountByZone: {[key: number]: number} = {};
-  @observable public burnedCellsInZone: {[key: number]: number} = {};
+
+  @observable public fireEvents: IFireEvent[] = [];
+  @observable public isFireActive = false;
   // These flags can be used by view to trigger appropriate rendering. Theoretically, view could/should check
   // every single cell and re-render when it detects some changes. In practice, we perform these updates in very
   // specific moments and usually for all the cells, so this approach can be way more efficient.
@@ -56,10 +57,22 @@ export class SimulationModel {
   constructor(presetConfig: Partial<ISimulationConfig>) {
     makeObservable(this);
     this.load(presetConfig);
+
+    reaction(
+      () => this.isFireEventActive,
+      (isFireEventActive, previousIsFireEventActive) => {
+        if (!isFireEventActive && previousIsFireEventActive) {
+          // Fire event just ended. Remove all the spark markers.
+          this.sparks.length = 0;
+          // Remove Fire Engine.
+          this.engine = null;
+        }
+      }
+    );
   }
 
   @computed public get ready() {
-    return this.dataReady && this.sparks.length > 0;
+    return this.dataReady;
   }
 
   @computed public get gridWidth() {
@@ -92,13 +105,22 @@ export class SimulationModel {
   }
 
   @computed public get remainingSparks() {
-    // There's an assumption that number of sparks should be smaller than number of zones.
-    return this.zonesCount - this.sparks.length;
+    return this.config.maxSparks - this.sparks.length;
   }
 
-  public getZoneBurnPercentage(zoneIdx: number) {
-    const burnedCells = this.engine?.burnedCellsInZone[zoneIdx] || 0;
-    return burnedCells / this.totalCellCountByZone[zoneIdx];
+  @computed public get isFireEventSetupActive() {
+    return this.fireEvents[this.fireEvents.length - 1]?.time === this.time;
+  }
+
+  @computed public get isFireEventActive() {
+    return this.isFireActive || this.isFireEventSetupActive;
+  }
+
+  @computed public get fireEventTime() {
+    if (!this.isFireEventActive) {
+      return -1;
+    }
+    return this.time - this.fireEvents[this.fireEvents.length - 1]?.time;
   }
 
   public cellAt(x: number, y: number) {
@@ -123,6 +145,8 @@ export class SimulationModel {
     config.sparks.forEach(s => {
       this.addSpark(s[0], s[1]);
     });
+
+    this.fireEvents.length = 0;
   }
 
   @action.bound public load(presetConfig: Partial<ISimulationConfig>) {
@@ -138,7 +162,6 @@ export class SimulationModel {
     this.dataReady = false;
     const config = this.config;
     const zones = this.zones;
-    this.totalCellCountByZone = {};
     this.dataReadyPromise = Promise.all([
       getZoneIndex(config, this.zoneIndex), getElevationData(config, zones), getRiverData(config), getUnburntIslandsData(config, zones)
     ]).then(values => {
@@ -170,11 +193,6 @@ export class SimulationModel {
             isUnburntIsland: unburntIsland && unburntIsland[index] > 0 || isNonBurnable,
             baseElevation: isEdge ? 0 : elevation?.[index]
           };
-          if (!this.totalCellCountByZone[zi]) {
-            this.totalCellCountByZone[zi] = 1;
-          } else {
-            this.totalCellCountByZone[zi]++;
-          }
           this.cells.push(new Cell(cellOptions));
         }
       }
@@ -193,7 +211,7 @@ export class SimulationModel {
       this.simulationStarted = true;
     }
     if (!this.engine) {
-      this.engine = new FireEngine(this.cells, this.wind, this.sparks, this.config);
+      this.engine = new FireEngine(this.cells, this.wind, this.config);
     }
 
     this.simulationRunning = true;
@@ -273,17 +291,23 @@ export class SimulationModel {
   }
 
   @action.bound public tick(timeStep: number) {
+    this.time += timeStep;
+
     if (this.engine) {
-      this.time += timeStep;
-      this.engine.updateFire(this.time);
-      if (this.engine.fireDidStop) {
-        this.simulationRunning = false;
-      }
+      this.processSparks();
+      this.engine.updateFire(this.fireEventTime);
+      this.isFireActive = !this.engine.fireDidStop;
+
+      this.updateCellsStateFlag();
+
+      this.changeWindIfNecessary();
     }
+  }
 
-    this.updateCellsStateFlag();
-
-    this.changeWindIfNecessary();
+  @action.bound public processSparks() {
+    const notProcessedSparks = this.sparks.filter(spark => !spark.locked);
+    this.engine?.setSparks(notProcessedSparks.map(spark => spark.position));
+    notProcessedSparks.forEach(spark => spark.locked = true);
   }
 
   @action.bound public changeWindIfNecessary() {
@@ -330,13 +354,13 @@ export class SimulationModel {
 
   @action.bound public addSpark(x: number, y: number) {
     if (this.canAddSpark) {
-      this.sparks.push(new Vector2(x, y));
+      this.sparks.push({ position: new Vector2(x, y), locked: false });
     }
   }
 
   // Coords are in model units (feet).
   @action.bound public setSpark(idx: number, x: number, y: number) {
-    this.sparks[idx] = new Vector2(x, y);
+    this.sparks[idx].position = new Vector2(x, y);
   }
 
   @action.bound public setWindDirection(direction: number) {
@@ -345,5 +369,17 @@ export class SimulationModel {
 
   @action.bound public setWindSpeed(speed: number) {
     this.wind.speed = speed;
+  }
+
+  @action.bound public addFireEvent() {
+    this.stop();
+    this.fireEvents.push({ time: this.time });
+  }
+
+  @action.bound public cancelFireEventSetup() {
+    if (this.time === this.fireEvents[this.fireEvents.length - 1].time) {
+      // Fire event was just added and not started yet, so it's still safe to cancel it.
+      this.fireEvents.pop();
+    }
   }
 }

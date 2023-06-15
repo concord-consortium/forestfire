@@ -28,6 +28,8 @@ export interface ISimulationConfig {
   zoneIndex?: number[][] | string;
   // Spark positions, in ft.
   sparks: number[][];
+  // Number of available sparks.
+  maxSparks: number;
   maxTimeStep: number; // minutes
   // One day in model should last X seconds in real world.
   modelDayInSeconds: number;
@@ -101,6 +103,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   unburntIslands: undefined, // will be derived from zone properties
   zoneIndex: undefined,
   sparks: [],
+  maxSparks: 10,
   maxTimeStep: 180, // minutes
   modelDayInSeconds: 8, // one day in model should last X seconds in real world
   windSpeed: 0, // mph

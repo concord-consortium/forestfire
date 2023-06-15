@@ -21,10 +21,10 @@ export const SparksContainer: React.FC<IProps> = observer(function WrappedCompon
             key={idx}
             markerImg={sparkImg}
             markerHighlightImg={sparkHighlightImg}
-            position={s}
+            position={s.position}
             onDrag={onDrag}
             dragPlane={dragPlane}
-            lockOnSimStart={true}
+            locked={s.locked}
           />;
         })
       }

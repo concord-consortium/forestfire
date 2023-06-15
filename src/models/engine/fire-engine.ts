@@ -93,10 +93,10 @@ export class FireEngine {
   public fireSurvivalProbability: number;
   public endOfLowIntensityFire = false;
   public fireDidStop = false;
+  public time = 0;
   public day = 0;
-  public burnedCellsInZone: {[key: number]: number} = {};
 
-  constructor(cells: Cell[], wind: IWindProps, sparks: Vector2[], config: IFireEngineConfig) {
+  constructor(cells: Cell[], wind: IWindProps, config: IFireEngineConfig) {
     this.cells = cells;
     this.wind = wind;
     this.gridWidth = config.gridWidth;
@@ -105,16 +105,21 @@ export class FireEngine {
     this.minCellBurnTime = config.minCellBurnTime;
     this.neighborsDist = config.neighborsDist;
     this.fireSurvivalProbability = config.fireSurvivalProbability;
+  }
 
-    // Use sparks to start the simulation.
+  public setSparks(sparks: Vector2[]) {
     sparks.forEach(spark => {
       const sparkCell = this.cellAt(spark.x, spark.y);
-      sparkCell.ignitionTime = 0;
+      sparkCell.ignitionTime = this.time;
       if (sparkCell.isUnburntIsland) {
         // If spark is placed inside unburnt island, remove this island as otherwise the fire won't pick up.
         this.removeUnburntIsland(sparkCell);
       }
     });
+  }
+
+  public setWind(wind: IWindProps) {
+    this.wind = wind;
   }
 
   public cellAt(x: number, y: number) {
@@ -142,11 +147,12 @@ export class FireEngine {
   }
 
   public updateFire(time: number) {
+    this.time = time;
     // Each time a day changes check if the low intensity fire shouldn't go out on itself.
     const newDay = Math.floor(time / modelDay);
     if (newDay !== this.day) {
       this.day = newDay;
-      if (Math.random() <= endOfLowIntensityFireProbability[newDay]) {
+      if (Math.random() <= endOfLowIntensityFireProbability[newDay] || 0) {
         this.endOfLowIntensityFire = true;
       }
     }
@@ -178,11 +184,6 @@ export class FireEngine {
         // above, this not only allows us to pre-set ignition times for testing, but will also allow us to
         // run forward or backward through a simulation.
         newFireStateData[i] = FireState.Burning;
-        if (!this.burnedCellsInZone[cell.zoneIdx]) {
-          this.burnedCellsInZone[cell.zoneIdx] = 1;
-        } else {
-          this.burnedCellsInZone[cell.zoneIdx] += 1;
-        }
         // Fire should spread if endOfLowIntensityFire flag is false or burn index is high enough.
         const fireShouldSpread = !this.endOfLowIntensityFire || cell.burnIndex !== BurnIndex.Low;
         if (fireShouldSpread) {

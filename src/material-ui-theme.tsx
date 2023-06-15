@@ -10,7 +10,7 @@ const options: ThemeOptions = {
     }
   },
   shape: {
-    borderRadius: 9
+    borderRadius: 0
   },
   typography: {
     fontFamily: "Lato, Arial, sans-serif",
@@ -41,7 +41,7 @@ const options: ThemeOptions = {
           },
           "&:disabled": {
             color: "inherit",
-            opacity: 0.25
+            opacity: 0.35
           }
         },
         text: {
