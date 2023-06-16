@@ -239,6 +239,7 @@ export class SimulationModel {
       // This use case is coved by one of the tests in the simulation.test.ts
       this.userDefinedWind = undefined;
     }
+    this.isFireActive = false;
     this.fireEvents = [];
     this.sparks = [];
     this.config.sparks.forEach(s => {
