@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event";
 import { createStores } from "../models/stores";
 import { Provider } from "mobx-react";
 import { BottomBar } from "./bottom-bar";
-import { Vector2 } from "three";
 import { act } from "react-dom/test-utils";
 
 describe("BottomBar component", () => {

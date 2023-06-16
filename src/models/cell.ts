@@ -47,6 +47,7 @@ export class Cell {
   public isFireLine = false;
   public isFireLineUnderConstruction = false;
   public helitackDropCount = 0;
+  public fireIdx: number | null = null;
 
   constructor(props: CellOptions) {
     Object.assign(this, props);
