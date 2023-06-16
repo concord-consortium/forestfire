@@ -65,7 +65,7 @@ export const PlaybackControls: React.FC<IProps> = ({ onReload, onRestart, onStar
             className={css.playbackButton}
             data-testid="start-stop-button"
           >
-            {playing ? <span><PauseIcon /> Stop</span> : <span><StartIcon /> Start</span>}
+            {playing ? <span><PauseIcon /> Pause</span> : <span><StartIcon /> Start</span>}
           </Button>
         </BottomBarWidgetGroup>
       }
