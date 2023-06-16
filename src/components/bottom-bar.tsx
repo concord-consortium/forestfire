@@ -98,6 +98,8 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         onStop={handleStop}
         playing={simulation.simulationRunning}
         startStopDisabled={startButtonDisabled}
+        reloadDisabled={!simulation.simulationStarted}
+        resetDisabled={!simulation.simulationStarted}
       />
       {
         simulation.config.showBurnIndex &&
