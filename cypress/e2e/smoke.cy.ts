@@ -22,7 +22,7 @@ context("Forest Fire Smoke Test", () => {
 
       bottomBar.getStartButton().click({ force: true });
       cy.wait(3000);
-      bottomBar.getStartButton().should("contain", "Stop");
+      bottomBar.getStartButton().should("contain", "Pause");
       modelInfo.getModelTimeProgress().should("not.contain", "0 hours");
     });
     it("restarts mode", () => {
