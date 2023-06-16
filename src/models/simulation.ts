@@ -141,19 +141,13 @@ export class SimulationModel {
       speed: config.windSpeed,
       direction: config.windDirection
     };
-    this.sparks.length = 0;
-    config.sparks.forEach(s => {
-      this.addSpark(s[0], s[1]);
-    });
-
-    this.fireEvents.length = 0;
   }
 
   @action.bound public load(presetConfig: Partial<ISimulationConfig>) {
-    this.restart();
     // Configuration are joined together. Default values can be replaced by preset, and preset values can be replaced
     // by URL parameters.
     this.config = Object.assign(getDefaultConfig(), presetConfig, getUrlConfig());
+    this.restart();
     this.setInputParamsFromConfig();
     this.populateCellsData();
   }
@@ -245,6 +239,11 @@ export class SimulationModel {
       // This use case is coved by one of the tests in the simulation.test.ts
       this.userDefinedWind = undefined;
     }
+    this.fireEvents = [];
+    this.sparks = [];
+    this.config.sparks.forEach(s => {
+      this.addSpark(s[0], s[1]);
+    });
   }
 
   @action.bound public reload() {
