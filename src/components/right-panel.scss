@@ -22,12 +22,12 @@
       background-color:  rgba(255, 255, 255, 0.9);
       padding: 10px;
       .title{
-        border-bottom: 1px solid $controlLabel;
+        border-bottom: 1px solid $textColor;
         text-align: center;
         margin-bottom: 10px;
         font-size: 14px;
         font-weight: bold;
-        color: $controlLabel;
+        color: $textColor;
       }
 
     }
@@ -87,7 +87,7 @@
           line-height: normal;
           letter-spacing: normal;
           text-align: center;
-          color: $controlLabel;
+          color: $textColor;
         }
       }
     }

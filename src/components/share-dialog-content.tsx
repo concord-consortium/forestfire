@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Copyright } from "./copyright";
+import { Copyright } from "./geohazard-components/top-bar/copyright";
 
 const getURL = () => {
   return window.location.href;
@@ -21,8 +21,8 @@ export const ShareDialogContent = () => (
       <textarea id="iframe-string" style={{ width: "100%" }} value={getIframeString()} readOnly={true} />
     </p>
     <p>
-      Suggested citation: Forest Fire Explorer [Computer software]. (2020). Concord, MA: The Concord Consortium.
+      Suggested citation: Forest Fire Explorer [Computer software]. (2023). Concord, MA: The Concord Consortium.
     </p>
-    <Copyright/>
+    <Copyright licenseUrl="https://github.com/concord-consortium/forestfire/blob/master/LICENSE" />
   </div>
 );
