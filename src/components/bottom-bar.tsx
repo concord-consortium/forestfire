@@ -20,10 +20,12 @@ import css from "./bottom-bar.scss";
 export const BottomBar: React.FC = observer(function WrappedComponent() {
   const { simulation, ui } = useStores();
 
-  const handleReload = () => {
-    simulation.reload();
-    log("SimulationReloaded");
-  };
+  // Temporarily unnecessary, as reload and restart would result in the same state. Reload can become useful
+  // when there is some input state that needs to be zeroed out.
+  // const handleReload = () => {
+  //   simulation.reload();
+  //   log("SimulationReloaded");
+  // };
 
   const handleRestart = () => {
     simulation.restart();
@@ -92,7 +94,7 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         />
       </BottomBarWidgetGroup>
       <PlaybackControls
-        onReload={handleReload}
+        // onReload={handleReload}
         onRestart={handleRestart}
         onStart={handleStart}
         onStop={handleStop}
