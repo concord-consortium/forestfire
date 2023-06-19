@@ -28,7 +28,7 @@ export const AppComponent = observer(function WrappedComponent() {
 
   const config = simulation.config;
   const timeInDays = Math.floor(simulation.timeInDays);
-  const timeHours = Math.floor(simulation.timeInHours);
+  const timeHours = Math.floor((simulation.time % 1440) / 60);
   const timeInYears = Math.floor(simulation.timeInYears);
   const showModelScale = config.showModelDimensions;
   return (
