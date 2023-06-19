@@ -4,6 +4,7 @@ import { View3d } from "./view-3d/view-3d";
 import { SimulationInfo } from "./simulation-info";
 import { RightPanel } from "./right-panel";
 import { BottomBar } from "./bottom-bar";
+import { Timeline } from "./timeline/timeline";
 import { useStores } from "../use-stores";
 import { TopBar } from "./geohazard-components/top-bar/top-bar";
 import { AboutDialogContent } from "./about-dialog-content";
@@ -57,6 +58,9 @@ export const AppComponent = observer(function WrappedComponent() {
       <div className={`${css.mainContent} ${ui.showChart && css.shrink}`}>
         <SimulationInfo />
         <View3d />
+      </div>
+      <div className={css.timeline}>
+        <Timeline />
       </div>
       <div className={`${css.rightContent} ${ui.showChart && css.grow}`}>
         <RightPanel />
