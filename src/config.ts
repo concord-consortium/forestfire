@@ -30,9 +30,11 @@ export interface ISimulationConfig {
   sparks: number[][];
   // Number of available sparks.
   maxSparks: number;
-  maxTimeStep: number; // minutes
-  // One day in model should last X seconds in real world.
-  modelDayInSeconds: number;
+  fireEngineMaxTimeStep: number; // minutes
+  // This variable defines fire event time step. One day in model should last X seconds in real world.
+  fireEventDayInSeconds: number;
+  // This variable defines regrowth phase time step. One year in model should last X seconds in real world.
+  regrowthYearInSeconds: number;
   windSpeed: number; // mph
   windDirection: number; // degrees, 0 is northern wind
   neighborsDist: number;
@@ -104,8 +106,9 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   zoneIndex: undefined,
   sparks: [],
   maxSparks: 10,
-  maxTimeStep: 180, // minutes
-  modelDayInSeconds: 8, // one day in model should last X seconds in real world
+  fireEngineMaxTimeStep: 180, // minutes
+  fireEventDayInSeconds: 8, // one day in model should last X seconds in real world
+  regrowthYearInSeconds: 60 / 400, // 400 years should last 60 seconds. 1 year should last 0.15 seconds.
   windSpeed: 0, // mph
   windDirection: 0, // degrees, northern wind
   // Note that 0.5 helps to create a nicer, more round shape of neighbours set for a given cell
