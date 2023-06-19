@@ -100,6 +100,10 @@ export class SimulationModel {
     return this.time / 525600; // 1440 * 365 minutes in a year, assuming that year has 365 days
   }
 
+  @computed public get simulationEnded() {
+    return this.timeInYears >= this.config.simulationEndYear;
+  }
+
   @computed public get canAddSpark() {
     return this.remainingSparks > 0;
   }
@@ -311,6 +315,10 @@ export class SimulationModel {
       this.updateCellsStateFlag();
 
       this.changeWindIfNecessary();
+    }
+
+    if (!this.isFireEventActive && this.timeInYears >= 400) {
+      this.stop();
     }
   }
 

@@ -35,6 +35,8 @@ export interface ISimulationConfig {
   fireEventDayInSeconds: number;
   // This variable defines regrowth phase time step. One year in model should last X seconds in real world.
   regrowthYearInSeconds: number;
+  // Stop model when year reaches this value.
+  simulationEndYear: number;
   windSpeed: number; // mph
   windDirection: number; // degrees, 0 is northern wind
   neighborsDist: number;
@@ -109,6 +111,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   fireEngineMaxTimeStep: 180, // minutes
   fireEventDayInSeconds: 8, // one day in model should last X seconds in real world
   regrowthYearInSeconds: 60 / 400, // 400 years should last 60 seconds. 1 year should last 0.15 seconds.
+  simulationEndYear: 400,
   windSpeed: 0, // mph
   windDirection: 0, // degrees, northern wind
   // Note that 0.5 helps to create a nicer, more round shape of neighbours set for a given cell
