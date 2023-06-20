@@ -70,14 +70,16 @@ describe("FireEngine", () => {
   };
 
   it("should stop low intensity fire after 5 days (or earlier but it's random)", () => {
-    const engine = new FireEngine(generateCells(), wind, sparks, config);
+    const engine = new FireEngine(generateCells(), wind, config);
+    engine.setSparks(sparks);
     expect(engine.endOfLowIntensityFire).toBe(false);
     engine.updateFire(1440 * 5); // 5 days in minutes
     expect(engine.endOfLowIntensityFire).toBe(true);
   });
 
   it("should detect when nothing is burning anymore", () => {
-    const engine = new FireEngine(generateCells(), wind, sparks, config);
+    const engine = new FireEngine(generateCells(), wind, config);
+    engine.setSparks(sparks);
     engine.updateFire(1440 * 5);
     expect(engine.fireDidStop).toBe(false);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toBeGreaterThan(0);
@@ -99,7 +101,8 @@ describe("FireEngine", () => {
     };
     const cells = generateCellsWithUnburntIsland();
     cells.forEach(c => expect(c.isUnburntIsland).toEqual(true));
-    const engine = new FireEngine(cells, wind, sparks, config);
+    const engine = new FireEngine(cells, wind, config);
+    engine.setSparks(sparks);
     engine.cells.forEach(c => expect(c.isUnburntIsland).toEqual(false));
     engine.updateFire(1440);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toBeGreaterThan(0);
@@ -109,7 +112,8 @@ describe("FireEngine", () => {
   describe("fire survivors", () => {
     const testVegetationAndGetNumberOfFireSurvivors = (vegetation: Vegetation) => {
       const zone = new Zone({ vegetation });
-      const engine = new FireEngine(generateCells(zone), wind, sparks, config);
+      const engine = new FireEngine(generateCells(zone), wind, config);
+      engine.setSparks(sparks);
       expect(engine.cells.filter(c => c.isFireSurvivor).length).toEqual(0);
       engine.updateFire(1440);
       engine.updateFire(1440);

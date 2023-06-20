@@ -14,9 +14,11 @@ interface IProps {
   onStop?: () => void;
   playing?: boolean;
   startStopDisabled?: boolean;
+  resetDisabled?: boolean;
+  reloadDisabled?: boolean;
 }
 
-export const PlaybackControls: React.FC<IProps> = ({ onReload, onRestart, onStart, onStop, playing, startStopDisabled }) => {
+export const PlaybackControls: React.FC<IProps> = ({ onReload, onRestart, onStart, onStop, playing, startStopDisabled, reloadDisabled, resetDisabled }) => {
   const handleStartPause = () => {
     if (playing) {
       onStop?.();
@@ -36,6 +38,7 @@ export const PlaybackControls: React.FC<IProps> = ({ onReload, onRestart, onStar
               className={css.playbackButton}
               data-testid="reload-button"
               onClick={onReload}
+              disabled={reloadDisabled}
             >
               <span><ReloadIcon /> Reload</span>
             </Button>
@@ -46,6 +49,7 @@ export const PlaybackControls: React.FC<IProps> = ({ onReload, onRestart, onStar
               className={css.playbackButton}
               data-testid="restart-button"
               onClick={onRestart}
+              disabled={resetDisabled}
             >
               <span><RestartIcon /> Restart</span>
             </Button>
@@ -61,7 +65,7 @@ export const PlaybackControls: React.FC<IProps> = ({ onReload, onRestart, onStar
             className={css.playbackButton}
             data-testid="start-stop-button"
           >
-            {playing ? <span><PauseIcon /> Stop</span> : <span><StartIcon /> Start</span>}
+            {playing ? <span><PauseIcon /> Pause</span> : <span><StartIcon /> Start</span>}
           </Button>
         </BottomBarWidgetGroup>
       }

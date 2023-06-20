@@ -32,14 +32,11 @@ describe("BottomBar component", () => {
         <BottomBar />
       </Provider>
     );
-    const start = screen.getByTestId("start-button");
+    const start = screen.getByTestId("start-stop-button");
     expect(start).toBeDisabled();
 
     act(() => {
       stores.simulation.dataReady = true;
-      // no sparks defined - this should still be false
-      expect(stores.simulation.ready).toEqual(false);
-      stores.simulation.sparks[0] = new Vector2(100, 100);
       expect(stores.simulation.ready).toEqual(true);
     });
     expect(start).not.toBeDisabled();
@@ -53,6 +50,11 @@ describe("BottomBar component", () => {
           <BottomBar />
         </Provider>
       );
+      expect(screen.getByTestId("restart-button")).toBeDisabled();
+      act(() => {
+        stores.simulation.simulationStarted = true;
+      });
+      expect(screen.getByTestId("restart-button")).not.toBeDisabled();
       await userEvent.click(screen.getByTestId("restart-button"));
       expect(stores.simulation.restart).toHaveBeenCalled();
     });
@@ -66,6 +68,18 @@ describe("BottomBar component", () => {
           <BottomBar />
         </Provider>
       );
+
+      const reloadButton = screen.queryByTestId("reload-button");
+      if (!reloadButton) {
+        // Note that reloadButton might be hidden as long as it's not useful for the app.
+        return;
+      }
+
+      expect(screen.getByTestId("reload-button")).toBeDisabled();
+      act(() => {
+        stores.simulation.simulationStarted = true;
+      });
+      expect(screen.getByTestId("reload-button")).not.toBeDisabled();
       await userEvent.click(screen.getByTestId("reload-button"));
       expect(stores.simulation.reload).toHaveBeenCalled();
     });

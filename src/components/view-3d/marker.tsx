@@ -38,19 +38,18 @@ interface IProps {
   dragPlane?: RefObject<THREE.Mesh>;
   // Optional highlight image that we'll be activated on hover.
   markerHighlightImg?: string | HTMLCanvasElement;
-  lockOnSimStart?: boolean;
+  locked?: boolean;
 }
 
 export const Marker: React.FC<IProps> = observer(function WrappedComponent({
  markerImg, markerHighlightImg, position, onDrag, onDragEnd, dragPlane,
- width = 0.06, height = 0.06, anchorX = 0.5, anchorY = 0, lockOnSimStart = false
+ width = 0.06, height = 0.06, anchorX = 0.5, anchorY = 0, locked = false
 }) {
   const { simulation } = useStores();
   const defTexture = useMemo(() => getTexture(markerImg), [markerImg]);
   const highlightTexture = useMemo(() => markerHighlightImg && getTexture(markerHighlightImg), [markerHighlightImg]);
-  const lockedOnSimStart = lockOnSimStart && simulation.simulationStarted;
   // Dragging is disabled when onDrag and dragPlane are missing, or when marker is locked on sim start.
-  const draggingEnabled = !!onDrag && !!dragPlane && !lockedOnSimStart;
+  const draggingEnabled = !!onDrag && !!dragPlane && !locked;
   const draggingInteraction = useDraggingOverPlaneInteraction(draggingEnabled, onDrag, onDragEnd, dragPlane);
 
   if (!simulation.dataReady) {
@@ -63,7 +62,7 @@ export const Marker: React.FC<IProps> = observer(function WrappedComponent({
   const y = position.y * ratio;
   const z = simulation.cellAt(position.x, position.y).elevation * ratio;
 
-  const scaleMult = lockedOnSimStart ? 0.5 : 1;
+  const scaleMult = locked ? 0.5 : 1;
 
   const texture = draggingInteraction.hovered && highlightTexture ? highlightTexture : defTexture;
 

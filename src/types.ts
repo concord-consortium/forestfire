@@ -60,3 +60,12 @@ export interface IWindProps {
   // 0 is northern wind, 90 is eastern wind.
   direction: number;
 }
+
+export interface IFireEvent {
+  time: number;
+}
+
+export interface ISpark {
+  position: Vector2;
+  locked: boolean;
+}
