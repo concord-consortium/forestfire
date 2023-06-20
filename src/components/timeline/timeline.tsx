@@ -1,10 +1,9 @@
 import React from "react";
-import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import { useStores } from "../../use-stores";
+import FireEventSpark from "../../assets/bottom-bar/Fire Event.svg";
 
 import css from "./timeline.scss";
-
 
 const TICK_COUNT = 16;
 
@@ -14,6 +13,11 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
   const timeProgress = `${(simulation.timeInYears / simulation.config.simulationEndYear) * 100}%`;
+  const endTime = simulation.simulationEndTime;
+
+  // Convert time from minutes to days.
+  const fireEventTimeInDays = Math.floor(simulation.fireEventTime / 1440);
+  const fireEventTimeHours = Math.floor((simulation.fireEventTime % 1440) / 60);
 
   return (
     <div className={css.timelineContainer}>
@@ -36,7 +40,25 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
             ))
           }
         </div>
-        <div className={css.fireEvents} />
+        <div className={css.fireEvents}>
+          {
+            simulation.fireEvents.map((event, i) => (
+              <div key={i} className={css.fireEvent} style={{ left: `${(event.time / endTime) * 100}%` }}>
+                {
+                  simulation.isFireActive && i === simulation.fireEvents.length - 1 &&
+                  <div className={css.fireEventTime}>
+                    {fireEventTimeInDays} {fireEventTimeInDays === 1 ? "day " : "days "}
+                    and {fireEventTimeHours} {fireEventTimeHours === 1 ? "hour" : "hours"}
+                  </div>
+                }
+                <FireEventSpark />
+                <div className={css.fireEventIdx}>
+                  { i + 1 }
+                </div>
+              </div>
+            ))
+          }
+        </div>
       </div>
     </div>
   );
