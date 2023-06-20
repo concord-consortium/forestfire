@@ -27,9 +27,9 @@ export const AppComponent = observer(function WrappedComponent() {
   useCustomCursor();
 
   const config = simulation.config;
-  // Convert time from minutes to days.
-  const timeInDays = Math.floor(simulation.time / 1440);
+  const timeInDays = Math.floor(simulation.timeInDays);
   const timeHours = Math.floor((simulation.time % 1440) / 60);
+  const timeInYears = Math.floor(simulation.timeInYears);
   const showModelScale = config.showModelDimensions;
   return (
     <div className={css.app}>
@@ -41,7 +41,18 @@ export const AppComponent = observer(function WrappedComponent() {
         </div>
       }
       <div className={css.timeDisplay}>
-        {timeInDays} {timeInDays === 1 ? "day" : "days"} and <br /> {timeHours} {timeHours === 1 ? "hour" : "hours"}
+        {
+          simulation.isFireEventActive &&
+          <>
+            {timeInDays} {timeInDays === 1 ? "day" : "days"} and {timeHours} {timeHours === 1 ? "hour" : "hours"}
+          </>
+        }
+        {
+          !simulation.isFireEventActive &&
+          <>
+            {timeInYears} years
+          </>
+        }
       </div>
       <div className={`${css.mainContent} ${ui.showChart && css.shrink}`}>
         <SimulationInfo />

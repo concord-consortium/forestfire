@@ -96,6 +96,14 @@ export class SimulationModel {
     return this.time / 1440;
   }
 
+  @computed public get timeInYears() {
+    return this.time / 525600; // 1440 * 365 minutes in a year, assuming that year has 365 days
+  }
+
+  @computed public get simulationEnded() {
+    return this.timeInYears >= this.config.simulationEndYear;
+  }
+
   @computed public get canAddSpark() {
     return this.remainingSparks > 0;
   }
@@ -269,8 +277,10 @@ export class SimulationModel {
     }
     let timeStep;
     if (realTimeDiffInMinutes) {
-      // One day in model time (86400 seconds) should last X seconds in real time.
-      const ratio = 86400 / this.config.modelDayInSeconds;
+      // One day in model time (86400 seconds) should last X seconds in real time when fire event is active. When the
+      // regrowth phase is active, one year in model time (31536000 seconds) should last X seconds in real time.
+      const ratio = this.isFireEventActive ?
+        (86400 / this.config.fireEventDayInSeconds) : (86400 * 365 / this.config.regrowthYearInSeconds);
       // Optimal time step assumes we have stable 60 FPS:
       // realTime = 1000ms / 60 = 16.666ms
       // timeStepInMs = ratio * realTime
@@ -278,10 +288,14 @@ export class SimulationModel {
       // Below, these calculations are just simplified (1000 / 60 / 1000 / 60 = 0.000277):
       const optimalTimeStep = ratio * 0.000277;
       // Final time step should be limited by:
-      // - maxTimeStep that model can handle
+      // - fireEngineMaxTimeStep that Fire Engine can handle
       // - reasonable multiplication of the "optimal time step" so user doesn't see significant jumps in the simulation
       //   when one tick takes much longer time (e.g. when cell properties are recalculated after adding fire line)
-      timeStep = Math.min(this.config.maxTimeStep, optimalTimeStep * 4, ratio * realTimeDiffInMinutes);
+      timeStep = Math.min(
+        this.isFireEventActive ? this.config.fireEngineMaxTimeStep : Infinity, // regrowth phase has no limits on time step
+        optimalTimeStep * 4,
+        ratio * realTimeDiffInMinutes
+      );
     } else {
       // We don't know performance yet, so simply increase time by some safe value and wait for the next tick.
       timeStep = 1;
@@ -301,6 +315,10 @@ export class SimulationModel {
       this.updateCellsStateFlag();
 
       this.changeWindIfNecessary();
+    }
+
+    if (!this.isFireEventActive && this.timeInYears >= 400) {
+      this.stop();
     }
   }
 
