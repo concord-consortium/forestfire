@@ -97,7 +97,13 @@ export class SimulationModel {
   }
 
   @computed public get timeInYears() {
-    return this.time / 525600; // 1440 * 365 minutes in a year, assuming that year has 365 days
+    // 1440 * 365 minutes in a year, assuming that year has 365 days
+    return this.time / 525600;
+  }
+
+  @computed public get simulationEndTime() {
+    // 1440 * 365 minutes in a year, assuming that year has 365 days
+    return this.config.simulationEndYear * 525600;
   }
 
   @computed public get simulationEnded() {
