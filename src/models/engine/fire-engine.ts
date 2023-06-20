@@ -70,6 +70,12 @@ export const getGridCellNeighbors = (
   return neighbours;
 };
 
+interface IFire {
+  startTime: number;
+  day: number;
+  endOfLowIntensityFire: boolean;
+}
+
 export interface IFireEngineConfig {
   gridWidth: number;
   gridHeight: number;
@@ -84,6 +90,7 @@ export interface IFireEngineConfig {
 // which config options are responsible for simulation progress.
 export class FireEngine {
   public cells: Cell[];
+  public fires: IFire[];
   public wind: IWindProps;
   public gridWidth: number;
   public gridHeight: number;
@@ -91,13 +98,12 @@ export class FireEngine {
   public minCellBurnTime: number;
   public neighborsDist: number;
   public fireSurvivalProbability: number;
-  public endOfLowIntensityFire = false;
   public fireDidStop = false;
   public time = 0;
-  public day = 0;
 
   constructor(cells: Cell[], wind: IWindProps, config: IFireEngineConfig) {
     this.cells = cells;
+    this.fires = [];
     this.wind = wind;
     this.gridWidth = config.gridWidth;
     this.gridHeight = config.gridHeight;
@@ -111,6 +117,9 @@ export class FireEngine {
     sparks.forEach(spark => {
       const sparkCell = this.cellAt(spark.x, spark.y);
       sparkCell.ignitionTime = this.time;
+      this.fires.push({ startTime: this.time, day: 0, endOfLowIntensityFire: false });
+      // Set fire origin cell to itself, so we can track fire origin later.
+      sparkCell.fireIdx = this.fires.length - 1;
       if (sparkCell.isUnburntIsland) {
         // If spark is placed inside unburnt island, remove this island as otherwise the fire won't pick up.
         this.removeUnburntIsland(sparkCell);
@@ -148,14 +157,18 @@ export class FireEngine {
 
   public updateFire(time: number) {
     this.time = time;
-    // Each time a day changes check if the low intensity fire shouldn't go out on itself.
-    const newDay = Math.floor(time / modelDay);
-    if (newDay !== this.day) {
-      this.day = newDay;
-      if (Math.random() <= endOfLowIntensityFireProbability[newDay] || 0) {
-        this.endOfLowIntensityFire = true;
+
+    this.fires.forEach(fire => {
+      const fireDuration = time - fire.startTime;
+      // Each time a day changes check if the low intensity fire shouldn't go out on itself.
+      const newDay = Math.floor(fireDuration / modelDay);
+      if (newDay !== fire.day) {
+        fire.day = newDay;
+        if (Math.random() <= endOfLowIntensityFireProbability[newDay] || 0) {
+          fire.endOfLowIntensityFire = true;
+        }
       }
-    }
+    });
 
     const numCells = this.cells.length;
     // Run through all cells. Check the unburnt neighbors of currently-burning cells. If the current time
@@ -185,7 +198,8 @@ export class FireEngine {
         // run forward or backward through a simulation.
         newFireStateData[i] = FireState.Burning;
         // Fire should spread if endOfLowIntensityFire flag is false or burn index is high enough.
-        const fireShouldSpread = !this.endOfLowIntensityFire || cell.burnIndex !== BurnIndex.Low;
+        const endOfLowIntensityFire = cell.fireIdx !== null && this.fires[cell.fireIdx].endOfLowIntensityFire;
+        const fireShouldSpread = !endOfLowIntensityFire || cell.burnIndex !== BurnIndex.Low;
         if (fireShouldSpread) {
           // Fire lines and other fire control methods will work only if burn index is low or medium.
           // If it's high, fire cannot be controlled.
@@ -197,9 +211,14 @@ export class FireEngine {
             const spreadRateIncDistance = spreadRate / distInFt;
             const ignitionDelta = 1 / spreadRateIncDistance;
             if (neighCell.fireState === FireState.Unburnt) {
-              newIgnitionData[n] = Math.min(
-                ignitionTime + ignitionDelta, newIgnitionData[n] || neighCell.ignitionTime
-              );
+              if (newIgnitionData[n] === undefined) {
+                newIgnitionData[n] = neighCell.ignitionTime;
+              }
+              const newIgnitionTime = ignitionTime + ignitionDelta;
+              if (newIgnitionTime < newIgnitionData[n]) {
+                newIgnitionData[n] = newIgnitionTime;
+                neighCell.fireIdx = cell.fireIdx;
+              }
               // Make cell burn time proportional to fire spread rate.
               const newBurnTime = (newIgnitionData[n] - ignitionTime) + this.minCellBurnTime;
               if (newBurnTime < neighCell.burnTime) {

@@ -72,9 +72,13 @@ describe("FireEngine", () => {
   it("should stop low intensity fire after 5 days (or earlier but it's random)", () => {
     const engine = new FireEngine(generateCells(), wind, config);
     engine.setSparks(sparks);
-    expect(engine.endOfLowIntensityFire).toBe(false);
+    engine.fires.forEach(fire => {
+      expect(fire.endOfLowIntensityFire).toBe(false);
+    });
     engine.updateFire(1440 * 5); // 5 days in minutes
-    expect(engine.endOfLowIntensityFire).toBe(true);
+    engine.fires.forEach(fire => {
+      expect(fire.endOfLowIntensityFire).toBe(true);
+    });
   });
 
   it("should detect when nothing is burning anymore", () => {
