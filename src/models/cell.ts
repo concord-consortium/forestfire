@@ -88,7 +88,7 @@ export class Cell {
   }
 
   public get canSurviveFire() {
-    return this.burnIndex === BurnIndex.Low && this.vegetation === Vegetation.Forest;
+    return this.burnIndex === BurnIndex.Low && this.vegetation === Vegetation.DeciduousForest;
   }
 
   public get burnIndex() {
@@ -108,13 +108,13 @@ export class Cell {
       }
       return BurnIndex.High;
     }
-    if (this.vegetation === Vegetation.Forest) {
+    if (this.vegetation === Vegetation.DeciduousForest) {
       if (this.spreadRate < 25) {
         return BurnIndex.Low;
       }
       return BurnIndex.Medium;
     }
-    // this.vegetation === Vegetation.ForestWithSuppression
+    // this.vegetation === Vegetation.ConiferousForest
     if (this.spreadRate < 12) {
       return BurnIndex.Low;
     }

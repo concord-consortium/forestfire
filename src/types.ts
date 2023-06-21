@@ -16,15 +16,15 @@ export interface Town {
 export enum Vegetation {
   Grass = 0,
   Shrub = 1,
-  Forest = 2,
-  ForestWithSuppression = 3
+  DeciduousForest = 2,
+  ConiferousForest = 3
 }
 
 export const vegetationLabels: Record<Vegetation, string> = {
   [Vegetation.Grass]: "Grass",
   [Vegetation.Shrub]: "Shrub",
-  [Vegetation.Forest]: "Forest",
-  [Vegetation.ForestWithSuppression]: "Forest With Suppression"
+  [Vegetation.DeciduousForest]: "Deciduous Forest",
+  [Vegetation.ConiferousForest]: "Coniferous Forest"
 };
 
 export enum TerrainType {

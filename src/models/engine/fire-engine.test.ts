@@ -134,11 +134,11 @@ describe("FireEngine", () => {
     });
 
     it("should mark some forest cells as fire survivors", () => {
-      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.Forest)).toBeGreaterThan(0);
+      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.DeciduousForest)).toBeGreaterThan(0);
     });
 
     it("should not mark any forest with suppression cells as fire survivors", () => {
-      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.ForestWithSuppression)).toEqual(0);
+      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.ConiferousForest)).toEqual(0);
     });
   });
 });
