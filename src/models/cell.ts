@@ -39,6 +39,7 @@ export class Cell {
   public baseElevation = 0;
   public ignitionTime = Infinity;
   public spreadRate = 0;
+  public vegetation: Vegetation = Vegetation.Grass;
   public burnTime: number = MAX_BURN_TIME;
   public fireState: FireState = FireState.Unburnt;
   public isUnburntIsland = false;
@@ -51,10 +52,7 @@ export class Cell {
 
   constructor(props: CellOptions) {
     Object.assign(this, props);
-  }
-
-  public get vegetation() {
-    return this.zone.vegetation;
+    this.vegetation = this.zone.vegetation;
   }
 
   public get elevation() {

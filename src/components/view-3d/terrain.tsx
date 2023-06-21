@@ -1,5 +1,5 @@
 import React, { forwardRef, useLayoutEffect, useRef } from "react";
-import { DroughtLevel } from "../../types";
+import { Vegetation } from "../../types";
 import { BurnIndex, Cell, FireState } from "../../models/cell";
 import { ISimulationConfig } from "../../config";
 import * as THREE from "three";
@@ -14,16 +14,16 @@ import { useShowCoordsInteraction } from "./use-show-coords-interaction";
 
 const vertexIdx = (cell: Cell, gridWidth: number, gridHeight: number) => (gridHeight - 1 - cell.y) * gridWidth + cell.x;
 
-const getTerrainColor = (droughtLevel: number) => {
-  switch (droughtLevel) {
-    case DroughtLevel.NoDrought:
-      return [0.008, 0.831, 0.039];
-    case DroughtLevel.MildDrought:
-      return [0.573, 0.839, 0.216];
-    case DroughtLevel.MediumDrought:
-      return [0.757, 0.886, 0.271];
-    default:
-      return [0.784, 0.631, 0.271];
+const getTerrainColor = (vegetation: Vegetation) => {
+  switch (vegetation) {
+    case Vegetation.Grass:
+      return [0.737, 0.984, 0.459];
+    case Vegetation.Shrub:
+      return [0.475, 0.827, 0];
+    case Vegetation.DeciduousForest:
+      return [0.2, 0.635, 0.153];
+    default: // Vegetation.ConiferousForest
+      return [0, 0.412, 0.318];
   }
 };
 const BURNING_COLOR = [1, 0, 0];
@@ -52,13 +52,13 @@ const setVertexColor = (
   if (cell.fireState === FireState.Burning) {
     color = config.showBurnIndex ? burnIndexColor(cell.burnIndex) : BURNING_COLOR;
   } else if (cell.fireState === FireState.Burnt) {
-    color = cell.isFireSurvivor ? getTerrainColor(cell.droughtLevel) : BURNT_COLOR;
+    color = cell.isFireSurvivor ? getTerrainColor(cell.vegetation) : BURNT_COLOR;
   } else if (cell.isRiver) {
     color = config.riverColor;
   } else if (cell.isFireLineUnderConstruction) {
     color = FIRE_LINE_UNDER_CONSTRUCTION_COLOR;
   } else {
-    color = getTerrainColor(cell.droughtLevel);
+    color = getTerrainColor(cell.vegetation);
   }
   // Note that we're using sRGB colorspace here (default while working with web). THREE.js needs to operate in linear
   // color space, so we need to convert it first. See:
