@@ -1,3 +1,4 @@
+import { dayInMinutes } from "../types";
 import { SimulationModel } from "./simulation";
 
 describe("SimulationModel", () => {
@@ -30,10 +31,10 @@ describe("SimulationModel", () => {
     sim.start();
     expect(sim.wind.direction).toBe(userWindDirection);
     expect(sim.wind.speed).toBe(userWindSpeed);
-    expect(sim.engine?.wind.direction).toBe(userWindDirection);
-    expect(sim.engine?.wind.speed).toBe(userWindSpeed); // model units
+    expect(sim.fireEngine?.wind.direction).toBe(userWindDirection);
+    expect(sim.fireEngine?.wind.speed).toBe(userWindSpeed); // model units
 
-    sim.tick(1440 / 2); // half of a day in minutes
+    sim.tick(dayInMinutes / 2); // half of a day in minutes
 
     expect(sim.timeInDays).toBe(0.5);
     expect(sim.windDidChange).toBe(true);
@@ -45,8 +46,8 @@ describe("SimulationModel", () => {
 
     expect(sim.wind.direction).toBe(userWindDirection);
     expect(sim.wind.speed).toBe(userWindSpeed);
-    expect(sim.engine?.wind.direction).toBe(userWindDirection);
-    expect(sim.engine?.wind.speed).toBe(userWindSpeed); // model units
+    expect(sim.fireEngine?.wind.direction).toBe(userWindDirection);
+    expect(sim.fireEngine?.wind.speed).toBe(userWindSpeed); // model units
 
     const newUserWindDirection = 15;
     const bewUserWindSpeed = 15;
@@ -58,7 +59,7 @@ describe("SimulationModel", () => {
 
     expect(sim.wind.direction).toBe(newUserWindDirection);
     expect(sim.wind.speed).toBe(bewUserWindSpeed);
-    expect(sim.engine?.wind.direction).toBe(newUserWindDirection);
-    expect(sim.engine?.wind.speed).toBe(bewUserWindSpeed); // model units
+    expect(sim.fireEngine?.wind.direction).toBe(newUserWindDirection);
+    expect(sim.fireEngine?.wind.speed).toBe(bewUserWindSpeed); // model units
   });
 });

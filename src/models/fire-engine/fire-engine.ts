@@ -1,10 +1,8 @@
 import { Vector2 } from "three";
 import { BurnIndex, Cell, FireState } from "../cell";
 import { getFireSpreadRate } from "./get-fire-spread-rate";
-import { IWindProps } from "../../types";
+import { IWindProps, dayInMinutes } from "../../types";
 import { dist, withinDist, getGridIndexForLocation, forEachPointBetween, directNeighbours, } from "../utils/grid-utils";
-
-const modelDay = 1440; // minutes
 
 const endOfLowIntensityFireProbability: {[key: number]: number} = {
   0: 0.0,
@@ -81,7 +79,7 @@ export interface IFireEngineConfig {
   gridHeight: number;
   cellSize: number;
   minCellBurnTime: number;
-  neighborsDist: number;
+  fireEngineNeighborsDist: number;
   fireSurvivalProbability: number;
 }
 
@@ -109,7 +107,7 @@ export class FireEngine {
     this.gridHeight = config.gridHeight;
     this.cellSize = config.cellSize;
     this.minCellBurnTime = config.minCellBurnTime;
-    this.neighborsDist = config.neighborsDist;
+    this.neighborsDist = config.fireEngineNeighborsDist;
     this.fireSurvivalProbability = config.fireSurvivalProbability;
   }
 
@@ -161,7 +159,7 @@ export class FireEngine {
     this.fires.forEach(fire => {
       const fireDuration = time - fire.startTime;
       // Each time a day changes check if the low intensity fire shouldn't go out on itself.
-      const newDay = Math.floor(fireDuration / modelDay);
+      const newDay = Math.floor(fireDuration / dayInMinutes);
       if (newDay !== fire.day) {
         fire.day = newDay;
         if (Math.random() <= endOfLowIntensityFireProbability[newDay] || 0) {

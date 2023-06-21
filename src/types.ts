@@ -69,3 +69,7 @@ export interface ISpark {
   position: Vector2;
   locked: boolean;
 }
+
+export const dayInMinutes = 1440;
+export const yearInMinutes = 365 * dayInMinutes;
+

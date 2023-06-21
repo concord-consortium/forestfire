@@ -1,5 +1,5 @@
 import { Zone, moistureLookups } from "./zone";
-import { Vegetation, DroughtLevel } from "../types";
+import { Vegetation, DroughtLevel, yearInMinutes } from "../types";
 
 export enum FireState {
   Unburnt = 0,
@@ -39,7 +39,7 @@ export class Cell {
   public baseElevation = 0;
   public ignitionTime = Infinity;
   public spreadRate = 0;
-  public vegetation: Vegetation = Vegetation.Grass;
+  public vegetationAge = 0;
   public burnTime: number = MAX_BURN_TIME;
   public fireState: FireState = FireState.Unburnt;
   public isUnburntIsland = false;
@@ -49,6 +49,7 @@ export class Cell {
   public isFireLineUnderConstruction = false;
   public helitackDropCount = 0;
   public fireIdx: number | null = null;
+  private _vegetation: Vegetation = Vegetation.Grass;
 
   constructor(props: CellOptions) {
     Object.assign(this, props);
@@ -122,6 +123,19 @@ export class Cell {
     return BurnIndex.High;
   }
 
+  public get vegetationAgeInYears() {
+    return this.vegetationAge / yearInMinutes;
+  }
+
+  public get vegetation() {
+    return this._vegetation;
+  }
+
+  public set vegetation(vegetation: Vegetation) {
+    this._vegetation = vegetation;
+    this.vegetationAge = 0;
+  }
+
   public isBurnableForBI(burnIndex: BurnIndex) {
     // Fire lines will burn when burn index is high.
     return !this.isNonburnable && (!this.isFireLine || burnIndex === BurnIndex.High);
@@ -136,5 +150,6 @@ export class Cell {
     this.isFireLine = false;
     this.helitackDropCount = 0;
     this.isFireSurvivor = false;
+    this.vegetation = this.zone.vegetation;
   }
 }
