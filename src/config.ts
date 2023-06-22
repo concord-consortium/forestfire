@@ -89,6 +89,21 @@ export interface ISimulationConfig {
   newWindDirection: number | undefined;
   // Works together with `changeWindOnDay`. Sets the new wind speed (mph). If undefined, it'll be random.
   newWindSpeed: number | undefined;
+  // Regrowth probabilities:
+  successionMinYears: number;
+  grassToShrub: number;
+  grassToShrubAdjacent: number;
+  shrubToDeciduous: number;
+  shrubToDeciduousAdjacent: number;
+  deciduousToConiferousMinYears: number;
+  deciduousToConiferous: number;
+  deciduousToConiferousAdjacent: number;
+  lowIntensityBurntAreaMinYears: number;
+  lowIntensityBurntShrubToGrass: number;
+  lowIntensityBurntDeciduousToGrass: number;
+  lowIntensityBurntConiferousToGrass: number;
+  highIntensityBurntAreaMinYears: number;
+  highIntensityBurntAreaToGrass: number;
 }
 
 export interface IUrlConfig extends ISimulationConfig {
@@ -165,7 +180,22 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   forestWithSuppressionAvailable: true,
   changeWindOnDay: undefined,
   newWindDirection: undefined,
-  newWindSpeed: undefined
+  newWindSpeed: undefined,
+  // Regrowth probabilities:
+  successionMinYears: 3,
+  grassToShrub: 0.1,
+  grassToShrubAdjacent: 0.3,
+  shrubToDeciduous: 0.1,
+  shrubToDeciduousAdjacent: 0.3,
+  deciduousToConiferousMinYears: 40,
+  deciduousToConiferous: 0.1,
+  deciduousToConiferousAdjacent: 0.3,
+  lowIntensityBurntAreaMinYears: 1,
+  lowIntensityBurntShrubToGrass: 0.4,
+  lowIntensityBurntDeciduousToGrass: 0.1,
+  lowIntensityBurntConiferousToGrass: 0.1,
+  highIntensityBurntAreaMinYears: 3,
+  highIntensityBurntAreaToGrass: 0.5
 });
 
 const getURLParam = (name: string) => {
