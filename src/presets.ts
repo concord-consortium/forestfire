@@ -70,6 +70,22 @@ const presets: { [key: string]: Partial<ISimulationConfig> } = {
     ],
     towns: []
   },
+  mediumDrought: {
+    zonesCount: 2,
+    zones: [
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
+    ],
+    towns: []
+  },
+  severeDrought: {
+    zonesCount: 2,
+    zones: [
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.SevereDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.SevereDrought },
+    ],
+    towns: []
+  },
   grass: {
     zonesCount: 2,
     zones: [
