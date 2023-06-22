@@ -397,6 +397,10 @@ export class SimulationModel {
 
   @action.bound public addFireEvent() {
     this.stop();
+    // Wind is randomly updated at the beginning of each fire event.
+    this.setWindDirection(Math.random() * 360);
+    this.setWindSpeed(0.5 + Math.random() * 1.5);
+    this.windDidChange = true; // notify user wind has been updated
     this.fireEvents.push({ time: this.time });
   }
 
