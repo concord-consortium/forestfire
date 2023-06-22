@@ -57,9 +57,9 @@ describe("getFireSpreadRate", () => {
     expect(getFireSpreadRate(sourceCell, targetCell, { speed: 20, direction: 0 }, cellSize)).toBeCloseTo(541.68779579);
   });
 
-  it("calculates the fireSpreadRate correctly for forest fuel type", () => {
-    sourceCell.vegetation = Vegetation.Forest;
-    targetCell.vegetation = Vegetation.Forest;
+  it("calculates the fireSpreadRate correctly for deciduous forest fuel type", () => {
+    sourceCell.vegetation = Vegetation.DeciduousForest;
+    targetCell.vegetation = Vegetation.DeciduousForest;
     // Note that result is taken from:
     // https://drive.google.com/file/d/1ck0nwlawOtK-GjCV4qJ6ztMcxh3utbv-/view?usp=sharing
     // cells F13:
@@ -72,9 +72,9 @@ describe("getFireSpreadRate", () => {
     expect(getFireSpreadRate(sourceCell, targetCell, { speed: 20, direction: 0 }, cellSize)).toBeCloseTo(64.40222588);
   });
 
-  it("calculates the fireSpreadRate correctly for forest with suppression fuel type", () => {
-    sourceCell.vegetation = Vegetation.ForestWithSuppression;
-    targetCell.vegetation = Vegetation.ForestWithSuppression;
+  it("calculates the fireSpreadRate correctly for foniferous forest fuel type", () => {
+    sourceCell.vegetation = Vegetation.ConiferousForest;
+    targetCell.vegetation = Vegetation.ConiferousForest;
     // Note that result is taken from:
     // https://drive.google.com/file/d/1ck0nwlawOtK-GjCV4qJ6ztMcxh3utbv-/view?usp=sharing
     // cells F13:

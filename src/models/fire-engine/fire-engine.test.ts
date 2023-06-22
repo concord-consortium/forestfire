@@ -2,7 +2,7 @@ import { BurnIndex, Cell, FireState } from "../cell";
 import { FireEngine, getGridCellNeighbors, nonburnableCellBetween } from "./fire-engine";
 import { Vector2 } from "three";
 import { Zone } from "../zone";
-import { Vegetation } from "../../types";
+import { Vegetation, dayInMinutes } from "../../types";
 
 describe("nonburnableCellBetween", () => {
   it("returns true if there's any nonburnable cell between two points", () => {
@@ -53,7 +53,7 @@ describe("FireEngine", () => {
     gridWidth: 5,
     gridHeight: 5,
     minCellBurnTime: 200,
-    neighborsDist: 2.5,
+    fireEngineNeighborsDist: 2.5,
     fireSurvivalProbability: 1 // so there's no randomness in the test
   };
   const wind = { speed: 0, direction: 0 };
@@ -75,7 +75,7 @@ describe("FireEngine", () => {
     engine.fires.forEach(fire => {
       expect(fire.endOfLowIntensityFire).toBe(false);
     });
-    engine.updateFire(1440 * 5); // 5 days in minutes
+    engine.updateFire(dayInMinutes * 5); // 5 days in minutes
     engine.fires.forEach(fire => {
       expect(fire.endOfLowIntensityFire).toBe(true);
     });
@@ -84,11 +84,11 @@ describe("FireEngine", () => {
   it("should detect when nothing is burning anymore", () => {
     const engine = new FireEngine(generateCells(), wind, config);
     engine.setSparks(sparks);
-    engine.updateFire(1440 * 5);
+    engine.updateFire(dayInMinutes * 5);
     expect(engine.fireDidStop).toBe(false);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toBeGreaterThan(0);
-    engine.updateFire(1440 * 6);
-    engine.updateFire(1440 * 7);
+    engine.updateFire(dayInMinutes * 6);
+    engine.updateFire(dayInMinutes * 7);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toEqual(0);
     expect(engine.fireDidStop).toBe(true);
   });
@@ -108,7 +108,7 @@ describe("FireEngine", () => {
     const engine = new FireEngine(cells, wind, config);
     engine.setSparks(sparks);
     engine.cells.forEach(c => expect(c.isUnburntIsland).toEqual(false));
-    engine.updateFire(1440);
+    engine.updateFire(dayInMinutes);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toBeGreaterThan(0);
   });
 
@@ -119,8 +119,8 @@ describe("FireEngine", () => {
       const engine = new FireEngine(generateCells(zone), wind, config);
       engine.setSparks(sparks);
       expect(engine.cells.filter(c => c.isFireSurvivor).length).toEqual(0);
-      engine.updateFire(1440);
-      engine.updateFire(1440);
+      engine.updateFire(dayInMinutes);
+      engine.updateFire(dayInMinutes);
       expect(engine.cells.filter(c => c.fireState === FireState.Burnt).length).toBeGreaterThan(0);
       return engine.cells.filter(c => c.isFireSurvivor).length;
     };
@@ -134,11 +134,11 @@ describe("FireEngine", () => {
     });
 
     it("should mark some forest cells as fire survivors", () => {
-      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.Forest)).toBeGreaterThan(0);
+      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.DeciduousForest)).toBeGreaterThan(0);
     });
 
     it("should not mark any forest with suppression cells as fire survivors", () => {
-      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.ForestWithSuppression)).toEqual(0);
+      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.ConiferousForest)).toEqual(0);
     });
   });
 });

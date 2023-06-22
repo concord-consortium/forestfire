@@ -1,5 +1,5 @@
 import { ZoneOptions } from "./models/zone";
-import { DroughtLevel, Vegetation, TerrainType } from "./types";
+import { DroughtLevel, Vegetation, TerrainType, dayInMinutes } from "./types";
 
 interface TownOptions {
   name: string;
@@ -39,7 +39,8 @@ export interface ISimulationConfig {
   simulationEndYear: number;
   windSpeed: number; // mph
   windDirection: number; // degrees, 0 is northern wind
-  neighborsDist: number;
+  fireEngineNeighborsDist: number;
+  regrowthEngineNeighborsDist: number;
   // In min - note that larger cells will burn the same amount of time. Cell doesn't burn from edge to edge, but
   // its whole area is supposed to burn at the same time. We might consider whether it should be different for
   // different fuel types.
@@ -69,7 +70,7 @@ export interface ISimulationConfig {
   // 1 means that all the unburnt islands will be visible, 0 means that none of them will be visible.
   unburntIslandProbability: number;
   // Number between 0 and 1 which decides how likely is for a cells to survive fire. Note that there are other factors
-  // too. The only vegetation that can survive fire low and medium intensity fire is `Forest`.
+  // too. The only vegetation that can survive low and medium intensity fire is `Forest`.
   fireSurvivalProbability: number;
   // Locks drought index slider in Terrain Setup dialog.
   droughtIndexLocked: boolean;
@@ -118,7 +119,8 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   // on the rectangular grid when small radius values are used (like 2.5).
   // 2.5 seems to be first value that ensures that fire front looks pretty round.
   // Higher values will make this shape better, but performance will be affected.
-  neighborsDist: 2.5,
+  fireEngineNeighborsDist: 2.5,
+  regrowthEngineNeighborsDist: 2.5,
   minCellBurnTime: 200, // minutes
   // This value works well with existing heightmap images.
   heightmapMaxElevation: 20000,
@@ -137,7 +139,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
     },
     {
       terrainType: TerrainType.Plains,
-      vegetation: Vegetation.Forest,
+      vegetation: Vegetation.DeciduousForest,
       droughtLevel: DroughtLevel.SevereDrought
     }
   ],
@@ -147,7 +149,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   windScaleFactor: 0.2, // Note that model is very sensitive to wind.
   // Scale wind values down for now, so changes are less dramatic.
   showModelDimensions: false,
-  fireLineDelay: 1440, // a day
+  fireLineDelay: dayInMinutes, // a day
   helitackDelay: 240, // four hours
   maxFireLineLength: 15000, // ft
   helitackDropRadius: 2640, // ft (5280 ft = 1 mile)

@@ -1,11 +1,12 @@
 import { action, computed, observable, makeObservable, reaction } from "mobx";
-import { IWindProps, Town, IFireEvent, ISpark } from "../types";
+import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes } from "../types";
 import {  Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
 import { getElevationData, getRiverData, getUnburntIslandsData, getZoneIndex } from "./utils/data-loaders";
 import { Zone } from "./zone";
-import { FireEngine } from "./engine/fire-engine";
+import { FireEngine } from "./fire-engine/fire-engine";
+import { RegrowthEngine } from "./regrowth-engine/regrowth-engine";
 import { getGridIndexForLocation } from "./utils/grid-utils";
 
 // When config.changeWindOnDay is defined, but config.newWindSpeed is not, the model will use random value limited
@@ -28,7 +29,8 @@ export class SimulationModel {
   public config: ISimulationConfig;
   public prevTickTime: number | null;
   public dataReadyPromise: Promise<void>;
-  public engine: FireEngine | null = null;
+  public fireEngine: FireEngine | null = null;
+  public regrowthEngine: RegrowthEngine | null = null;
   public zoneIndex: number[][] | string = [];
   // Cells are not directly observable. Changes are broadcasted using cellsStateFlag and cellsElevationFlag.
   public cells: Cell[] = [];
@@ -65,7 +67,7 @@ export class SimulationModel {
           // Fire event just ended. Remove all the spark markers.
           this.sparks.length = 0;
           // Remove Fire Engine.
-          this.engine = null;
+          this.fireEngine = null;
         }
       }
     );
@@ -93,17 +95,15 @@ export class SimulationModel {
   }
 
   @computed public get timeInDays() {
-    return this.time / 1440;
+    return this.time / dayInMinutes;
   }
 
   @computed public get timeInYears() {
-    // 1440 * 365 minutes in a year, assuming that year has 365 days
-    return this.time / 525600;
+    return this.time / yearInMinutes;
   }
 
   @computed public get simulationEndTime() {
-    // 1440 * 365 minutes in a year, assuming that year has 365 days
-    return this.config.simulationEndYear * 525600;
+    return this.config.simulationEndYear * yearInMinutes;
   }
 
   @computed public get simulationEnded() {
@@ -218,8 +218,11 @@ export class SimulationModel {
     if (!this.simulationStarted) {
       this.simulationStarted = true;
     }
-    if (!this.engine) {
-      this.engine = new FireEngine(this.cells, this.wind, this.config);
+    if (!this.fireEngine) {
+      this.fireEngine = new FireEngine(this.cells, this.wind, this.config);
+    }
+    if (!this.regrowthEngine) {
+      this.regrowthEngine = new RegrowthEngine(this.cells, this.config);
     }
 
     this.simulationRunning = true;
@@ -239,7 +242,8 @@ export class SimulationModel {
     this.updateCellsStateFlag();
     this.updateCellsElevationFlag();
     this.time = 0;
-    this.engine = null;
+    this.fireEngine = null;
+    this.regrowthEngine = null;
     this.windDidChange = false;
     if (this.userDefinedWind) {
       this.wind.speed = this.userDefinedWind.speed;
@@ -313,24 +317,28 @@ export class SimulationModel {
   @action.bound public tick(timeStep: number) {
     this.time += timeStep;
 
-    if (this.engine) {
+    this.changeWindIfNecessary();
+
+    if (this.isFireEventActive && this.fireEngine) {
       this.processSparks();
-      this.engine.updateFire(this.fireEventTime);
-      this.isFireActive = !this.engine.fireDidStop;
-
+      this.fireEngine.updateFire(this.fireEventTime);
+      this.isFireActive = !this.fireEngine.fireDidStop;
       this.updateCellsStateFlag();
-
-      this.changeWindIfNecessary();
     }
 
-    if (!this.isFireEventActive && this.timeInYears >= 400) {
+    if (!this.isFireEventActive && this.regrowthEngine) {
+      this.regrowthEngine.updateVegetation(this.time);
+      this.updateCellsStateFlag();
+    }
+
+    if (!this.isFireEventActive && this.timeInYears >= this.config.simulationEndYear) {
       this.stop();
     }
   }
 
   @action.bound public processSparks() {
     const notProcessedSparks = this.sparks.filter(spark => !spark.locked);
-    this.engine?.setSparks(notProcessedSparks.map(spark => spark.position));
+    this.fireEngine?.setSparks(notProcessedSparks.map(spark => spark.position));
     notProcessedSparks.forEach(spark => spark.locked = true);
   }
 
@@ -346,10 +354,10 @@ export class SimulationModel {
       // Update UI.
       this.wind.direction = newDirection;
       this.wind.speed = newSpeed;
-      // Update engine.
-      if (this.engine) {
-        this.engine.wind.direction = newDirection;
-        this.engine.wind.speed = newSpeed;
+      // Update fireEngine.
+      if (this.fireEngine) {
+        this.fireEngine.wind.direction = newDirection;
+        this.fireEngine.wind.speed = newSpeed;
       }
       // Mark that the change just happened.
       this.windDidChange = true;

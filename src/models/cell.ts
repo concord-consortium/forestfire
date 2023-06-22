@@ -1,5 +1,5 @@
 import { Zone, moistureLookups } from "./zone";
-import { Vegetation, DroughtLevel } from "../types";
+import { Vegetation, DroughtLevel, yearInMinutes } from "../types";
 
 export enum FireState {
   Unburnt = 0,
@@ -39,6 +39,7 @@ export class Cell {
   public baseElevation = 0;
   public ignitionTime = Infinity;
   public spreadRate = 0;
+  public vegetationAge = 0;
   public burnTime: number = MAX_BURN_TIME;
   public fireState: FireState = FireState.Unburnt;
   public isUnburntIsland = false;
@@ -48,13 +49,11 @@ export class Cell {
   public isFireLineUnderConstruction = false;
   public helitackDropCount = 0;
   public fireIdx: number | null = null;
+  private _vegetation: Vegetation = Vegetation.Grass;
 
   constructor(props: CellOptions) {
     Object.assign(this, props);
-  }
-
-  public get vegetation() {
-    return this.zone.vegetation;
+    this.vegetation = this.zone.vegetation;
   }
 
   public get elevation() {
@@ -88,7 +87,7 @@ export class Cell {
   }
 
   public get canSurviveFire() {
-    return this.burnIndex === BurnIndex.Low && this.vegetation === Vegetation.Forest;
+    return this.burnIndex === BurnIndex.Low && this.vegetation === Vegetation.DeciduousForest;
   }
 
   public get burnIndex() {
@@ -108,13 +107,13 @@ export class Cell {
       }
       return BurnIndex.High;
     }
-    if (this.vegetation === Vegetation.Forest) {
+    if (this.vegetation === Vegetation.DeciduousForest) {
       if (this.spreadRate < 25) {
         return BurnIndex.Low;
       }
       return BurnIndex.Medium;
     }
-    // this.vegetation === Vegetation.ForestWithSuppression
+    // this.vegetation === Vegetation.ConiferousForest
     if (this.spreadRate < 12) {
       return BurnIndex.Low;
     }
@@ -122,6 +121,19 @@ export class Cell {
       return BurnIndex.Medium;
     }
     return BurnIndex.High;
+  }
+
+  public get vegetationAgeInYears() {
+    return this.vegetationAge / yearInMinutes;
+  }
+
+  public get vegetation() {
+    return this._vegetation;
+  }
+
+  public set vegetation(vegetation: Vegetation) {
+    this._vegetation = vegetation;
+    this.vegetationAge = 0;
   }
 
   public isBurnableForBI(burnIndex: BurnIndex) {
@@ -138,5 +150,6 @@ export class Cell {
     this.isFireLine = false;
     this.helitackDropCount = 0;
     this.isFireSurvivor = false;
+    this.vegetation = this.zone.vegetation;
   }
 }

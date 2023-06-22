@@ -2,6 +2,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../../use-stores";
 import FireEventSpark from "../../assets/bottom-bar/Fire Event.svg";
+import { dayInMinutes } from "../../types";
 
 import css from "./timeline.scss";
 
@@ -16,8 +17,8 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const endTime = simulation.simulationEndTime;
 
   // Convert time from minutes to days.
-  const fireEventTimeInDays = Math.floor(simulation.fireEventTime / 1440);
-  const fireEventTimeHours = Math.floor((simulation.fireEventTime % 1440) / 60);
+  const fireEventTimeInDays = Math.floor(simulation.fireEventTime / dayInMinutes);
+  const fireEventTimeHours = Math.floor((simulation.fireEventTime % dayInMinutes) / 60);
 
   return (
     <div className={css.timelineContainer}>
