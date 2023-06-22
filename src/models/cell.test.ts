@@ -1,4 +1,5 @@
-import { BurnIndex, Cell } from "./cell";
+import { BurnIndex } from "../types";
+import { Cell } from "./cell";
 import { Zone } from "./zone";
 
 describe("Cell model", () => {

@@ -1,8 +1,8 @@
-import { BurnIndex, Cell, FireState } from "../cell";
+import { Cell } from "../cell";
 import { FireEngine, getGridCellNeighbors, nonburnableCellBetween } from "./fire-engine";
 import { Vector2 } from "three";
 import { Zone } from "../zone";
-import { Vegetation, dayInMinutes } from "../../types";
+import { Vegetation, dayInMinutes, FireState, BurnIndex } from "../../types";
 
 describe("nonburnableCellBetween", () => {
   it("returns true if there's any nonburnable cell between two points", () => {

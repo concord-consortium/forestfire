@@ -1,6 +1,6 @@
 import React, { forwardRef, useLayoutEffect, useRef } from "react";
-import { Vegetation } from "../../types";
-import { BurnIndex, Cell, FireState } from "../../models/cell";
+import { Vegetation, BurnIndex, FireState } from "../../types";
+import { Cell } from "../../models/cell";
 import { ISimulationConfig } from "../../config";
 import * as THREE from "three";
 import { BufferAttribute } from "three";

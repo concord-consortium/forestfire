@@ -1,4 +1,4 @@
-import { action, computed, observable, makeObservable, reaction } from "mobx";
+import { action, computed, observable, makeObservable } from "mobx";
 import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes } from "../types";
 import {  Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
@@ -47,7 +47,6 @@ export class SimulationModel {
   @observable public zones: Zone[] = [];
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
-
   @observable public fireEvents: IFireEvent[] = [];
   @observable public isFireActive = false;
   // These flags can be used by view to trigger appropriate rendering. Theoretically, view could/should check
@@ -59,18 +58,6 @@ export class SimulationModel {
   constructor(presetConfig: Partial<ISimulationConfig>) {
     makeObservable(this);
     this.load(presetConfig);
-
-    reaction(
-      () => this.isFireEventActive,
-      (isFireEventActive, previousIsFireEventActive) => {
-        if (!isFireEventActive && previousIsFireEventActive) {
-          // Fire event just ended. Remove all the spark markers.
-          this.sparks.length = 0;
-          // Remove Fire Engine.
-          this.fireEngine = null;
-        }
-      }
-    );
   }
 
   @computed public get ready() {
@@ -218,7 +205,7 @@ export class SimulationModel {
     if (!this.simulationStarted) {
       this.simulationStarted = true;
     }
-    if (!this.fireEngine) {
+    if (this.sparks.length > 0 && !this.fireEngine) {
       this.fireEngine = new FireEngine(this.cells, this.wind, this.config);
     }
     if (!this.regrowthEngine) {
@@ -319,11 +306,16 @@ export class SimulationModel {
 
     this.changeWindIfNecessary();
 
-    if (this.isFireEventActive && this.fireEngine) {
+    if (this.fireEngine) {
       this.processSparks();
       this.fireEngine.updateFire(this.fireEventTime);
-      this.isFireActive = !this.fireEngine.fireDidStop;
       this.updateCellsStateFlag();
+      this.isFireActive = !this.fireEngine.fireDidStop;
+      if (!this.isFireActive) {
+        this.fireEngine = null;
+        // Fire event just ended. Remove all the spark markers.
+        this.sparks.length = 0;
+      }
     }
 
     if (!this.isFireEventActive && this.regrowthEngine) {
@@ -412,6 +404,7 @@ export class SimulationModel {
     if (this.time === this.fireEvents[this.fireEvents.length - 1].time) {
       // Fire event was just added and not started yet, so it's still safe to cancel it.
       this.fireEvents.pop();
+      this.sparks.length = 0;
     }
   }
 }

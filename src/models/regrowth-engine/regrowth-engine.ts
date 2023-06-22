@@ -1,5 +1,5 @@
 import { Cell } from "../cell";
-import { Vegetation, yearInMinutes } from "../../types";
+import { Vegetation, yearInMinutes, FireState, BurnIndex } from "../../types";
 import { getGridIndexForLocation } from "../utils/grid-utils";
 
 export interface IRegrowthEngineConfig {
@@ -7,6 +7,21 @@ export interface IRegrowthEngineConfig {
   gridHeight: number;
   cellSize: number;
   regrowthEngineNeighborsDist: number;
+  // Probabilities of vegetation type change in a cell.
+  successionMinYears: number;
+  grassToShrub: number;
+  grassToShrubAdjacent: number;
+  shrubToDeciduous: number;
+  shrubToDeciduousAdjacent: number;
+  deciduousToConiferousMinYears: number;
+  deciduousToConiferous: number;
+  deciduousToConiferousAdjacent: number;
+  lowIntensityBurntAreaMinYears: number;
+  lowIntensityBurntShrubToGrass: number;
+  lowIntensityBurntDeciduousToGrass: number;
+  lowIntensityBurntConiferousToGrass: number;
+  highIntensityBurntAreaMinYears: number;
+  highIntensityBurntAreaToGrass: number;
 }
 
 // Lightweight helper that is responsible only for math calculations. It's not bound to MobX or any UI state
@@ -20,6 +35,7 @@ export class RegrowthEngine {
   public neighborsDist: number;
   public time = 0;
   public year = 0;
+  public config: IRegrowthEngineConfig;
 
   constructor(cells: Cell[], config: IRegrowthEngineConfig) {
     this.cells = cells;
@@ -27,6 +43,7 @@ export class RegrowthEngine {
     this.gridHeight = config.gridHeight;
     this.cellSize = config.cellSize;
     this.neighborsDist = config.regrowthEngineNeighborsDist;
+    this.config = config;
   }
 
   public cellAt(x: number, y: number) {
@@ -72,26 +89,59 @@ export class RegrowthEngine {
       return;
     }
 
+    const p = this.config;
     const numCells = this.cells.length;
     for (let i = 0; i < numCells; i++) {
       const cell = this.cells[i];
       cell.vegetationAge += yearInMinutes;
 
       // Growth of existing vegetation
-      if (cell.vegetation === Vegetation.Grass && cell.vegetationAgeInYears > 3) {
-        const adjacentShrub = this.isAdjacentVegetationPresent(cell, Vegetation.Shrub);
-        if (Math.random() < (adjacentShrub ? 0.3 : 0.1)) {
-          cell.vegetation = Vegetation.Shrub;
+      if (cell.fireState === FireState.Unburnt) {
+        if (cell.vegetation === Vegetation.Grass && cell.vegetationAgeInYears > p.successionMinYears) {
+          const adjacentShrub = this.isAdjacentVegetationPresent(cell, Vegetation.Shrub);
+          if (Math.random() < (adjacentShrub ? p.grassToShrubAdjacent : p.grassToShrub)) {
+            cell.vegetation = Vegetation.Shrub;
+          }
+        } else if (cell.vegetation === Vegetation.Shrub && cell.vegetationAgeInYears > p.successionMinYears) {
+          const adjacentDeciduousForest = this.isAdjacentVegetationPresent(cell, Vegetation.DeciduousForest);
+          if (Math.random() < (adjacentDeciduousForest ? p.shrubToDeciduousAdjacent : p.shrubToDeciduous)) {
+            cell.vegetation = Vegetation.DeciduousForest;
+          }
+        } else if (cell.vegetation === Vegetation.DeciduousForest && cell.vegetationAgeInYears > p.deciduousToConiferousMinYears) {
+          const adjacentConiferousForest = this.isAdjacentVegetationPresent(cell, Vegetation.ConiferousForest);
+          if (Math.random() < (adjacentConiferousForest ? p.deciduousToConiferousAdjacent : p.deciduousToConiferous)) {
+            cell.vegetation = Vegetation.ConiferousForest;
+          }
         }
-      } else if (cell.vegetation === Vegetation.Shrub && cell.vegetationAgeInYears > 3) {
-        const adjacentDeciduousForest = this.isAdjacentVegetationPresent(cell, Vegetation.DeciduousForest);
-        if (Math.random() < (adjacentDeciduousForest ? 0.3 : 0.1)) {
-          cell.vegetation = Vegetation.DeciduousForest;
-        }
-      } else if (cell.vegetation === Vegetation.DeciduousForest && cell.vegetationAgeInYears > 40) {
-        const adjacentConiferousForest = this.isAdjacentVegetationPresent(cell, Vegetation.ConiferousForest);
-        if (Math.random() < (adjacentConiferousForest ? 0.3 : 0.1)) {
-          cell.vegetation = Vegetation.ConiferousForest;
+      }
+
+      if (cell.fireState === FireState.Burnt) {
+        const timeSinceLastFire = time - cell.lastFireTime;
+        if (cell.lastFireBurnIndex === BurnIndex.Low && timeSinceLastFire > p.lowIntensityBurntAreaMinYears * yearInMinutes) {
+          if (cell.vegetation === Vegetation.Shrub) {
+            if (Math.random() < p.lowIntensityBurntShrubToGrass) {
+              // 40% brows back as grass
+              cell.vegetation = Vegetation.Grass;
+            }
+          }
+          if (cell.vegetation === Vegetation.DeciduousForest) {
+            if (Math.random() < p.lowIntensityBurntDeciduousToGrass) {
+              // 10% brows back as grass
+              cell.vegetation = Vegetation.Grass;
+            }
+          }
+          if (cell.vegetation === Vegetation.ConiferousForest) {
+            if (Math.random() < p.lowIntensityBurntConiferousToGrass) {
+              // 10% brows back as grass
+              cell.vegetation = Vegetation.Grass;
+            }
+          }
+          cell.fireState = FireState.Unburnt;
+        } else if (
+            timeSinceLastFire > p.highIntensityBurntAreaMinYears * yearInMinutes &&
+            Math.random() < p.highIntensityBurntAreaToGrass) { //  && (lastFireBurnIndex === BurnIndex.Medium || lastFireBurnIndex === BurnIndex.High)
+          cell.vegetation = Vegetation.Grass;
+          cell.fireState = FireState.Unburnt;
         }
       }
     }
