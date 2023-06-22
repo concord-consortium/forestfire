@@ -70,6 +70,24 @@ export interface ISpark {
   locked: boolean;
 }
 
+export enum FireState {
+  Unburnt = 0,
+  Burning = 1,
+  Burnt = 2
+}
+
+// See: https://www.pivotaltracker.com/story/show/170344417
+export enum BurnIndex {
+  Low = 0,
+  Medium = 1,
+  High = 2
+}
+
+export interface IBurnHistory {
+  time: number;
+  burnIndex: BurnIndex;
+}
+
 export const dayInMinutes = 1440;
 export const yearInMinutes = 365 * dayInMinutes;
 

@@ -1,18 +1,5 @@
 import { Zone, moistureLookups } from "./zone";
-import { Vegetation, DroughtLevel, yearInMinutes } from "../types";
-
-export enum FireState {
-  Unburnt = 0,
-  Burning = 1,
-  Burnt = 2
-}
-
-// See: https://www.pivotaltracker.com/story/show/170344417
-export enum BurnIndex {
-  Low = 0,
-  Medium = 1,
-  High = 2
-}
+import { Vegetation, DroughtLevel, yearInMinutes, IBurnHistory, BurnIndex, FireState } from "../types";
 
 export interface CellOptions {
   x: number;
@@ -49,6 +36,7 @@ export class Cell {
   public isFireLineUnderConstruction = false;
   public helitackDropCount = 0;
   public fireIdx: number | null = null;
+  public burnsHistory: IBurnHistory[] = [];
   private _vegetation: Vegetation = Vegetation.Grass;
 
   constructor(props: CellOptions) {
@@ -123,6 +111,14 @@ export class Cell {
     return BurnIndex.High;
   }
 
+  public get lastFireBurnIndex() {
+    return this.burnsHistory[this.burnsHistory.length - 1]?.burnIndex;
+  }
+
+  public get lastFireTime() {
+    return this.burnsHistory[this.burnsHistory.length - 1]?.time;
+  }
+
   public get vegetationAgeInYears() {
     return this.vegetationAge / yearInMinutes;
   }
@@ -141,15 +137,20 @@ export class Cell {
     return !this.isNonburnable && (!this.isFireLine || burnIndex === BurnIndex.High);
   }
 
-  public reset() {
+  public preFireEventReset() {
     this.ignitionTime = Infinity;
     this.spreadRate = 0;
     this.burnTime = MAX_BURN_TIME;
+    this.isFireSurvivor = false;
+  }
+
+  public reset() {
+    this.preFireEventReset();
     this.fireState = FireState.Unburnt;
     this.isFireLineUnderConstruction = false;
     this.isFireLine = false;
     this.helitackDropCount = 0;
-    this.isFireSurvivor = false;
     this.vegetation = this.zone.vegetation;
+    this.burnsHistory = [];
   }
 }

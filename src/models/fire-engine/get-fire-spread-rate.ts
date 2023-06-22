@@ -90,13 +90,6 @@ export const getDirectionFactor =
  *   https://docs.google.com/spreadsheets/d/1ov3JUz6hXdnXChbXTz20Fo_9YoWmGukJgCaIMJeRUb4/
  *   UPDATED version: https://drive.google.com/file/d/1ck0nwlawOtK-GjCV4qJ6ztMcxh3utbv-/view
  *
- * Still to do:
- *  * Calculate the slope between two cells
- *  * Scale the value given the angle between these two cells and the wind
- *  * Break up this function into several curried functions which will allow us to calculate
- *    the spread times between two cells as quickly as possible. (Fuel types and magnitude of
- *    the wind can be curried, angle and slope will be calculated per pair)
- *
  * @param sourceCell Grid cell that is currently BURNING
  * @param targetCell Adjacent grid cell that is currently UNBURNT
  * @param wind Wind properties, speed and direction

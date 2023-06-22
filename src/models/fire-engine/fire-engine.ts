@@ -1,7 +1,7 @@
 import { Vector2 } from "three";
-import { BurnIndex, Cell, FireState } from "../cell";
+import { Cell } from "../cell";
 import { getFireSpreadRate } from "./get-fire-spread-rate";
-import { IWindProps, dayInMinutes } from "../../types";
+import { IWindProps, dayInMinutes, BurnIndex, FireState } from "../../types";
 import { dist, withinDist, getGridIndexForLocation, forEachPointBetween, directNeighbours, } from "../utils/grid-utils";
 
 const endOfLowIntensityFireProbability: {[key: number]: number} = {
@@ -109,6 +109,8 @@ export class FireEngine {
     this.minCellBurnTime = config.minCellBurnTime;
     this.neighborsDist = config.fireEngineNeighborsDist;
     this.fireSurvivalProbability = config.fireSurvivalProbability;
+
+    this.cells.forEach(cell => cell.preFireEventReset());
   }
 
   public setSparks(sparks: Vector2[]) {
@@ -186,6 +188,7 @@ export class FireEngine {
       const ignitionTime = cell.ignitionTime;
       if (cell.fireState === FireState.Burning && time - ignitionTime > cell.burnTime) {
         newFireStateData[i] = FireState.Burnt;
+        cell.burnsHistory.push({ time, burnIndex: cell.burnIndex });
         if (cell.canSurviveFire && Math.random() < this.fireSurvivalProbability) {
           cell.isFireSurvivor = true;
         }
