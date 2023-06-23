@@ -88,6 +88,8 @@ export interface IBurnHistory {
   burnIndex: BurnIndex;
 }
 
+export type VegetationStatistics = Record<Vegetation | "burned", number>;
+
 export const dayInMinutes = 1440;
 export const yearInMinutes = 365 * dayInMinutes;
 

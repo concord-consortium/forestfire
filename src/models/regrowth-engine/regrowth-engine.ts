@@ -86,7 +86,7 @@ export class RegrowthEngine {
 
     if (!yearDidChange) {
       // Nothing to do. All the vegetation updates are done on per-year basis.
-      return;
+      return false; // false means that no vegetation change happened
     }
 
     const p = this.config;
@@ -145,5 +145,6 @@ export class RegrowthEngine {
         }
       }
     }
+    return true; // true means that vegetation change happened
   }
 }
