@@ -58,6 +58,9 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
   };
 
   const sparkBtnDisabled = !simulation.isFireEventActive || !simulation.canAddSpark || ui.interaction === Interaction.PlaceSpark;
+  // Sparks counter should actually be "enabled" (fully visible) when there's no more sparks left to clearly show
+  // why the button is disabled.
+  const sparkCountDisabled = sparkBtnDisabled && simulation.remainingSparks > 0;
   const startButtonDisabled =
     !simulation.ready ||
     // User cannot start the sim until he adds at least one spark during the fire event setup.
@@ -83,9 +86,9 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
           dataTest="fire-event-button"
           onClick={toggleFireEvent}
           selected={simulation.isFireEventActive}
-          disabled={simulation.isFireActive} // user cannot cancel active fire
+          disabled={simulation.isFireActive || simulation.simulationEnded} // user cannot cancel active fire
         />
-        <div className={clsx(css.sparksCount, {[css.disabled]: sparkBtnDisabled})}>{simulation.remainingSparks}</div>
+        <div className={clsx(css.sparksCount, {[css.disabled]: sparkCountDisabled})}>{simulation.remainingSparks}</div>
         <IconButton
           className={clsx({[css.grayscale]: !simulation.canAddSpark})}
           icon={<SparkIcon height={48} />}
