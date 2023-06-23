@@ -1,5 +1,5 @@
 import { action, computed, observable, makeObservable } from "mobx";
-import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes } from "../types";
+import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vegetation, FireState, VegetationStatistics } from "../types";
 import {  Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
@@ -49,6 +49,7 @@ export class SimulationModel {
   @observable public simulationRunning = false;
   @observable public fireEvents: IFireEvent[] = [];
   @observable public isFireActive = false;
+  @observable public vegetationStatistics: VegetationStatistics;
   // These flags can be used by view to trigger appropriate rendering. Theoretically, view could/should check
   // every single cell and re-render when it detects some changes. In practice, we perform these updates in very
   // specific moments and usually for all the cells, so this approach can be way more efficient.
@@ -122,6 +123,39 @@ export class SimulationModel {
       return -1;
     }
     return this.time - this.fireEvents[this.fireEvents.length - 1]?.time;
+  }
+
+  public calculateVegetationStatistics(): VegetationStatistics {
+    const statistics: VegetationStatistics = {
+      [Vegetation.Grass]: 0,
+      [Vegetation.Shrub]: 0,
+      [Vegetation.DeciduousForest]: 0,
+      [Vegetation.ConiferousForest]: 0,
+      burned: 0
+    };
+
+    const numCells = this.cells.length;
+
+    if (numCells === 0) {
+      return statistics;
+    }
+
+    for (let i = 0; i < numCells; i++) {
+      const cell = this.cells[i];
+      if (cell.fireState === FireState.Burnt) {
+        statistics.burned++;
+      } else {
+        statistics[cell.vegetation]++;
+      }
+    }
+
+    statistics.burned /= numCells;
+    statistics[Vegetation.Grass] /= numCells;
+    statistics[Vegetation.Shrub] /= numCells;
+    statistics[Vegetation.DeciduousForest] /= numCells;
+    statistics[Vegetation.ConiferousForest] /= numCells;
+
+    return statistics;
   }
 
   public cellAt(x: number, y: number) {
@@ -319,8 +353,10 @@ export class SimulationModel {
     }
 
     if (!this.isFireEventActive && this.regrowthEngine) {
-      this.regrowthEngine.updateVegetation(this.time);
-      this.updateCellsStateFlag();
+      const anythingUpdated = this.regrowthEngine.updateVegetation(this.time);
+      if (anythingUpdated) {
+        this.updateCellsStateFlag();
+      }
     }
 
     if (!this.isFireEventActive && this.timeInYears >= this.config.simulationEndYear) {
@@ -362,6 +398,8 @@ export class SimulationModel {
 
   @action.bound public updateCellsStateFlag() {
     this.cellsStateFlag += 1;
+
+    this.vegetationStatistics = this.calculateVegetationStatistics();
   }
 
   @action.bound public updateTownMarkers() {

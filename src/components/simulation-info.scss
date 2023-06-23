@@ -9,24 +9,13 @@
   left: 10px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  z-index: 2;
 
   .title {
     font-family: $lato;
     font-size: 13px;
     font-weight: bold;
-    margin-bottom: 6px;
-  }
-
-  @keyframes highlight {
-    0% {
-      background: #fff;
-    }
-    15% {
-      background: rgb(255, 158, 158);
-    }
-    100% {
-      background: #fff;
-    }
+    white-space: nowrap;
   }
 
   .header {
@@ -40,20 +29,80 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 
-  .windContainer {
+  .container {
     width: 113px;
-    height: 113px;
     box-sizing: border-box;
     border-radius: 5px;
     border: solid 1px $controlGray;
     background-color: #fff;
     text-align: center;
     color: $controlText;
+    margin-top: 6px;
+  }
 
-    &.windDidChange {
+  .vegetationStats {
+
+    .stat {
+      font-family: $robotoCondensed;
+      font-size: 14px;
+      text-align: left;
+      white-space: nowrap;
+
+      .box {
+        width: 32px;
+        height: 20px;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: $lato;
+        font-weight: bold;
+        font-size: 12px;
+        border: 1px solid #767676;
+        margin: 0 4px 6px 6px;
+        padding-bottom: 1px;
+
+        &.coniferous {
+          color: #fff;
+          background-color: $coniferous;
+        }
+        &.deciduous {
+          color: #000;
+          background-color: $deciduous;
+        }
+        &.shrub {
+          color: #000;
+          background-color: $shrub;
+        }
+        &.grass {
+          color: #000;
+          background-color: $grass;
+        }
+        &.burned {
+          color: #fff;
+          background-color: $burned;
+        }
+      }
+    }
+  }
+
+  .wind {
+    @keyframes highlight {
+      0% {
+        background: #fff;
+      }
+      15% {
+        background: rgb(255, 158, 158);
+      }
+      100% {
+        background: #fff;
+      }
+    }
+
+    .windDidChange {
       animation: highlight 2s ease-in-out;
     }
 
@@ -69,6 +118,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-bottom: 5px;
     }
   }
 }
