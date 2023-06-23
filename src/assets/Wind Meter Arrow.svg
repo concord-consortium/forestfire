@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+  <g id="Wind_Meter_Arrow" data-name="Wind Meter Arrow">
+    <rect width="52" height="52" fill="none"/>
+    <g id="arrow">
+      <path id="arrow-2" data-name="arrow" d="m31.38251,13.05066L25.99921,1.99799l-5.38171,11.05347,3.38251-.00024.00092,12.94928c.00012,1.10449.89569,1.99994,2.00018,1.99982,1.10449-.00006,1.99994-.89563,1.99982-2.00012l-.00092-12.94928,3.38251-.00024Z" fill="#0071ff"/>
+      <circle id="pin" cx="26" cy="26" r=".5" fill="#fff"/>
+    </g>
+  </g>
+</svg>
