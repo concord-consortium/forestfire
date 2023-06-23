@@ -86,7 +86,7 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
           dataTest="fire-event-button"
           onClick={toggleFireEvent}
           selected={simulation.isFireEventActive}
-          disabled={simulation.isFireActive} // user cannot cancel active fire
+          disabled={simulation.isFireActive || simulation.simulationEnded} // user cannot cancel active fire
         />
         <div className={clsx(css.sparksCount, {[css.disabled]: sparkCountDisabled})}>{simulation.remainingSparks}</div>
         <IconButton
