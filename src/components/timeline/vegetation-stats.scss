@@ -1,0 +1,33 @@
+@import "../common.scss";
+
+.vegetation {
+  height: 25px;
+  position: relative;
+
+  .bar {
+    position: absolute;
+    height: 25px;
+    box-sizing: border-box;
+    display: inline-block;
+
+    & > * {
+      width: 100%;
+    }
+
+    .coniferous {
+      background-color: $coniferous;
+    }
+    .deciduous {
+      background-color: $deciduous;
+    }
+    .shrub {
+      background-color: $shrub;
+    }
+    .grass {
+      background-color: $grass;
+    }
+    .burned {
+      background-color: $burned;
+    }
+  }
+}

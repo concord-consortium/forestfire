@@ -1,0 +1,41 @@
+@import "../common.scss";
+
+.fireEvents {
+  position: relative;
+
+  .fireEvent {
+    position: absolute;
+    top: -10px;
+    // It may seem strange, but content will overflow easily and it helps with centering the container perfectly.
+    width: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .fireEventTime {
+      font-family: $robotoCondensed;
+      white-space: nowrap;
+      padding: 2px 5px 2px 12px;
+      border-radius: 5px;
+      border: solid 1px #fff;
+      background-color: #ffb6fa;
+      position: absolute;
+      left: 2px;
+      top: 7px;
+    }
+
+    svg {
+      position: relative;
+      width: 23px;
+      height: 31px;
+    }
+
+    .fireEventIdx {
+      position: relative;
+      margin-top: -20px;
+      font-family: $lato;
+      font-weight: bold;
+    }
+  }
+}

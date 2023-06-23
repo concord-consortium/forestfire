@@ -1,8 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../../use-stores";
-import FireEventSpark from "../../assets/bottom-bar/Fire Event.svg";
-import { dayInMinutes } from "../../types";
+import { VegetationStats } from "./vegetation-stats";
+import { FireEvents } from "./fire-events";
 
 import css from "./timeline.scss";
 
@@ -14,11 +14,6 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
   const timeProgress = `${(simulation.timeInYears / simulation.config.simulationEndYear) * 100}%`;
-  const endTime = simulation.simulationEndTime;
-
-  // Convert time from minutes to days.
-  const fireEventTimeInDays = Math.floor(simulation.fireEventTime / dayInMinutes);
-  const fireEventTimeHours = Math.floor((simulation.fireEventTime % dayInMinutes) / 60);
 
   return (
     <div className={css.timelineContainer}>
@@ -28,7 +23,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
         <div className={css.labelBold}>Fire Events</div>
       </div>
       <div className={css.graphs}>
-        <div className={css.vegetation} />
+        <VegetationStats />
         <div className={css.time}>
           <div className={css.axis} />
           <div className={css.progressBar} style={{ width: timeProgress }} />
@@ -41,25 +36,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
             ))
           }
         </div>
-        <div className={css.fireEvents}>
-          {
-            simulation.fireEvents.map((event, i) => (
-              <div key={i} className={css.fireEvent} style={{ left: `${(event.time / endTime) * 100}%` }}>
-                {
-                  simulation.isFireActive && i === simulation.fireEvents.length - 1 &&
-                  <div className={css.fireEventTime}>
-                    {fireEventTimeInDays} {fireEventTimeInDays === 1 ? "day " : "days "}
-                    and {fireEventTimeHours} {fireEventTimeHours === 1 ? "hour" : "hours"}
-                  </div>
-                }
-                <FireEventSpark />
-                <div className={css.fireEventIdx}>
-                  { i + 1 }
-                </div>
-              </div>
-            ))
-          }
-        </div>
+        <FireEvents />
       </div>
     </div>
   );

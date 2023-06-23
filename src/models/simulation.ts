@@ -50,6 +50,7 @@ export class SimulationModel {
   @observable public fireEvents: IFireEvent[] = [];
   @observable public isFireActive = false;
   @observable public vegetationStatistics: VegetationStatistics;
+  @observable public yearlyVegetationStatistics: VegetationStatistics[] = [];
   // These flags can be used by view to trigger appropriate rendering. Theoretically, view could/should check
   // every single cell and re-render when it detects some changes. In practice, we perform these updates in very
   // specific moments and usually for all the cells, so this approach can be way more efficient.
@@ -281,6 +282,7 @@ export class SimulationModel {
     this.isFireActive = false;
     this.fireEvents = [];
     this.sparks = [];
+    this.yearlyVegetationStatistics = [];
     this.config.sparks.forEach(s => {
       this.addSpark(s[0], s[1]);
     });
@@ -336,7 +338,14 @@ export class SimulationModel {
   }
 
   @action.bound public tick(timeStep: number) {
+    const oldYear = Math.floor(this.timeInYears);
     this.time += timeStep;
+    const newYear = Math.floor(this.timeInYears);
+    const yearDidChange = newYear !== oldYear;
+
+    if (yearDidChange) {
+      this.yearlyVegetationStatistics.push(this.calculateVegetationStatistics());
+    }
 
     this.changeWindIfNecessary();
 
@@ -352,11 +361,9 @@ export class SimulationModel {
       }
     }
 
-    if (!this.isFireEventActive && this.regrowthEngine) {
-      const anythingUpdated = this.regrowthEngine.updateVegetation(this.time);
-      if (anythingUpdated) {
-        this.updateCellsStateFlag();
-      }
+    if (!this.isFireEventActive && this.regrowthEngine && yearDidChange) {
+      this.regrowthEngine.updateVegetation(this.time);
+      this.updateCellsStateFlag();
     }
 
     if (!this.isFireEventActive && this.timeInYears >= this.config.simulationEndYear) {

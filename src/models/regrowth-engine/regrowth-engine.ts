@@ -33,8 +33,6 @@ export class RegrowthEngine {
   public gridHeight: number;
   public cellSize: number;
   public neighborsDist: number;
-  public time = 0;
-  public year = 0;
   public config: IRegrowthEngineConfig;
 
   constructor(cells: Cell[], config: IRegrowthEngineConfig) {
@@ -75,20 +73,6 @@ export class RegrowthEngine {
   }
 
   public updateVegetation(time: number) {
-    this.time = time;
-
-    let yearDidChange = false;
-    const newYear = Math.floor(time / yearInMinutes);
-    if (newYear !== this.year) {
-      this.year = newYear;
-      yearDidChange = true;
-    }
-
-    if (!yearDidChange) {
-      // Nothing to do. All the vegetation updates are done on per-year basis.
-      return false; // false means that no vegetation change happened
-    }
-
     const p = this.config;
     const numCells = this.cells.length;
     for (let i = 0; i < numCells; i++) {
@@ -145,6 +129,5 @@ export class RegrowthEngine {
         }
       }
     }
-    return true; // true means that vegetation change happened
   }
 }
