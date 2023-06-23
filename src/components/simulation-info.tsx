@@ -10,10 +10,12 @@ export const SimulationInfo = observer(function WrappedComponent() {
 
   return (
     <div className={css.simulationInfo}>
+      <div className={css.title}>Current Conditions</div>
+
       <div className={`${css.windContainer} ${simulation.windDidChange ? css.windDidChange : ""}`}>
-        <div className={css.windHeader}>Wind Meter</div>
+        <div className={css.header}>Wind</div>
         <div className={css.windText}>
-            {`${Math.round(scaledWind)} MPH from the ${degToCompass(simulation.wind.direction)}`}
+            {`${Math.round(scaledWind)} MPH from ${degToCompass(simulation.wind.direction)}`}
         </div>
         <div className={css.windDial}>
           <WindDial windDirection={simulation.wind.direction} />

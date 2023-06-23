@@ -3,8 +3,8 @@ import {
   CircularInput,
   CircularTrack,
 } from "react-circular-input";
-import WindDialImage from "../assets/wind-dial.svg";
-import WindArrow from "../assets/wind-arrow.svg";
+import WindDialImage from "../assets/Wind Meter.svg";
+import WindArrow from "../assets/Wind Meter Arrow.svg";
 
 import css from "./wind-dial.scss";
 
