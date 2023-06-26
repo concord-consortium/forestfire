@@ -187,10 +187,11 @@ export class FireEngine {
       }
       const ignitionTime = cell.ignitionTime;
       if (cell.fireState === FireState.Burning && time - ignitionTime > cell.burnTime) {
-        newFireStateData[i] = FireState.Burnt;
-        cell.burnsHistory.push({ time, burnIndex: cell.burnIndex });
         if (cell.canSurviveFire && Math.random() < this.fireSurvivalProbability) {
-          cell.isFireSurvivor = true;
+          newFireStateData[i] = FireState.Survived;
+        } else {
+          newFireStateData[i] = FireState.Burnt;
+          cell.burnsHistory.push({ time, burnIndex: cell.burnIndex });
         }
       } else if (cell.fireState === FireState.Unburnt && time > ignitionTime ) {
         // Sets any unburnt cells to burning if we are passed their ignition time.

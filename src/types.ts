@@ -73,7 +73,8 @@ export interface ISpark {
 export enum FireState {
   Unburnt = 0,
   Burning = 1,
-  Burnt = 2
+  Burnt = 2,
+  Survived = 3
 }
 
 // See: https://www.pivotaltracker.com/story/show/170344417

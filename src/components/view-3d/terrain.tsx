@@ -52,7 +52,7 @@ const setVertexColor = (
   if (cell.fireState === FireState.Burning) {
     color = config.showBurnIndex ? burnIndexColor(cell.burnIndex) : BURNING_COLOR;
   } else if (cell.fireState === FireState.Burnt) {
-    color = cell.isFireSurvivor ? getTerrainColor(cell.vegetation) : BURNT_COLOR;
+    color = BURNT_COLOR;
   } else if (cell.isRiver) {
     color = config.riverColor;
   } else if (cell.isFireLineUnderConstruction) {
@@ -94,7 +94,7 @@ const setupElevation = (geometry: THREE.PlaneGeometry, simulation: SimulationMod
 };
 
 export const Terrain = observer(forwardRef<THREE.Mesh>(function WrappedComponent(props, ref) {
-  const { simulation } = useStores();
+  const { simulation, ui } = useStores();
   const height = planeHeight(simulation);
   const geometryRef = useRef<THREE.PlaneGeometry>(null);
 
