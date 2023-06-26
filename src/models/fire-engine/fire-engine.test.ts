@@ -118,27 +118,27 @@ describe("FireEngine", () => {
       const zone = new Zone({ vegetation });
       const engine = new FireEngine(generateCells(zone), wind, config);
       engine.setSparks(sparks);
-      expect(engine.cells.filter(c => c.isFireSurvivor).length).toEqual(0);
+      expect(engine.cells.filter(c => c.fireState === FireState.Survived).length).toEqual(0);
       engine.updateFire(dayInMinutes);
       engine.updateFire(dayInMinutes);
-      expect(engine.cells.filter(c => c.fireState === FireState.Burnt).length).toBeGreaterThan(0);
-      return engine.cells.filter(c => c.isFireSurvivor).length;
+      engine.updateFire(dayInMinutes);
+      return engine.cells.filter(c => c.fireState === FireState.Survived).length;
     };
 
-    it("should not mark any grass cells as fire survivors", () => {
-      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.Grass)).toEqual(0);
+    it("should mark some grass cells as fire survivors", () => {
+      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.Grass)).toBeGreaterThan(0);
     });
 
-    it("should not mark any shrub cells as fire survivors", () => {
-      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.Shrub)).toEqual(0);
+    it("should not mark some shrub cells as fire survivors", () => {
+      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.Shrub)).toBeGreaterThan(0);
     });
 
     it("should mark some forest cells as fire survivors", () => {
       expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.DeciduousForest)).toBeGreaterThan(0);
     });
 
-    it("should not mark any forest with suppression cells as fire survivors", () => {
-      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.ConiferousForest)).toEqual(0);
+    it("should mark some forest with suppression cells as fire survivors", () => {
+      expect(testVegetationAndGetNumberOfFireSurvivors(Vegetation.ConiferousForest)).toBeGreaterThan(0);
     });
   });
 });

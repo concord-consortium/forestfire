@@ -30,7 +30,6 @@ export class Cell {
   public burnTime: number = MAX_BURN_TIME;
   public fireState: FireState = FireState.Unburnt;
   public isUnburntIsland = false;
-  public isFireSurvivor = false;
   public isRiver = false;
   public isFireLine = false;
   public isFireLineUnderConstruction = false;
@@ -75,7 +74,7 @@ export class Cell {
   }
 
   public get canSurviveFire() {
-    return this.burnIndex === BurnIndex.Low && this.vegetation === Vegetation.DeciduousForest;
+    return this.burnIndex === BurnIndex.Low;
   }
 
   public get burnIndex() {
@@ -141,7 +140,6 @@ export class Cell {
     this.ignitionTime = Infinity;
     this.spreadRate = 0;
     this.burnTime = MAX_BURN_TIME;
-    this.isFireSurvivor = false;
   }
 
   public reset() {
