@@ -10,6 +10,7 @@ export class UIModel {
   @observable public interaction: Interaction | null = null;
   @observable public dragging = false;
   @observable public showChart = false;
+  @observable public showFireHistoryOverlay = false;
 
   constructor() {
     makeObservable(this);

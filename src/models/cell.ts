@@ -1,5 +1,5 @@
 import { Zone, moistureLookups } from "./zone";
-import { Vegetation, DroughtLevel, yearInMinutes, IBurnHistory, BurnIndex, FireState } from "../types";
+import { Vegetation, DroughtLevel, yearInMinutes, IFireHistory, BurnIndex, FireState } from "../types";
 
 export interface CellOptions {
   x: number;
@@ -35,7 +35,7 @@ export class Cell {
   public isFireLineUnderConstruction = false;
   public helitackDropCount = 0;
   public fireIdx: number | null = null;
-  public burnsHistory: IBurnHistory[] = [];
+  public fireHistory: IFireHistory[] = [];
   private _vegetation: Vegetation = Vegetation.Grass;
 
   constructor(props: CellOptions) {
@@ -111,11 +111,11 @@ export class Cell {
   }
 
   public get lastFireBurnIndex() {
-    return this.burnsHistory[this.burnsHistory.length - 1]?.burnIndex;
+    return this.fireHistory[this.fireHistory.length - 1]?.burnIndex;
   }
 
   public get lastFireTime() {
-    return this.burnsHistory[this.burnsHistory.length - 1]?.time;
+    return this.fireHistory[this.fireHistory.length - 1]?.time;
   }
 
   public get vegetationAgeInYears() {
@@ -149,6 +149,6 @@ export class Cell {
     this.isFireLine = false;
     this.helitackDropCount = 0;
     this.vegetation = this.zone.vegetation;
-    this.burnsHistory = [];
+    this.fireHistory = [];
   }
 }

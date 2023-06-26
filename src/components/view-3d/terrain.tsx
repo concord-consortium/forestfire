@@ -1,5 +1,5 @@
 import React, { forwardRef, useLayoutEffect, useRef } from "react";
-import { Vegetation, BurnIndex, FireState } from "../../types";
+import { Vegetation, BurnIndex, FireState, IFireHistory } from "../../types";
 import { Cell } from "../../models/cell";
 import { ISimulationConfig } from "../../config";
 import * as THREE from "three";
@@ -14,7 +14,7 @@ import { useShowCoordsInteraction } from "./use-show-coords-interaction";
 
 const vertexIdx = (cell: Cell, gridWidth: number, gridHeight: number) => (gridHeight - 1 - cell.y) * gridWidth + cell.x;
 
-const getTerrainColor = (vegetation: Vegetation) => {
+const terrainColor = (vegetation: Vegetation) => {
   switch (vegetation) {
     case Vegetation.Grass:
       return [0.737, 0.984, 0.459];
@@ -26,6 +26,7 @@ const getTerrainColor = (vegetation: Vegetation) => {
       return [0, 0.412, 0.318];
   }
 };
+
 const BURNING_COLOR = [1, 0, 0];
 const BURNT_COLOR = [0.2, 0.2, 0.2];
 const FIRE_LINE_UNDER_CONSTRUCTION_COLOR = [0.5, 0.5, 0];
@@ -44,8 +45,22 @@ const burnIndexColor = (burnIndex: BurnIndex) => {
   return BURN_INDEX_HIGH;
 };
 
+const FIRE_HISTORY_ALPHA_PER_ENTRY = 0.2;
+export const fireHistoryColor = (cellFireHistory: IFireHistory[]) => {
+  const overlayBase = [1, 0, 240 / 255];
+  const overlayAlpha = Math.min(1, FIRE_HISTORY_ALPHA_PER_ENTRY * cellFireHistory.length);
+  const background = [1, 1, 1];
+  // Combine pink overlay with with white background. It's simple enough to do it here rather than apply
+  // some shader magic or second layer over the terrain.
+  return [
+    overlayBase[0] * overlayAlpha + background[0] * (1 - overlayAlpha),
+    overlayBase[1] * overlayAlpha + background[1] * (1 - overlayAlpha),
+    overlayBase[2] * overlayAlpha + background[2] * (1 - overlayAlpha),
+  ];
+};
+
 const setVertexColor = (
-  colArray: number[], cell: Cell, gridWidth: number, gridHeight: number, config: ISimulationConfig
+  colArray: number[], cell: Cell, gridWidth: number, gridHeight: number, config: ISimulationConfig, showFireHistoryOverlay: boolean
 ) => {
   const idx = vertexIdx(cell, gridWidth, gridHeight) * 4;
   let color;
@@ -57,8 +72,10 @@ const setVertexColor = (
     color = config.riverColor;
   } else if (cell.isFireLineUnderConstruction) {
     color = FIRE_LINE_UNDER_CONSTRUCTION_COLOR;
+  } else if (ui.showFireHistoryOverlay) {
+    color = fireHistoryColor(cell.fireHistory);
   } else {
-    color = getTerrainColor(cell.vegetation);
+    color = terrainColor(cell.vegetation);
   }
   // Note that we're using sRGB colorspace here (default while working with web). THREE.js needs to operate in linear
   // color space, so we need to convert it first. See:
@@ -70,13 +87,13 @@ const setVertexColor = (
   colArray[idx] = threeJsColor.r;
   colArray[idx + 1] = threeJsColor.g;
   colArray[idx + 2] = threeJsColor.b;
-  colArray[idx + 3] = 1; // alpha
+  colArray[idx + 3] = 1; // color[3] !== undefined ? color[3] : 1; // optional alpha
 };
 
-const updateColors = (geometry: THREE.PlaneGeometry, simulation: SimulationModel) => {
+const updateColors = (geometry: THREE.PlaneGeometry, simulation: SimulationModel, showFireHistoryOverlay: boolean) => {
   const colArray = geometry.attributes.color.array as number[];
   simulation.cells.forEach(cell => {
-    setVertexColor(colArray, cell, simulation.gridWidth, simulation.gridHeight, simulation.config);
+    setVertexColor(colArray, cell, simulation.gridWidth, simulation.gridHeight, simulation.config, showFireHistoryOverlay);
   });
   (geometry.attributes.color as BufferAttribute).needsUpdate = true;
 };
@@ -113,9 +130,9 @@ export const Terrain = observer(forwardRef<THREE.Mesh>(function WrappedComponent
 
   useLayoutEffect(() => {
     if (geometryRef.current) {
-      updateColors(geometryRef.current, simulation);
+      updateColors(geometryRef.current, simulation, ui.showFireHistoryOverlay);
     }
-  }, [simulation, simulation.cellsStateFlag]);
+  }, [simulation, ui.showFireHistoryOverlay, simulation.cellsStateFlag]);
 
   const interactions: InteractionHandler[] = [
     usePlaceSparkInteraction(),

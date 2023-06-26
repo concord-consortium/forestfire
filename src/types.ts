@@ -84,7 +84,7 @@ export enum BurnIndex {
   High = 2
 }
 
-export interface IBurnHistory {
+export interface IFireHistory {
   time: number;
   burnIndex: BurnIndex;
 }

@@ -191,7 +191,7 @@ export class FireEngine {
           newFireStateData[i] = FireState.Survived;
         } else {
           newFireStateData[i] = FireState.Burnt;
-          cell.burnsHistory.push({ time, burnIndex: cell.burnIndex });
+          cell.fireHistory.push({ time, burnIndex: cell.burnIndex });
         }
       } else if (cell.fireState === FireState.Unburnt && time > ignitionTime ) {
         // Sets any unburnt cells to burning if we are passed their ignition time.
