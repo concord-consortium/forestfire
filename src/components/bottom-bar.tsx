@@ -50,7 +50,7 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
   const toggleFireEvent = () => {
     if (!simulation.isFireEventActive) {
       simulation.addFireEvent();
-      log("FireEventActivated");
+      log("FireEventActivated", { wind: simulation.wind });
     } else if (simulation.isFireEventSetupActive) {
       simulation.cancelFireEventSetup();
       log("FireEventCancelled");
