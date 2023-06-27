@@ -171,7 +171,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   showBurnIndex: true,
   showCoordsOnClick: false,
   unburntIslandProbability: 0.5, // [0, 1]
-  fireSurvivalProbability: 0.05, // [0, 1]
+  fireSurvivalProbability: 0, // [0, 1]
   droughtIndexLocked: false,
   severeDroughtAvailable: true,
   riverColor: [0.067, 0.529, 0.882, 1],
