@@ -1,4 +1,4 @@
-import { observable, makeObservable } from "mobx";
+import { observable, makeObservable, action } from "mobx";
 
 export enum Interaction {
   PlaceSpark = "PlaceSpark",
@@ -14,5 +14,9 @@ export class UIModel {
 
   constructor() {
     makeObservable(this);
+  }
+
+  @action.bound setShowFireHistoryOverlay(show: boolean) {
+    this.showFireHistoryOverlay = show;
   }
 }

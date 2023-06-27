@@ -7,6 +7,7 @@ import { observer } from "mobx-react";
 import { useStores } from "../use-stores";
 import { Interaction } from "../models/ui";
 import { FireIntensityScale } from "./fire-intensity-scale";
+import { MapTypeSwitch } from "./map-type-switch";
 import { log } from "@concord-consortium/lara-interactive-api";
 import SparkIcon from "../assets/bottom-bar/spark.svg";
 import SparkHighlight from "../assets/bottom-bar/spark_highlight.svg";
@@ -109,6 +110,9 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         reloadDisabled={!simulation.simulationStarted}
         resetDisabled={!simulation.simulationStarted}
       />
+      <BottomBarWidgetGroup title="Map Type" hoverable={true}>
+        <MapTypeSwitch />
+      </BottomBarWidgetGroup>
       {
         simulation.config.showBurnIndex &&
         <BottomBarWidgetGroup title="Fire Intensity Scale">
