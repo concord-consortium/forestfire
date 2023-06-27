@@ -6,7 +6,7 @@ import { IconButton } from "./geohazard-components/bottom-bar/icon-button";
 import { observer } from "mobx-react";
 import { useStores } from "../use-stores";
 import { Interaction } from "../models/ui";
-import { FireIntensityScale } from "./fire-intensity-scale";
+import { FireIntensityScale, FireHistoryScale } from "./fire-intensity-scale";
 import { MapTypeSwitch } from "./map-type-switch";
 import { log } from "@concord-consortium/lara-interactive-api";
 import SparkIcon from "../assets/bottom-bar/spark.svg";
@@ -114,9 +114,15 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         <MapTypeSwitch />
       </BottomBarWidgetGroup>
       {
-        simulation.config.showBurnIndex &&
+        !ui.showFireHistoryOverlay && simulation.config.showBurnIndex &&
         <BottomBarWidgetGroup title="Fire Intensity Scale">
           <FireIntensityScale />
+        </BottomBarWidgetGroup>
+      }
+      {
+        ui.showFireHistoryOverlay &&
+        <BottomBarWidgetGroup title="Fire History Scale">
+          <FireHistoryScale />
         </BottomBarWidgetGroup>
       }
     </BottomBarContainer>

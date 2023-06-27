@@ -46,16 +46,18 @@ const burnIndexColor = (burnIndex: BurnIndex) => {
 };
 
 const FIRE_HISTORY_ALPHA_PER_ENTRY = 0.2;
+export const FIRE_HISTORY_OVERLAY = [1, 0, 240 / 255];
+export const FIRE_HISTORY_BACKGROUND = [1, 1, 1];
+
 export const fireHistoryColor = (cellFireHistory: IFireHistory[]) => {
-  const overlayBase = [1, 0, 240 / 255];
   const overlayAlpha = Math.min(1, FIRE_HISTORY_ALPHA_PER_ENTRY * cellFireHistory.length);
-  const background = [1, 1, 1];
+
   // Combine pink overlay with with white background. It's simple enough to do it here rather than apply
   // some shader magic or second layer over the terrain.
   return [
-    overlayBase[0] * overlayAlpha + background[0] * (1 - overlayAlpha),
-    overlayBase[1] * overlayAlpha + background[1] * (1 - overlayAlpha),
-    overlayBase[2] * overlayAlpha + background[2] * (1 - overlayAlpha),
+    FIRE_HISTORY_OVERLAY[0] * overlayAlpha + FIRE_HISTORY_BACKGROUND[0] * (1 - overlayAlpha),
+    FIRE_HISTORY_OVERLAY[1] * overlayAlpha + FIRE_HISTORY_BACKGROUND[1] * (1 - overlayAlpha),
+    FIRE_HISTORY_OVERLAY[2] * overlayAlpha + FIRE_HISTORY_BACKGROUND[2] * (1 - overlayAlpha),
   ];
 };
 
@@ -72,7 +74,7 @@ const setVertexColor = (
     color = config.riverColor;
   } else if (cell.isFireLineUnderConstruction) {
     color = FIRE_LINE_UNDER_CONSTRUCTION_COLOR;
-  } else if (ui.showFireHistoryOverlay) {
+  } else if (showFireHistoryOverlay) {
     color = fireHistoryColor(cell.fireHistory);
   } else {
     color = terrainColor(cell.vegetation);
