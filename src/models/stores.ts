@@ -29,8 +29,10 @@ export const createStores = (): IStores => {
   (window as any).DroughtLevel = DroughtLevel;
   (window as any).Vegetation = Vegetation;
   (window as any).TerrainType = TerrainType;
+
+  const ui = new UIModel();
+  (window as any).ui = ui;
   return {
-    simulation,
-    ui: new UIModel(),
+    simulation, ui
   };
 };

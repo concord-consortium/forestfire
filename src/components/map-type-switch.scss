@@ -1,0 +1,43 @@
+@import "common.scss";
+
+.mapTypeSwitch {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+
+  .topRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+      min-width: 24px;
+      width: 24px;
+      height: 24px;
+      box-sizing: border-box;
+      border: 1px solid $controlGray;
+      border-radius: 5px;
+      margin: 0 7px;
+      background-color: #fff;
+
+      &:hover {
+        background-color: #d8d8d8;
+        outline: 3px solid rgba(#fff, 0.5);
+      }
+
+      &:active {
+        outline: 3px solid #fff;
+      }
+    }
+  }
+
+  .label {
+    font-size: 14px;
+    font-family: $lato;
+    line-height: 15px;
+    color: $textColor;
+    margin-top: 3px;
+  }
+}
