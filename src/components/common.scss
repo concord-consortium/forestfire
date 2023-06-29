@@ -4,7 +4,6 @@ $robotoCondensed: 'Roboto Condensed', Lato, arial, sans-serif;
 $lato: Lato, arial, sans-serif;
 
 $textColor: #434343;
-$controlIconLine: #797979;
 
 $controlText: #434343;
 $controlGray: #797979;
@@ -43,3 +42,16 @@ $deciduous: #33a227;
 $shrub: #79d300;
 $grass: #bcfb75;
 $burned: #000;
+
+$rightPanelTransition: all 0.8s ease-in-out;
+
+// Export the color palette to make it accessible to JS
+:export {
+  coniferous: $coniferous;
+  deciduous: $deciduous;
+  shrub: $shrub;
+  grass: $grass;
+  burned: $burned;
+  robotoFontFamily: $robotoCondensed;
+  controlGray: $controlGray;
+}

@@ -19,4 +19,8 @@ export class UIModel {
   @action.bound setShowFireHistoryOverlay(show: boolean) {
     this.showFireHistoryOverlay = show;
   }
+
+  @action.bound toggleChart() {
+    this.showChart = !this.showChart;
+  }
 }

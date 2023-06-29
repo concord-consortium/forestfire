@@ -15,10 +15,6 @@
     border: 2px solid $controlGreenDark2;
     background-color: $controlGreenDark2;
 
-    &.active {
-      width: $tabWidth + 1px; // to cover border on the right side
-    }
-
     .tabImage {
       position: absolute;
       width: 60px;
@@ -36,6 +32,7 @@
         opacity: 0.75;
       }
     }
+
     .tabContent {
       position: relative;
       width: 64px;
