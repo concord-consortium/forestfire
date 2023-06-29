@@ -35,7 +35,8 @@ export const View3d = () => {
     // See: https://github.com/jsx-eslint/eslint-plugin-react/issues/3423
     // flat=true disables tone mapping that is not a default in threejs, but is enabled by default in react-three-fiber.
     // It makes textures match colors in the original image.
-    <Canvas camera={{manual: true}} flat={true}>
+    // resize.debounce=0 ensures that canvas will resize immediately when container size changes (right tab animation).
+    <Canvas camera={{manual: true}} flat={true} resize={{ debounce: 0 }}>
       {/* Why do we need to setup provider again? No idea. It seems that components inside Canvas don't have
           access to MobX stores anymore. */}
       <Provider stores={stores}>

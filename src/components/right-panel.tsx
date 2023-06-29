@@ -1,26 +1,18 @@
 import { observer } from "mobx-react";
-import React, { useState } from "react";
-import { RightPanelTab, TabType } from "./right-panel-tab";
+import React from "react";
+import { VegetationGraph } from "./vegetation-graph";
+import { RightPanelTab } from "./right-panel-tab";
 import { useStores } from "../use-stores";
 import { log } from "@concord-consortium/lara-interactive-api";
+
 import css from "./right-panel.scss";
 
-export const RightPanel = observer(function WrappedComponent() {
+export const RightPanel = observer(() => {
   const { ui } = useStores();
-  const [open, setOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("graph");
 
   const handleToggleDrawer = (e: React.SyntheticEvent) => {
-    if (e.currentTarget.id !== selectedTab) {
-      setOpen(true);
-      setSelectedTab(e.currentTarget.id as TabType);
-      ui.showChart = true;
-    } else {
-      const isOpen = !open;
-      setOpen(isOpen);
-      ui.showChart = isOpen;
+    ui.toggleChart();
 
-    }
     if (ui.showChart) {
       log("ChartTabShown");
     } else {
@@ -29,14 +21,14 @@ export const RightPanel = observer(function WrappedComponent() {
   };
 
   return (
-    <div className={`${css.rightPanel} ${open ? css.open : ""}`} data-testid="right-panel">
+    <div className={`${css.rightPanel} ${ui.showChart ? css.open : ""}`} data-testid="right-panel">
       <div className={css.rightPanelContent}>
-        GRAPH TODO
+        <VegetationGraph allData={false} />
       </div>
       <ul className={css.rightPanelTabs}>
         <li>
-          <div id="base" className={css.rightPanelTab} onClick={handleToggleDrawer}>
-            <RightPanelTab tabType="graph" active={selectedTab === "graph" || !open} />
+          <div className={css.rightPanelTab} onClick={handleToggleDrawer}>
+            <RightPanelTab />
           </div>
         </li>
       </ul>

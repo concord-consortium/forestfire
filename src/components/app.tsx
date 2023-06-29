@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { clsx } from "clsx";
 import { observer } from "mobx-react";
 import { View3d } from "./view-3d/view-3d";
 import { SimulationInfo } from "./simulation-info";
@@ -38,11 +39,11 @@ export const AppComponent = observer(function WrappedComponent() {
           <div>Highest Point Possible: {config.heightmapMaxElevation} ft</div>
         </div>
       }
-      <div className={`${css.mainContent} ${ui.showChart && css.shrink}`}>
+      <div className={clsx(css.mainContent, {[css.shrink]: ui.showChart})}>
         <SimulationInfo />
         <View3d />
       </div>
-      <div className={css.timeline}>
+      <div className={clsx(css.timeline, {[css.shrink]: ui.showChart})}>
         <Timeline />
       </div>
       <div className={`${css.rightContent} ${ui.showChart && css.grow}`}>

@@ -8,59 +8,61 @@
   flex-direction: column;
   background-color: #c8c8c8;
   color: $textColor;
-}
 
-.mainContent{
-  overflow: hidden;
-  width: 100%;
-  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth});
-  position: fixed;
-  top: $topBarHeight;
-  left: 0;
-  transition: 1s;
-  &.shrink{
-    width: calc(100% - #{$rightPanelContainerWidth});
+  .mainContent {
+    overflow: hidden;
+    width: 100%;
+    height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth});
+    position: fixed;
+    top: $topBarHeight;
     left: 0;
+    transition: $rightPanelTransition;
   }
-}
 
-.rightContent{
-  pointer-events: none;
-  overflow-x: hidden;
-  width: $rightPanelContainerWidth + $tabWidth;
-  height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight});
-  min-height: 551px;
-  position: fixed;
-  top: $topBarHeight;
-  right: 0;
-  transition: 1s;
-  &.grow{
+  .rightContent {
+    pointer-events: none;
+    overflow-x: hidden;
+    width: $rightPanelContainerWidth + $tabWidth;
+    height: calc(100% - #{$bottomBarHeight + $bottomBarBorderWidth + $topBarHeight});
+    min-height: 551px;
+    position: fixed;
+    top: $topBarHeight;
     right: 0;
+    transition: 1s;
+
+    &.grow {
+      right: 0;
+    }
   }
-}
 
-.modelInfo {
-  text-align: left;
-  position: absolute;
-  top: 10px;
-  left: 120px;
-  color: $controlText;
-  font-family: $lato;
-  font-size: 12px;
-  font-weight: bold;
-}
+  .modelInfo {
+    text-align: left;
+    position: absolute;
+    top: 10px;
+    left: 120px;
+    color: $controlText;
+    font-family: $lato;
+    font-size: 12px;
+    font-weight: bold;
+  }
 
-.bottomBar {
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-}
+  .bottomBar {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+  }
 
-.timeline {
-  width: 100%;
-  position: fixed;
-  bottom: $bottomBarHeight + 21px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  .timeline {
+    width: 100%;
+    position: fixed;
+    bottom: $bottomBarHeight + 21px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $rightPanelTransition;
+  }
+
+  .shrink {
+    width: calc(100% - #{$rightPanelContainerWidth});
+  }
 }
