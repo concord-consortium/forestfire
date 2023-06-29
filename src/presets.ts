@@ -65,16 +65,16 @@ const presets: { [key: string]: Partial<ISimulationConfig> } = {
   default: {
     zonesCount: 2,
     zones: [
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MildDrought },
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MildDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
     ],
     towns: []
   },
-  mediumDrought: {
+  mildDrought: {
     zonesCount: 2,
     zones: [
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MildDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MildDrought },
     ],
     towns: []
   },
@@ -89,8 +89,8 @@ const presets: { [key: string]: Partial<ISimulationConfig> } = {
   grass: {
     zonesCount: 2,
     zones: [
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass, droughtLevel: DroughtLevel.MildDrought },
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass, droughtLevel: DroughtLevel.MildDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass, droughtLevel: DroughtLevel.MediumDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass, droughtLevel: DroughtLevel.MediumDrought },
     ],
     towns: []
   }
