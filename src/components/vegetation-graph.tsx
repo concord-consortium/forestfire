@@ -152,9 +152,17 @@ export const VegetationGraph: React.FC<IProps> = observer(({ allData }) => {
     ]
   };
 
+  const barPercentage = simulation.config.graphBarPercentage;
+  const wideAllData = simulation.config.graphWideAllData;
+  const options = {
+    ...defaultOptions,
+    // When all data graph is squeezed in the narrow right panel, set bar percentage to 1 to avoid aliasing artifacts.
+    barPercentage: allData ? (wideAllData ? barPercentage : 1) : barPercentage
+  };
+
   return (
     <div style={{height: "210px", width: "100%" }}>
-      <Bar options={defaultOptions} data={data} />
+      <Bar options={options} data={data} />
     </div>
   );
 });

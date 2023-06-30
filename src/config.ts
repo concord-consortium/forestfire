@@ -89,6 +89,10 @@ export interface ISimulationConfig {
   newWindDirection: number | undefined;
   // Works together with `changeWindOnDay`. Sets the new wind speed (mph). If undefined, it'll be random.
   newWindSpeed: number | undefined;
+  // Adjusts spacing between bars in the vegetation bar chart, [0, 1].
+  graphBarPercentage: number;
+  // When true, "Show All Data" will expand the right panel to 75% of the screen width.
+  graphWideAllData: boolean;
   // Regrowth probabilities:
   successionMinYears: number;
   grassToShrub: number;
@@ -181,6 +185,8 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   changeWindOnDay: undefined,
   newWindDirection: undefined,
   newWindSpeed: undefined,
+  graphBarPercentage: 0.85,
+  graphWideAllData: true,
   // Regrowth probabilities:
   successionMinYears: 3,
   grassToShrub: 0.1,

@@ -22,6 +22,11 @@ $padding: 4px;
     height: 100%;
   }
 
+  &.wide {
+    width: 70vw;
+    right: -70vw;
+  }
+
   &.open {
     right: 0;
   }
@@ -64,3 +69,23 @@ $padding: 4px;
     }
   }
 }
+
+.graphControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  button.allDataBtn {
+    margin-top: 30px;
+    border: 1px solid $controlGray;
+    border-radius: 5px;
+    font-family: $lato;
+    font-size: 12px;
+    color: $controlText;
+    box-sizing: border-box;
+    width: 121px;
+    height: 29px;
+  }
+}
+
+
