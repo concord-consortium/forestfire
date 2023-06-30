@@ -72,11 +72,47 @@ $padding: 4px;
 
 .graphControls {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 
+  .sliderContainer {
+    height: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+
+    .slider {
+      padding: 10px;
+      width: 215px;
+
+
+      .rail, .track {
+        height: 1px;
+        background-color: $controlGray;
+        opacity: 1;
+      }
+
+      .sliderThumb {
+        width: 30px;
+        height: 30px;
+        background-image: url("../assets/slider-thumb.svg");
+        box-shadow: none;
+
+        &:hover {
+          box-shadow: 0 0 0 3px rgba($controlGray, 0.15);
+        }
+
+        &:active,
+        &:global(.Mui-active) {
+          box-shadow: 0 0 0 3px rgba($controlGray, 0.25);
+        }
+      }
+    }
+  }
+
   button.allDataBtn {
-    margin-top: 30px;
+    margin-top: 20px;
     border: 1px solid $controlGray;
     border-radius: 5px;
     font-family: $lato;
@@ -87,5 +123,3 @@ $padding: 4px;
     height: 29px;
   }
 }
-
-

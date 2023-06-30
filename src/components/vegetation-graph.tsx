@@ -46,7 +46,11 @@ export const defaultOptions = {
       border: {
         color: cssExports.controlGray,
       },
-      stacked: true
+      stacked: true,
+      title: {
+        display: true,
+        text: "Time (years)"
+      }
     },
     y: {
       stacked: true,
@@ -75,13 +79,13 @@ const datasetOptions = {
   borderWidth: 0,
 };
 
-const RECENT_YEARS = 51;
-
 export interface IProps {
-  allData?: boolean;
+  allData: boolean;
+  recentDataEndPoint: number;
+  recentDataLength: number;
 }
 
-export const VegetationGraph: React.FC<IProps> = observer(({ allData }) => {
+export const VegetationGraph: React.FC<IProps> = observer(({ allData, recentDataEndPoint, recentDataLength }) => {
   const { simulation } = useStores();
   const [, setFontsReady] = useState<number>(0); // used to force re-render graph after fonts are ready.
 
@@ -130,8 +134,9 @@ export const VegetationGraph: React.FC<IProps> = observer(({ allData }) => {
 
   const statsData = simulation.yearlyVegetationStatistics;
 
-  const range = allData ? simulation.config.simulationEndYear : RECENT_YEARS;
-  for (let i = Math.max(0, statsData.length - range); i < Math.max(statsData.length, range); i++) {
+  const startPoint = allData ? 0 : Math.max(0, recentDataEndPoint - recentDataLength);
+  const range = allData ? simulation.config.simulationEndYear : (startPoint + recentDataLength);
+  for (let i = startPoint; i < range; i++) {
     const stats = statsData[i] || {};
 
     labels.push(i);

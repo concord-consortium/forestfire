@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
       - name: Install Dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
       - name: Build
         run: npm run build
       - name: Run Tests
@@ -35,7 +35,6 @@ jobs:
         uses: actions/checkout@v2
       - uses: cypress-io/github-action@v5
         with:
-          install-command: npm ci --legacy-peer-deps
           start: npm start
           wait-on: 'http://localhost:8080'
           # only record the results to dashboard.cypress.io if CYPRESS_RECORD_KEY is set
@@ -69,7 +68,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
       - name: Install Dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
         env:
           # skip installing cypress since it isn't needed for just building
           # This decreases the deploy time quite a bit
