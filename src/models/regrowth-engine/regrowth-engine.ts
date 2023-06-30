@@ -1,6 +1,14 @@
 import { Cell } from "../cell";
-import { Vegetation, yearInMinutes, FireState, BurnIndex } from "../../types";
+import { Vegetation, yearInMinutes, FireState, BurnIndex, DroughtLevel } from "../../types";
 import { getGridIndexForLocation } from "../utils/grid-utils";
+
+
+const DroughtLevelToRegrowthMultiplier: Record<DroughtLevel, number> = {
+  [DroughtLevel.NoDrought]: 0.5,
+  [DroughtLevel.MildDrought]: 0.8,
+  [DroughtLevel.MediumDrought]: 1,
+  [DroughtLevel.SevereDrought]: 1.5,
+};
 
 export interface IRegrowthEngineConfig {
   gridWidth: number;
@@ -78,22 +86,25 @@ export class RegrowthEngine {
     for (let i = 0; i < numCells; i++) {
       const cell = this.cells[i];
       cell.vegetationAge += yearInMinutes;
+      const droughtLevelFactor = DroughtLevelToRegrowthMultiplier[cell.droughtLevel];
+
+      const randomNumber = Math.random() * droughtLevelFactor;
 
       // Growth of existing vegetation
       if (cell.fireState === FireState.Unburnt) {
         if (cell.vegetation === Vegetation.Grass && cell.vegetationAgeInYears > p.successionMinYears) {
           const adjacentShrub = this.isAdjacentVegetationPresent(cell, Vegetation.Shrub);
-          if (Math.random() < (adjacentShrub ? p.grassToShrubAdjacent : p.grassToShrub)) {
+          if (randomNumber < (adjacentShrub ? p.grassToShrubAdjacent : p.grassToShrub)) {
             cell.vegetation = Vegetation.Shrub;
           }
         } else if (cell.vegetation === Vegetation.Shrub && cell.vegetationAgeInYears > p.successionMinYears) {
           const adjacentDeciduousForest = this.isAdjacentVegetationPresent(cell, Vegetation.DeciduousForest);
-          if (Math.random() < (adjacentDeciduousForest ? p.shrubToDeciduousAdjacent : p.shrubToDeciduous)) {
+          if (randomNumber < (adjacentDeciduousForest ? p.shrubToDeciduousAdjacent : p.shrubToDeciduous)) {
             cell.vegetation = Vegetation.DeciduousForest;
           }
-        } else if (cell.vegetation === Vegetation.DeciduousForest && cell.vegetationAgeInYears > p.deciduousToConiferousMinYears) {
+        } else if (cell.vegetation === Vegetation.DeciduousForest && cell.vegetationAgeInYears > p.deciduousToConiferousMinYears * droughtLevelFactor) {
           const adjacentConiferousForest = this.isAdjacentVegetationPresent(cell, Vegetation.ConiferousForest);
-          if (Math.random() < (adjacentConiferousForest ? p.deciduousToConiferousAdjacent : p.deciduousToConiferous)) {
+          if (randomNumber < (adjacentConiferousForest ? p.deciduousToConiferousAdjacent : p.deciduousToConiferous)) {
             cell.vegetation = Vegetation.ConiferousForest;
           }
         }
@@ -103,19 +114,19 @@ export class RegrowthEngine {
         const timeSinceLastFire = time - cell.lastFireTime;
         if (cell.lastFireBurnIndex === BurnIndex.Low && timeSinceLastFire > p.lowIntensityBurntAreaMinYears * yearInMinutes) {
           if (cell.vegetation === Vegetation.Shrub) {
-            if (Math.random() < p.lowIntensityBurntShrubToGrass) {
+            if (randomNumber < p.lowIntensityBurntShrubToGrass) {
               // 40% brows back as grass
               cell.vegetation = Vegetation.Grass;
             }
           }
           if (cell.vegetation === Vegetation.DeciduousForest) {
-            if (Math.random() < p.lowIntensityBurntDeciduousToGrass) {
+            if (randomNumber < p.lowIntensityBurntDeciduousToGrass) {
               // 10% brows back as grass
               cell.vegetation = Vegetation.Grass;
             }
           }
           if (cell.vegetation === Vegetation.ConiferousForest) {
-            if (Math.random() < p.lowIntensityBurntConiferousToGrass) {
+            if (randomNumber < p.lowIntensityBurntConiferousToGrass) {
               // 10% brows back as grass
               cell.vegetation = Vegetation.Grass;
             }
@@ -123,7 +134,7 @@ export class RegrowthEngine {
           cell.fireState = FireState.Unburnt;
         } else if (
             timeSinceLastFire > p.highIntensityBurntAreaMinYears * yearInMinutes &&
-            Math.random() < p.highIntensityBurntAreaToGrass) { //  && (lastFireBurnIndex === BurnIndex.Medium || lastFireBurnIndex === BurnIndex.High)
+            randomNumber < p.highIntensityBurntAreaToGrass) { //  && (lastFireBurnIndex === BurnIndex.Medium || lastFireBurnIndex === BurnIndex.High)
           cell.vegetation = Vegetation.Grass;
           cell.fireState = FireState.Unburnt;
         }

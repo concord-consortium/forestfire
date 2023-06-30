@@ -126,8 +126,8 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   maxSparks: 10,
   fireEngineMaxTimeStep: 180, // minutes
   fireEventDayInSeconds: 8, // one day in model should last X seconds in real world
-  regrowthYearInSeconds: 60 / 400, // 400 years should last 60 seconds. 1 year should last 0.15 seconds.
-  simulationEndYear: 400,
+  regrowthYearInSeconds: 60 / 240, // Complete simulation should take around 60 seconds.
+  simulationEndYear: 240,
   windSpeed: 0, // mph
   windDirection: 0, // degrees, northern wind
   // Note that 0.5 helps to create a nicer, more round shape of neighbours set for a given cell
@@ -185,17 +185,17 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   successionMinYears: 3,
   grassToShrub: 0.1,
   grassToShrubAdjacent: 0.3,
-  shrubToDeciduous: 0.1,
-  shrubToDeciduousAdjacent: 0.3,
-  deciduousToConiferousMinYears: 40,
-  deciduousToConiferous: 0.1,
-  deciduousToConiferousAdjacent: 0.3,
-  lowIntensityBurntAreaMinYears: 1,
-  lowIntensityBurntShrubToGrass: 0.4,
-  lowIntensityBurntDeciduousToGrass: 0.1,
-  lowIntensityBurntConiferousToGrass: 0.1,
-  highIntensityBurntAreaMinYears: 3,
-  highIntensityBurntAreaToGrass: 0.5
+  shrubToDeciduous: 0.05,
+  shrubToDeciduousAdjacent: 0.15,
+  deciduousToConiferousMinYears: 50,
+  deciduousToConiferous: 0.01,
+  deciduousToConiferousAdjacent: 0.05,
+  lowIntensityBurntAreaMinYears: 2,
+  lowIntensityBurntShrubToGrass: 0.8,
+  lowIntensityBurntDeciduousToGrass: 0.7,
+  lowIntensityBurntConiferousToGrass: 0.6,
+  highIntensityBurntAreaMinYears: 5,
+  highIntensityBurntAreaToGrass: 0.9
 });
 
 const getURLParam = (name: string) => {
