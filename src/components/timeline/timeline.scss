@@ -43,7 +43,7 @@
       .axis {
         width: 100%;
         height: 1px;
-        background-color: $textColor;
+        background-color: $controlText;
       }
 
       .progressBar {
@@ -65,7 +65,7 @@
         .tickSymbol {
           width: 1px;
           height: 6px;
-          background-color: $textColor;
+          background-color: $controlText;
         }
 
         .tickLabel {
