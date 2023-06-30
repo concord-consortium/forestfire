@@ -53,7 +53,7 @@ export const RightPanel = observer(() => {
         <div className={css.graphControls}>
           <div className={css.sliderContainer}>
             {
-              true &&
+              showRangeSlider &&
               <div className={css.slider}>
                 <Slider
                   classes={{
@@ -63,10 +63,8 @@ export const RightPanel = observer(() => {
                   }}
                   size="small"
                   step={1}
-                  min={0}
-                  max={70}
-                  // min={RECENT_DATA_RANGE}
-                  // max={simulation.yearlyVegetationStatistics.length}
+                  min={RECENT_DATA_RANGE}
+                  max={simulation.yearlyVegetationStatistics.length}
                   value={graphEndPoint}
                   onChange={handleSliderChange}
                 />
