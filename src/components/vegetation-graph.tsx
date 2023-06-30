@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../use-stores";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, defaults } from "chart.js";
-import { Line, Bar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { Vegetation } from "../types";
 
 import cssExports from "./common.scss";
@@ -15,6 +15,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 
 export const defaultOptions = {
   responsive: true,
+  maintainAspectRatio: false,
   animation: {
     duration: 0,
   },
@@ -32,12 +33,12 @@ export const defaultOptions = {
       }
     },
   },
-  categoryPercentage: 1, // no spacing between bars
-  barPercentage: 0.9,
+  categoryPercentage: 1, // no additional spacing between bar categories
+  barPercentage: 0.85,
   scales: {
     x: {
       ticks: {
-        maxTicksLimit: 6,
+        maxTicksLimit: 7,
       },
       grid: {
         display: false
@@ -74,8 +75,7 @@ const datasetOptions = {
   borderWidth: 0,
 };
 
-const RECENT_YEARS = 26;
-const GRAPH_HEIGHT = 210;
+const RECENT_YEARS = 51;
 
 export interface IProps {
   allData?: boolean;
@@ -152,15 +152,17 @@ export const VegetationGraph: React.FC<IProps> = observer(({ allData }) => {
     ]
   };
 
+  const barPercentage = simulation.config.graphBarPercentage;
+  const wideAllData = simulation.config.graphWideAllData;
   const options = {
     ...defaultOptions,
-    barPercentage: allData ? 1 : 0.9, // remove spacing between bars when displaying all data
+    // When all data graph is squeezed in the narrow right panel, set bar percentage to 1 to avoid aliasing artifacts.
+    barPercentage: allData ? (wideAllData ? barPercentage : 1) : barPercentage
   };
 
   return (
-    <>
-      <Line options={options} data={data} height={GRAPH_HEIGHT} />
-      <Bar options={options} data={data} height={GRAPH_HEIGHT} />
-    </>
+    <div style={{height: "210px", width: "100%" }}>
+      <Bar options={options} data={data} />
+    </div>
   );
 });
