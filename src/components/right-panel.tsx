@@ -1,7 +1,6 @@
 import { observer } from "mobx-react";
 import React from "react";
 import { VegetationGraph } from "./vegetation-graph";
-import { RightPanelTab } from "./right-panel-tab";
 import { useStores } from "../use-stores";
 import { log } from "@concord-consortium/lara-interactive-api";
 
@@ -25,13 +24,11 @@ export const RightPanel = observer(() => {
       <div className={css.rightPanelContent}>
         <VegetationGraph allData={false} />
       </div>
-      <ul className={css.rightPanelTabs}>
-        <li>
-          <div className={css.rightPanelTab} onClick={handleToggleDrawer}>
-            <RightPanelTab />
-          </div>
-        </li>
-      </ul>
+      <div className={css.rightPanelTabs}>
+        <div className={css.rightPanelTab} onClick={handleToggleDrawer}>
+            <div className={css.tabContent}>Graphs</div>
+        </div>
+      </div>
     </div>
   );
 });

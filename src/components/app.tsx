@@ -46,7 +46,7 @@ export const AppComponent = observer(function WrappedComponent() {
       <div className={clsx(css.timeline, {[css.shrink]: ui.showChart})}>
         <Timeline />
       </div>
-      <div className={`${css.rightContent} ${ui.showChart && css.grow}`}>
+      <div className={css.rightContent}>
         <RightPanel />
       </div>
       <div className={css.bottomBar}>

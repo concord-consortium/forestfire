@@ -16,12 +16,12 @@
   color: #797979;
   cursor: pointer;
   &:hover {
-    color: $textColor;
+    color: $controlText;
   }
 }
 
 .content {
-  color: $textColor;
+  color: $controlText;
   margin-top: 1em;
   p:first-child {
     margin-top: 0;

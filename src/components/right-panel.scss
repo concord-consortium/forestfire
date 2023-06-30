@@ -1,35 +1,25 @@
 @import "common";
 
+$tabVerticalSpacing: 10px;
+$tabWidth: 68px;
+$padding: 4px;
+
 .rightPanel {
-  pointer-events: all;
   position: absolute;
   right: -$rightPanelWidth;
-  top: 0;
   width: $rightPanelWidth;
-  bottom: 0 !important;
+  top: 0;
+  bottom: 0;
   transition: $rightPanelTransition;
-  border-left: 2px solid $controlGreenDark2;
-  border-top: 1px solid $controlGreenDark2;
+  border-top: 1px solid $controlGray;
+  border-left: 1px solid $controlGray;
   background-color: $controlGreenDark2;
-  z-index: 0;
 
   .rightPanelContent {
-    position: absolute;
-    top: 0;
-    width: $rightPanelContentWidth;
-    right: 0;
-    bottom: 0;
+    margin-left: $padding;
     background-color: rgba(255, 255, 255, 1);
     padding: 10px;
-
-    .title {
-      border-bottom: 1px solid $textColor;
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 14px;
-      font-weight: bold;
-      color: $textColor;
-    }
+    height: 100%;
   }
 
   &.open {
@@ -37,56 +27,40 @@
   }
 
   .rightPanelTabs {
-    pointer-events: all;
     position: absolute;
-    display: block;
-    margin: 0;
-    margin-right: $rightPanelWidth;
-    right: 0;
-    list-style-type: none;
+    left: -$tabWidth ;
+    top: 0;
   }
 
   .rightPanelTab {
     margin-top: $tabVerticalSpacing;
-  }
-
-  .tabContentBack {
-    z-index: 1;
-    position: absolute;
-    width: $rightPanelWidth;
-    bottom: 0;
-    top: 0;
-    right: 0;
-    min-height: 618px;
-    height: 100%;
+    box-sizing: border-box;
+    width: $tabWidth;
+    height: 52px;
+    border-left: 1px solid $controlGray;
+    border-top: 1px solid $controlGray;
+    border-bottom: 1px solid $controlGray;
+    border-right: 1px solid $controlGreenDark2;
+    background-color: $controlGreenDark2;
+    border-top-left-radius: 9px;
+    border-bottom-left-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
 
     .tabContent {
-      pointer-events: all;
-      position: absolute;
-      bottom: 0;
-      top: 0;
-      right: 0;
-      width: $rightPanelInnerWidth;
-      min-height: 618px;
-      background-color: $tabContents;
-      margin-right: 0;
-      margin-left: auto;
-      height: 100%;
-
-      .drawerTitle {
-        width: 100%;
-        height: 17px;
-        margin: 10px auto;
-        font-family: $lato;
-        font-size: 14px;
-        font-weight: bold;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: normal;
-        letter-spacing: normal;
-        text-align: center;
-        color: $textColor;
-      }
+      width: calc(100% - $padding);
+      height: calc(100% - 2 * $padding);
+      background-color: #fff;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: $lato;
+      font-weight: bold;
+      font-size: 14px;
     }
   }
 }
