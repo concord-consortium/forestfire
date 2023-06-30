@@ -1,7 +1,8 @@
 @import "common.scss";
 
-.fireEventButton {
+button.fireEventButton {
   width: 98px;
+  border-right: 1px dashed $controlGray;
 
   .fireEventIcon {
     width: 84px;
