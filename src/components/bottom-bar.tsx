@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { clsx } from "clsx";
 import { BottomBarContainer, BottomBarWidgetGroup } from "./geohazard-components/bottom-bar/bottom-bar-container";
 import { PlaybackControls } from "./geohazard-components/bottom-bar/playback-controls";
@@ -44,8 +44,13 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
   };
 
   const placeSpark = () => {
-    ui.interaction = Interaction.PlaceSpark;
-    log("SparkButtonClicked");
+    if (ui.interaction !== Interaction.PlaceSpark) {
+      ui.interaction = Interaction.PlaceSpark;
+      log("SparkInteractionActivated");
+    } else {
+      ui.interaction = null;
+      log("SparkInteractionCancelled");
+    }
   };
 
   const toggleFireEvent = () => {
@@ -58,7 +63,16 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
     }
   };
 
-  const sparkBtnDisabled = !simulation.isFireEventActive || !simulation.canAddSpark || ui.interaction === Interaction.PlaceSpark;
+  useEffect(() => {
+    if (!simulation.canAddSpark) {
+      ui.interaction = null;
+    }
+    if (!simulation.isFireEventActive) {
+      ui.interaction = null;
+    }
+  }, [simulation.canAddSpark, simulation.isFireEventActive, ui]);
+
+  const sparkBtnDisabled = !simulation.isFireEventActive || !simulation.canAddSpark;
   // Sparks counter should actually be "enabled" (fully visible) when there's no more sparks left to clearly show
   // why the button is disabled.
   const sparkCountDisabled = sparkBtnDisabled && simulation.remainingSparks > 0;
@@ -98,6 +112,7 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
           buttonText="Spark"
           dataTest="spark-button"
           onClick={placeSpark}
+          selected={ui.interaction === Interaction.PlaceSpark}
         />
       </BottomBarWidgetGroup>
       <PlaybackControls

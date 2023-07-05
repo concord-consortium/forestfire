@@ -14,7 +14,6 @@ export const usePlaceSparkInteraction = () => {
       const y = e.point.y / ratio;
       simulation.addSpark(x, y);
       const cell = simulation.cellAt(x, y);
-      ui.interaction = null;
       log("SparkPlaced", { x: x / simulation.config.modelWidth, y: y / simulation.config.modelHeight, elevation: cell.elevation });
     }
   };

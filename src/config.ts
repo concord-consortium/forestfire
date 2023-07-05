@@ -129,7 +129,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   sparks: [],
   maxSparks: 10,
   fireEngineMaxTimeStep: 180, // minutes
-  fireEventDayInSeconds: 8, // one day in model should last X seconds in real world
+  fireEventDayInSeconds: 2, // one day in model should last X seconds in real world
   regrowthYearInSeconds: 60 / 240, // Complete simulation should take around 60 seconds.
   simulationEndYear: 240,
   windSpeed: 0, // mph

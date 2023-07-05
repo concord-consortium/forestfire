@@ -11,6 +11,7 @@ import { TopBar } from "./geohazard-components/top-bar/top-bar";
 import { AboutDialogContent } from "./about-dialog-content";
 import { ShareDialogContent } from "./share-dialog-content";
 import { useCustomCursor } from "./use-custom-cursors";
+import { mainContentId } from "../types";
 import Shutterbug from "shutterbug";
 
 import css from "./app.scss";
@@ -39,7 +40,7 @@ export const AppComponent = observer(function WrappedComponent() {
           <div>Highest Point Possible: {config.heightmapMaxElevation} ft</div>
         </div>
       }
-      <div className={clsx(css.mainContent, {[css.shrink]: ui.showChart})}>
+      <div id={mainContentId} className={clsx(css.mainContent, {[css.shrink]: ui.showChart})}>
         <SimulationInfo />
         <View3d />
       </div>
