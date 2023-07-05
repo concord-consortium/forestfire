@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../use-stores";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, defaults } from "chart.js";
+import annotationPlugin from "chartjs-plugin-annotation";
 import { Bar } from "react-chartjs-2";
-import { Vegetation } from "../types";
+import { Vegetation, yearInMinutes } from "../types";
+import { renderToString } from "react-dom/server";
+import FireEventSpark from "../assets/bottom-bar/Fire Event.svg";
 
 import cssExports from "./common.scss";
 
@@ -11,9 +14,14 @@ defaults.font.family = cssExports.robotoFontFamily;
 defaults.color = cssExports.controlGray;
 defaults.font.size = 14;
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend);
+const SPARK_HEIGHT = 31;
+const FireEventSparkString = renderToString(<FireEventSpark height={SPARK_HEIGHT} />);
+const FireEventImage = new Image();
+FireEventImage.src = `data:image/svg+xml;base64,${btoa(FireEventSparkString)}`;
 
-export const defaultOptions = {
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, annotationPlugin);
+
+export const defaultOptions: any = {
   responsive: true,
   maintainAspectRatio: false,
   animation: {
@@ -27,11 +35,20 @@ export const defaultOptions = {
       display: true,
       text: "Vegetation vs. Time",
       fullSize: false, // center over chart area only
+      padding: {
+        bottom: SPARK_HEIGHT
+      },
       font: {
         size: 15,
         weight: "bold"
       }
     },
+    annotation: {
+      clip: false,
+      annotations: {
+
+      }
+    }
   },
   categoryPercentage: 1, // no additional spacing between bar categories
   barPercentage: 0.85,
@@ -78,6 +95,41 @@ const datasetOptions = {
   pointRadius: 0,
   borderWidth: 0,
 };
+
+const getFireEventAnnotations = (idx: number, xPos: number) => ({
+  [`image${idx}`]: {
+    type: "label",
+    content: FireEventImage,
+    xValue: xPos,
+    yValue: 100,
+    height: SPARK_HEIGHT,
+    yAdjust: -0.5 * SPARK_HEIGHT - 2,
+  },
+  [`label${idx}`]: {
+    type: "label",
+    // drawTime: "afterDraw",
+    content: `${idx + 1}`,
+    xValue: xPos,
+    yValue: 100,
+    yAdjust: -0.5 * SPARK_HEIGHT + 4,
+    font: {
+      size: 14,
+      color: "#000",
+      weight: "bold",
+      // family: cssExports.robotoFontFamily,
+    }
+  },
+  [`line${idx}`]: {
+    type: "line",
+    xMin: xPos,
+    xMax: xPos,
+    yMin: 0,
+    yMax: 100,
+    borderColor: "#b2b2b2",
+    borderDash: [5, 5],
+    borderWidth: 1.5,
+  }
+});
 
 export interface IProps {
   allData: boolean;
@@ -165,8 +217,18 @@ export const VegetationGraph: React.FC<IProps> = observer(({ allData, recentData
     barPercentage: allData ? (wideAllData ? barPercentage : 1) : barPercentage
   };
 
+  options.plugins.annotation.annotations = {};
+  simulation.fireEvents.forEach((fireEvent, idx) => {
+    const xPos = Math.floor(fireEvent.time / yearInMinutes) - startPoint;
+    if (xPos < 0) {
+      return;
+    }
+    const newAnnotations = getFireEventAnnotations(idx, xPos);
+    Object.assign(options.plugins.annotation.annotations, newAnnotations);
+  });
+
   return (
-    <div style={{height: "210px", width: "100%" }}>
+    <div style={{ height: "210px", width: "100%" }}>
       <Bar options={options} data={data} />
     </div>
   );
