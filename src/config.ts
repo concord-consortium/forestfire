@@ -1,6 +1,10 @@
 import { ZoneOptions } from "./models/zone";
 import { DroughtLevel, Vegetation, TerrainType, dayInMinutes } from "./types";
 
+import riverTexture from "./assets/data/river-texmap.png";
+import foothillsHeightmap from "./assets/data/foothills-foothills-heightmap.png";
+import foothillsIslands from "./assets/data/foothills-foothills-islands.png";
+
 interface TownOptions {
   name: string;
   x: number; // [0, 1], position relative to model width
@@ -123,8 +127,8 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   gridWidth: 240,
   get cellSize() { return this.modelWidth / this.gridWidth; },
   get gridHeight() { return Math.ceil(this.modelHeight / this.cellSize); },
-  elevation: undefined, // will be derived from zone properties
-  unburntIslands: undefined, // will be derived from zone properties
+  elevation: foothillsHeightmap,
+  unburntIslands: foothillsIslands,
   zoneIndex: undefined,
   sparks: [],
   maxSparks: 10,
@@ -164,7 +168,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   ],
   towns: [],
   fillTerrainEdges: true,
-  riverData: "data/river-texmap.png",
+  riverData: riverTexture,
   windScaleFactor: 0.2, // Note that model is very sensitive to wind.
   // Scale wind values down for now, so changes are less dramatic.
   showModelDimensions: false,

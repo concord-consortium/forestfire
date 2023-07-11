@@ -1,19 +1,6 @@
-import { TerrainType } from "../../types";
 import { ISimulationConfig } from "../../config";
 import { getInputData } from "./image-utils";
 import { Zone } from "../zone";
-
-// Maps zones config to image data files (see data dir). E.g. it can generate file names like:
-// - data/plains-plains
-// - data/plains-mountains
-// etc.
-const zonesToImageDataFile = (zones: Zone[]) => {
-  const zoneTypes: string[] = [];
-  zones.forEach((z, i) => {
-    zoneTypes.push(TerrainType[z.terrainType].toLowerCase());
-  });
-  return "data/" + zoneTypes.join("-");
-};
 
 export const getZoneIndex = (config: ISimulationConfig, zoneIndex: number[][] | string): Promise<number[] | undefined> => {
   return getInputData(zoneIndex, config.gridWidth, config.gridHeight, false,
@@ -31,13 +18,7 @@ export const getZoneIndex = (config: ISimulationConfig, zoneIndex: number[][] | 
 };
 
 export const getElevationData = (config: ISimulationConfig, zones: Zone[]): Promise<number[] | undefined> => {
-  // If `elevation` height map is provided, it will be loaded during model initialization.
-  // Otherwise, height map URL will be derived from zones `terrainType` properties.
-  let elevation = config.elevation;
-  if (!elevation) {
-    elevation = zonesToImageDataFile(zones) + "-heightmap.png";
-  }
-  return getInputData(elevation, config.gridWidth, config.gridHeight, true,
+  return getInputData(config.elevation, config.gridWidth, config.gridHeight, true,
     (rgba: [number, number, number, number]) => {
       // Elevation data is supposed to black & white image, where black is the lowest point and
       // white is the highest.
@@ -47,14 +28,8 @@ export const getElevationData = (config: ISimulationConfig, zones: Zone[]): Prom
 };
 
 export const getUnburntIslandsData = (config: ISimulationConfig, zones: Zone[]): Promise<number[] | undefined> => {
-  // Unburnt islands can be specified directly using unburntIslands property or they'll be generated automatically
-  // using zones terrain type.
-  let unburntIslands: number[][] | string | undefined = config.unburntIslands;
-  if (!unburntIslands) {
-    unburntIslands = zonesToImageDataFile(zones) + "-islands.png";
-  }
   const islandActive: { [key: number]: number } = {};
-  return getInputData(unburntIslands, config.gridWidth, config.gridHeight, true,
+  return getInputData(config.unburntIslands, config.gridWidth, config.gridHeight, true,
     (rgba: [number, number, number, number]) => {
       // White areas are regular cells. Islands use gray scale colors, every island is supposed to have different
       // shade. It's enough to look just at R value, as G and B will be equal.
