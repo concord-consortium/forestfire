@@ -4,7 +4,6 @@ const path = require('path');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 // DEPLOY_PATH is set by the s3-deploy-action its value will be:
 // `branch/[branch-name]/` or `version/[tag-name]/`
@@ -126,19 +125,14 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: 'src/index.html',
-        favicon: 'src/public/favicon.ico'
+        favicon: 'src/assets/favicon.ico'
       }),
       ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
         filename: 'index-top.html',
         template: 'src/index.html',
-        favicon: 'src/public/favicon.ico',
+        favicon: 'src/assets/favicon.ico',
         publicPath: DEPLOY_PATH
-      })] : []),
-      new CopyWebpackPlugin({
-        patterns: [
-          { from: 'src/public' }
-        ],
-      }),
+      })] : [])
     ]
   };
 };
