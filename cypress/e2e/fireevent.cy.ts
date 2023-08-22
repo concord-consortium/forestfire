@@ -27,7 +27,7 @@ context("Forest Fire Fire Event And Spark Test", () => {
       bottomBar.getSparkButton().click({ force: true });
       bottomBar.getStartButton().should("contain", "Start");
       bottomBar.getStartButton().click({ force: true });
-      cy.wait(10000);
+      cy.wait(5000);
       bottomBar.getSparkButton().invoke("attr", "disabled").should("exist");
       bottomBar.getFireEventButton().click({ force: true });
       timeLine.getFireEventIndex().eq(1).should("have.text", "2");
