@@ -28,7 +28,7 @@ export class BottomBar {
     this.getMapType().find("[class^='bottom-bar-container--title--']").should("have.text", "Map Type");
   }
   changeMapType() {
-    return this.getMapType().find('button').eq(0);
+    return this.getMapType().find("button").eq(0);
   }
   getMapTypeLabel() {
     return this.getMapType().find("[class^='map-type-switch--label--']");
