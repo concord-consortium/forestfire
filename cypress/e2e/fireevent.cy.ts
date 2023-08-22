@@ -24,6 +24,7 @@ context("Forest Fire Fire Event And Spark Test", () => {
       timeLine.getFireEventIndex().eq(0).should("have.text", "1");
       bottomBar.getSparkButton().click({ force: true });
       cy.get(".app--mainContent--__forestfire-v1__ canvas").click(600, 500, { force: true });
+      cy.wait(2000);
       bottomBar.getStartButton().click({ force: true });
       cy.wait(10000);
       bottomBar.getSparkButton().invoke("attr", "disabled").should("exist");
@@ -31,6 +32,7 @@ context("Forest Fire Fire Event And Spark Test", () => {
       timeLine.getFireEventIndex().eq(1).should("have.text", "2");
       bottomBar.getSparkButton().click({ force: true });
       cy.get(".app--mainContent--__forestfire-v1__ canvas").click(600, 400, { force: true });
+      cy.wait(2000);
       bottomBar.getStartButton().click({ force: true });
       cy.wait(65000);
       bottomBar.getFireEventButton().invoke("attr", "disabled").should("exist");
