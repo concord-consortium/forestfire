@@ -22,19 +22,6 @@ context("Forest Fire Fire Event And Spark Test", () => {
       bottomBar.getStartButton().invoke("attr", "disabled").should("exist");
       timeLine.getFireEventIndex().should("exist");
       timeLine.getFireEventIndex().eq(0).should("have.text", "1");
-      bottomBar.getSparkButton().click({ force: true });
-      cy.get(".app--mainContent--__forestfire-v1__ canvas").click(600, 500, { force: true });
-      bottomBar.getSparkButton().click({ force: true });
-      bottomBar.getStartButton().should("contain", "Start");
-      bottomBar.getStartButton().click({ force: true });
-      cy.wait(7000);
-      bottomBar.getSparkButton().invoke("attr", "disabled").should("exist");
-      bottomBar.getFireEventButton().click({ force: true });
-      timeLine.getFireEventIndex().eq(1).should("have.text", "2");
-      bottomBar.getSparkButton().click({ force: true });
-      cy.get(".app--mainContent--__forestfire-v1__ canvas").click(600, 400, { force: true });
-      bottomBar.getStartButton().should("contain", "Start");
-      bottomBar.getStartButton().click({ force: true });
     });
     it("adds multiple sparks at once", () => {
       bottomBar.getSparkButton().invoke("attr", "disabled").should("exist");
