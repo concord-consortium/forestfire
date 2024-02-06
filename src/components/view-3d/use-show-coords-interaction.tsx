@@ -1,13 +1,13 @@
 import { ftToViewUnit } from "./helpers";
 import { InteractionHandler } from "./interaction-handler";
 import { useStores } from "../../use-stores";
-import { Event } from "three";
+import { ThreeEvent } from "@react-three/fiber";
 
 export const useShowCoordsInteraction: () => InteractionHandler = () => {
   const { simulation } = useStores();
   return {
     active: simulation.config.showCoordsOnClick,
-    onClick: (e: Event) => {
+    onClick: (e: ThreeEvent<PointerEvent>) => {
       const ratio = ftToViewUnit(simulation);
       const xFt = e.point.x / ratio;
       const yFt = e.point.y / ratio;

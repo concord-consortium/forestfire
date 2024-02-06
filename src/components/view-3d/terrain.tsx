@@ -62,7 +62,7 @@ export const fireHistoryColor = (cellFireHistory: IFireHistory[]) => {
 };
 
 const setVertexColor = (
-  colArray: number[], cell: Cell, gridWidth: number, gridHeight: number, config: ISimulationConfig, showFireHistoryOverlay: boolean
+  colArray: THREE.TypedArray, cell: Cell, gridWidth: number, gridHeight: number, config: ISimulationConfig, showFireHistoryOverlay: boolean
 ) => {
   const idx = vertexIdx(cell, gridWidth, gridHeight) * 4;
   let color;
@@ -93,7 +93,7 @@ const setVertexColor = (
 };
 
 const updateColors = (geometry: THREE.PlaneGeometry, simulation: SimulationModel, showFireHistoryOverlay: boolean) => {
-  const colArray = geometry.attributes.color.array as number[];
+  const colArray = geometry.attributes.color.array;
   simulation.cells.forEach(cell => {
     setVertexColor(colArray, cell, simulation.gridWidth, simulation.gridHeight, simulation.config, showFireHistoryOverlay);
   });
@@ -101,7 +101,7 @@ const updateColors = (geometry: THREE.PlaneGeometry, simulation: SimulationModel
 };
 
 const setupElevation = (geometry: THREE.PlaneGeometry, simulation: SimulationModel) => {
-  const posArray = geometry.attributes.position.array as number[];
+  const posArray = geometry.attributes.position.array;
   const mult = ftToViewUnit(simulation);
   // Apply height map to vertices of plane.
   simulation.cells.forEach(cell => {
