@@ -10,8 +10,8 @@ export const FireEvents: React.FC = observer(function WrappedComponent() {
   const { simulation } = useStores();
   const endTime = simulation.simulationEndTime;
   // Convert time from minutes to days.
-  const fireEventTimeInDays = Math.floor(simulation.fireEventTime / dayInMinutes);
-  const fireEventTimeHours = Math.floor((simulation.fireEventTime % dayInMinutes) / 60);
+  const fireEventTimeInDays = Math.floor(simulation.fireEventDisplayTime / dayInMinutes);
+  const fireEventTimeHours = Math.floor((simulation.fireEventDisplayTime % dayInMinutes) / 60);
 
   return (
     <div className={css.fireEvents}>

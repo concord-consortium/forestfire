@@ -1,6 +1,6 @@
 import { action, computed, observable, makeObservable } from "mobx";
 import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vegetation, FireState, VegetationStatistics } from "../types";
-import {  Cell, CellOptions } from "./cell";
+import { Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
 import { getElevationData, getRiverData, getUnburntIslandsData, getZoneIndex } from "./utils/data-loaders";
@@ -124,6 +124,10 @@ export class SimulationModel {
       return -1;
     }
     return this.time - this.fireEvents[this.fireEvents.length - 1]?.time;
+  }
+
+  @computed public get fireEventDisplayTime() {
+    return this.fireEventTime * this.config.fireEventDisplayTimeScale;
   }
 
   public calculateVegetationStatistics(): VegetationStatistics {
