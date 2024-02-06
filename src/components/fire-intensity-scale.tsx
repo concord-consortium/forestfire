@@ -1,7 +1,7 @@
 
 import React from "react";
 import { clsx } from "clsx";
-import { BURN_INDEX_HIGH, BURN_INDEX_LOW, BURN_INDEX_MEDIUM, FIRE_HISTORY_BACKGROUND, FIRE_HISTORY_OVERLAY } from "./view-3d/terrain";
+import { BURN_INDEX_HIGH, BURN_INDEX_LOW, FIRE_HISTORY_BACKGROUND, FIRE_HISTORY_OVERLAY } from "./view-3d/terrain";
 import css from "./fire-intensity-scale.scss";
 
 const colorArrayToRGBA = (colorArray: number[]) =>
