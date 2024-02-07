@@ -92,6 +92,7 @@ export interface IFireHistory {
 export type VegetationStatistics = Record<Vegetation | "burned", number>;
 
 export const dayInMinutes = 1440;
+export const weekInMinutes = 7 * dayInMinutes;
 export const yearInMinutes = 365 * dayInMinutes;
 
 export const mainContentId = "main-content";
