@@ -1,4 +1,4 @@
-import { Event } from "three";
+import { ThreeEvent } from "@react-three/fiber";
 
 // All the events listed here:
 // https://github.com/react-spring/@react-three/fiber#events
@@ -17,7 +17,7 @@ export enum InteractionAction {
   // onWheel = "onWheel" - causes type errors after updating TypeScript, and not used anyway
 }
 
-type EventHandler = (e: Event) => void;
+type EventHandler = (e: ThreeEvent<PointerEvent>) => void;
 
 export type InteractionHandler = {
   [action in InteractionAction]?: EventHandler;
@@ -49,7 +49,7 @@ export const getEventHandlers = (interactions: InteractionHandler[]) => {
   });
   const result: {[action in InteractionAction]?: EventHandler} = {};
   Object.keys(handlers).forEach((eventName: InteractionAction) => {
-    result[eventName] = (e: Event) => {
+    result[eventName] = (e: ThreeEvent<PointerEvent>) => {
       handlers[eventName]?.forEach(handler => {
         handler(e);
       });

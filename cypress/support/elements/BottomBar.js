@@ -57,7 +57,8 @@ export class BottomBar {
     cy.get("[data-name='Map Type Burn History']").should("exist");
   }
   verifyFireHistoryScaleBarContainer() {
-    this.getFireScale().find("[class^='fire-intensity-scale--bar--']").invoke("attr", "style").should("contain", "linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 0, 240) 100%)");
+    this.getFireScale().find("[class^='fire-intensity-scale--bar--']").invoke("attr", "style")
+      .should("contain", "linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 0, 240) 100%)");
   }
   verifyFireHistoryScaleLabels() {
     return this.getFireScale().find("[class^='fire-intensity-scale--labels--']")
