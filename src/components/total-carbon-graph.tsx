@@ -22,7 +22,7 @@ export const defaultOptions: any = {
     },
     title: {
       display: true,
-      text: "Total Carbon vs. Time",
+      text: "Total Stored Carbon vs. Time",
       fullSize: false, // center over chart area only
       font: {
         size: 15,
@@ -56,9 +56,9 @@ export const defaultOptions: any = {
     y: {
       stacked: true,
       min: 0,
-      // max: 100,
+      max: 10,
       ticks: {
-        stepSize: 20,
+        stepSize: 1,
       },
       grid: {
         display: false

@@ -1,6 +1,36 @@
 import { Zone, moistureLookups } from "./zone";
 import { Vegetation, DroughtLevel, yearInMinutes, IFireHistory, BurnIndex, FireState } from "../types";
 
+const carbonAccumulationRate = (vegetation: Vegetation) => { // in kg/m2 per year
+  // Cap and regrowth values are based on the reference provided in the PT story:
+  // https://www.pivotaltracker.com/story/show/185316704
+  switch (vegetation) {
+    case Vegetation.Grass:
+      return 0.068;
+    case Vegetation.Shrub:
+      return 0.09;
+    case Vegetation.DeciduousForest:
+      return 0.09;
+    case Vegetation.ConiferousForest:
+      return 0.021;
+  }
+};
+
+const carbonMaxCapacity = (vegetation: Vegetation) => { // in kg/m2
+  // Cap and regrowth values are based on the reference provided in the PT story:
+  // https://www.pivotaltracker.com/story/show/185316704
+  switch (vegetation) {
+    case Vegetation.Grass:
+      return 0.068;
+    case Vegetation.Shrub:
+      return 0.8;
+    case Vegetation.DeciduousForest:
+      return 6.9;
+    case Vegetation.ConiferousForest:
+      return 8.1;
+  }
+};
+
 export interface CellOptions {
   x: number;
   y: number;
@@ -26,7 +56,8 @@ export class Cell {
   public baseElevation = 0;
   public ignitionTime = Infinity;
   public spreadRate = 0;
-  public vegetationAge = 0;
+  public vegetationAge = Infinity;
+  public storedCarbon = 0;
   public burnTime: number = MAX_BURN_TIME;
   public fireState: FireState = FireState.Unburnt;
   public isUnburntIsland = false;
@@ -41,6 +72,7 @@ export class Cell {
   constructor(props: CellOptions) {
     Object.assign(this, props);
     this.vegetation = this.zone.vegetation;
+    this.storedCarbon = carbonMaxCapacity(this.vegetation);
   }
 
   public get elevation() {
@@ -129,6 +161,15 @@ export class Cell {
   public set vegetation(vegetation: Vegetation) {
     this._vegetation = vegetation;
     this.vegetationAge = 0;
+  }
+
+  public accumulateCarbon(yearsDiff = 1) {
+    this.storedCarbon += carbonAccumulationRate(this.vegetation) * yearsDiff;
+    this.storedCarbon = Math.min(carbonMaxCapacity(this.vegetation), this.storedCarbon);
+  }
+
+  public releaseCarbon() {
+    this.storedCarbon = 0;
   }
 
   public isBurnableForBI(burnIndex: BurnIndex) {
