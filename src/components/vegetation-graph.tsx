@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../use-stores";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, defaults } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { Bar } from "react-chartjs-2";
 import { Vegetation, yearInMinutes } from "../types";
@@ -9,10 +9,6 @@ import { renderToString } from "react-dom/server";
 import FireEventSpark from "../assets/bottom-bar/Fire Event.svg";
 
 import cssExports from "./common.scss";
-
-defaults.font.family = cssExports.robotoFontFamily;
-defaults.color = cssExports.controlGray;
-defaults.font.size = 14;
 
 const SPARK_HEIGHT = 31;
 const FireEventSparkString = renderToString(<FireEventSpark height={SPARK_HEIGHT} />);
@@ -63,11 +59,7 @@ export const defaultOptions: any = {
       border: {
         color: cssExports.controlGray,
       },
-      stacked: true,
-      title: {
-        display: true,
-        text: "Time (years)"
-      }
+      stacked: true
     },
     y: {
       stacked: true,
@@ -228,7 +220,7 @@ export const VegetationGraph: React.FC<IProps> = observer(({ allData, recentData
   });
 
   return (
-    <div style={{ height: "210px", width: "100%" }}>
+    <div style={{ height: "210px", width: "100%", marginBottom: "6px" }}>
       <Bar options={options} data={data} />
     </div>
   );

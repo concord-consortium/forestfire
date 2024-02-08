@@ -51,6 +51,7 @@ export class SimulationModel {
   @observable public isFireActive = false;
   @observable public vegetationStatistics: VegetationStatistics;
   @observable public yearlyVegetationStatistics: VegetationStatistics[] = [];
+  @observable public yearlyTotalCarbon: number[] = [];
   // These flags can be used by view to trigger appropriate rendering. Theoretically, view could/should check
   // every single cell and re-render when it detects some changes. In practice, we perform these updates in very
   // specific moments and usually for all the cells, so this approach can be way more efficient.
@@ -161,6 +162,11 @@ export class SimulationModel {
     statistics[Vegetation.ConiferousForest] /= numCells;
 
     return statistics;
+  }
+
+  public calculateTotalCarbon(): number {
+    // TODO: implement real logic
+    return Math.random() * 100;
   }
 
   public cellAt(x: number, y: number) {
@@ -287,6 +293,7 @@ export class SimulationModel {
     this.fireEvents = [];
     this.sparks = [];
     this.yearlyVegetationStatistics = [];
+    this.yearlyTotalCarbon = [];
     this.config.sparks.forEach(s => {
       this.addSpark(s[0], s[1]);
     });
@@ -349,6 +356,7 @@ export class SimulationModel {
 
     if (yearDidChange) {
       this.yearlyVegetationStatistics.push(this.calculateVegetationStatistics());
+      this.yearlyTotalCarbon.push(this.calculateTotalCarbon());
     }
 
     this.changeWindIfNecessary();
