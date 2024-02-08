@@ -41,13 +41,11 @@ export class BottomBar {
   }
   verifyFireIntensityScaleBarContainer() {
     this.getFireScale().find("[class^='fire-intensity-scale--bar1--']").invoke("attr", "style").should("contain", "rgb(255, 231, 117)");
-    this.getFireScale().find("[class^='fire-intensity-scale--bar2--']").invoke("attr", "style").should("contain", "rgb(255, 193, 64)");
-    this.getFireScale().find("[class^='fire-intensity-scale--bar3--']").invoke("attr", "style").should("contain", "rgb(255, 96, 96)");
+    this.getFireScale().find("[class^='fire-intensity-scale--bar2--']").invoke("attr", "style").should("contain", "rgb(255, 96, 96)");
   }
   verifyFireIntensityScaleLabels() {
     return this.getFireScale().find("[class^='fire-intensity-scale--labels--']")
     .should("contain", "Low")
-    .should("contain", "Medium")
     .should("contain", "High");
   }
   verifyVegetationMapDisplayed() {

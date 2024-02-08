@@ -1,7 +1,7 @@
 
 import React from "react";
 import { clsx } from "clsx";
-import { BURN_INDEX_HIGH, BURN_INDEX_LOW, BURN_INDEX_MEDIUM, FIRE_HISTORY_BACKGROUND, FIRE_HISTORY_OVERLAY } from "./view-3d/terrain";
+import { BURN_INDEX_HIGH, BURN_INDEX_LOW, FIRE_HISTORY_BACKGROUND, FIRE_HISTORY_OVERLAY } from "./view-3d/terrain";
 import css from "./fire-intensity-scale.scss";
 
 const colorArrayToRGBA = (colorArray: number[]) =>
@@ -11,12 +11,10 @@ export const FireIntensityScale = () => (
   <div className={clsx(css.scaleContainer, css.fireIntensity)}>
     <div className={css.barsContainer}>
       <div className={css.bar1} style={{backgroundColor: colorArrayToRGBA(BURN_INDEX_LOW) }} />
-      <div className={css.bar2} style={{backgroundColor: colorArrayToRGBA(BURN_INDEX_MEDIUM) }} />
-      <div className={css.bar3} style={{backgroundColor: colorArrayToRGBA(BURN_INDEX_HIGH) }} />
+      <div className={css.bar2} style={{backgroundColor: colorArrayToRGBA(BURN_INDEX_HIGH) }} />
     </div>
     <div className={css.labels}>
       <div>Low</div>
-      <div>Medium</div>
       <div>High</div>
     </div>
   </div>
