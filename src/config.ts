@@ -37,6 +37,8 @@ export interface ISimulationConfig {
   fireEngineMaxTimeStep: number; // minutes
   // This variable defines fire event time step. One day in model should last X seconds in real world.
   fireEventDayInSeconds: number;
+  // The time displayed by the fire event label will be multiplied by this value.
+  fireEventDisplayTimeScale: number;
   // This variable defines regrowth phase time step. One year in model should last X seconds in real world.
   regrowthYearInSeconds: number;
   // Stop model when year reaches this value.
@@ -134,6 +136,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   maxSparks: 10,
   fireEngineMaxTimeStep: 180, // minutes
   fireEventDayInSeconds: 2, // one day in model should last X seconds in real world
+  fireEventDisplayTimeScale: 4, // the time displayed by the fire event label will be multiplied by this value
   regrowthYearInSeconds: 60 / 240, // Complete simulation should take around 60 seconds.
   simulationEndYear: 240,
   windSpeed: 0, // mph
