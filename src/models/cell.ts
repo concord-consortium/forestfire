@@ -163,6 +163,22 @@ export class Cell {
     this.vegetationAge = 0;
   }
 
+  public isInMultipleBurnsState(time: number) {
+    // Check fire history if 2 or more files have occurred within 30 years window span.
+    const postMultipleBurnsStateLength = 150 * yearInMinutes; // 150 years after multiple burns within 30 years
+    const multipleBurnsWindow = 30 * yearInMinutes;
+
+    for (let i = this.fireHistory.length - 1; i >= 1; i--) {
+      const fire = this.fireHistory[i];
+      const prevFire = this.fireHistory[i - 1];
+      if (time - fire.time <= postMultipleBurnsStateLength && fire.time - prevFire.time <= multipleBurnsWindow) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public accumulateCarbon(yearsDiff = 1) {
     this.storedCarbon += carbonAccumulationRate(this.vegetation) * yearsDiff;
     this.storedCarbon = Math.min(carbonMaxCapacity(this.vegetation), this.storedCarbon);

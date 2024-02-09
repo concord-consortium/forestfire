@@ -371,7 +371,7 @@ export class SimulationModel {
 
     if (this.fireEngine) {
       this.processSparks();
-      this.fireEngine.updateFire(this.fireEventTime);
+      this.fireEngine.updateFire(this.fireEventTime, this.time);
       this.updateCellsStateFlag();
       this.isFireActive = !this.fireEngine.fireDidStop;
       if (!this.isFireActive) {

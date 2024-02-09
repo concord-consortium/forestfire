@@ -104,7 +104,9 @@ export class RegrowthEngine {
           if (randomNumber < (adjacentDeciduousForest ? p.shrubToDeciduousAdjacent : p.shrubToDeciduous)) {
             cell.vegetation = Vegetation.DeciduousForest;
           }
-        } else if (cell.vegetation === Vegetation.DeciduousForest && cell.vegetationAgeInYears > p.deciduousToConiferousMinYears * droughtLevelFactor) {
+        } else if (cell.vegetation === Vegetation.DeciduousForest &&
+            !cell.isInMultipleBurnsState(time) && // When cell experienced multiple burns within short time span, coniferous trees will not grow.
+            cell.vegetationAgeInYears > p.deciduousToConiferousMinYears * droughtLevelFactor) {
           const adjacentConiferousForest = this.isAdjacentVegetationPresent(cell, Vegetation.ConiferousForest);
           if (randomNumber < (adjacentConiferousForest ? p.deciduousToConiferousAdjacent : p.deciduousToConiferous)) {
             cell.vegetation = Vegetation.ConiferousForest;
