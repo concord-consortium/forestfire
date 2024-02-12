@@ -92,6 +92,8 @@ export class RegrowthEngine {
 
       // Growth of existing vegetation
       if (cell.fireState === FireState.Unburnt) {
+        cell.accumulateCarbon();
+
         if (cell.vegetation === Vegetation.Grass && cell.vegetationAgeInYears > p.successionMinYears) {
           const adjacentShrub = this.isAdjacentVegetationPresent(cell, Vegetation.Shrub);
           if (randomNumber < (adjacentShrub ? p.grassToShrubAdjacent : p.grassToShrub)) {
@@ -111,6 +113,8 @@ export class RegrowthEngine {
       }
 
       if (cell.fireState === FireState.Burnt) {
+        cell.releaseCarbon();
+
         const timeSinceLastFire = time - cell.lastFireTime;
         if (cell.lastFireBurnIndex === BurnIndex.Low && timeSinceLastFire > p.lowIntensityBurntAreaMinYears * yearInMinutes) {
           if (cell.vegetation === Vegetation.Shrub) {

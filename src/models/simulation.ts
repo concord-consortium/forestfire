@@ -164,9 +164,17 @@ export class SimulationModel {
     return statistics;
   }
 
-  public calculateTotalCarbon(): number {
-    // TODO: implement real logic
-    return Math.random() * 100;
+  public calculateTotalStoredCarbon(): number {
+    // Note that the total carbon graph shows values in kg/m^2, so it is actually an average, not a sum as the name might suggest.
+    let sum = 0;
+    let count = 0;
+    this.cells.forEach(cell => {
+      if (!cell.isNonburnable) {
+        sum += cell.storedCarbon;
+        count++;
+      }
+    });
+    return sum / count;
   }
 
   public cellAt(x: number, y: number) {
@@ -356,7 +364,7 @@ export class SimulationModel {
 
     if (yearDidChange) {
       this.yearlyVegetationStatistics.push(this.calculateVegetationStatistics());
-      this.yearlyTotalCarbon.push(this.calculateTotalCarbon());
+      this.yearlyTotalCarbon.push(this.calculateTotalStoredCarbon());
     }
 
     this.changeWindIfNecessary();
