@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Slider } from "@mui/material";
 import { clsx } from "clsx";
 import { VegetationGraph } from "./vegetation-graph";
+import { TotalCarbonGraph } from "./total-carbon-graph";
 import { useStores } from "../use-stores";
 import { log } from "@concord-consortium/lara-interactive-api";
 
@@ -50,6 +51,7 @@ export const RightPanel = observer(() => {
     <div className={clsx(css.rightPanel, { [css.open]: ui.showChart, [css.wide]: simulation.config.graphWideAllData && allData })}>
       <div className={css.rightPanelContent}>
         <VegetationGraph allData={allData} recentDataEndPoint={graphEndPoint} recentDataLength={RECENT_DATA_RANGE} />
+        <TotalCarbonGraph allData={allData} recentDataEndPoint={graphEndPoint} recentDataLength={RECENT_DATA_RANGE} />
         <div className={css.graphControls}>
           <div className={css.sliderContainer}>
             {
