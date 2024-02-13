@@ -39,9 +39,7 @@ const burnIndexColor = (burnIndex: BurnIndex) => {
   if (burnIndex === BurnIndex.Low) {
     return BURN_INDEX_LOW;
   }
-  if (burnIndex === BurnIndex.Medium) {
-    return BURN_INDEX_MEDIUM;
-  }
+  // Project team requested to merge medium and high burn index colors, hence the same color for both.
   return BURN_INDEX_HIGH;
 };
 
