@@ -155,11 +155,11 @@ export class FireEngine {
     }
   }
 
-  public updateFire(time: number) {
-    this.time = time;
+  public updateFire(fireEventTime: number, time: number) {
+    this.time = fireEventTime;
 
     this.fires.forEach(fire => {
-      const fireDuration = time - fire.startTime;
+      const fireDuration = fireEventTime - fire.startTime;
       // Each time a day changes check if the low intensity fire shouldn't go out on itself.
       const newDay = Math.floor(fireDuration / dayInMinutes);
       if (newDay !== fire.day) {
@@ -186,14 +186,14 @@ export class FireEngine {
         this.fireDidStop = false; // fire still going on
       }
       const ignitionTime = cell.ignitionTime;
-      if (cell.fireState === FireState.Burning && time - ignitionTime > cell.burnTime) {
+      if (cell.fireState === FireState.Burning && fireEventTime - ignitionTime > cell.burnTime) {
         if (cell.canSurviveFire && Math.random() < this.fireSurvivalProbability) {
           newFireStateData[i] = FireState.Survived;
         } else {
           newFireStateData[i] = FireState.Burnt;
           cell.fireHistory.push({ time, burnIndex: cell.burnIndex });
         }
-      } else if (cell.fireState === FireState.Unburnt && time > ignitionTime ) {
+      } else if (cell.fireState === FireState.Unburnt && fireEventTime > ignitionTime ) {
         // Sets any unburnt cells to burning if we are passed their ignition time.
         // Although during a simulation all cells will have their state sent to BURNING through the process
         // above, this not only allows us to pre-set ignition times for testing, but will also allow us to

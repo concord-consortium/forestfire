@@ -75,7 +75,7 @@ describe("FireEngine", () => {
     engine.fires.forEach(fire => {
       expect(fire.endOfLowIntensityFire).toBe(false);
     });
-    engine.updateFire(dayInMinutes * 5); // 5 days in minutes
+    engine.updateFire(dayInMinutes * 5, dayInMinutes * 5); // 5 days in minutes
     engine.fires.forEach(fire => {
       expect(fire.endOfLowIntensityFire).toBe(true);
     });
@@ -84,11 +84,11 @@ describe("FireEngine", () => {
   it("should detect when nothing is burning anymore", () => {
     const engine = new FireEngine(generateCells(), wind, config);
     engine.setSparks(sparks);
-    engine.updateFire(dayInMinutes * 5);
+    engine.updateFire(dayInMinutes * 5, dayInMinutes * 5);
     expect(engine.fireDidStop).toBe(false);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toBeGreaterThan(0);
-    engine.updateFire(dayInMinutes * 6);
-    engine.updateFire(dayInMinutes * 7);
+    engine.updateFire(dayInMinutes * 6, dayInMinutes * 6);
+    engine.updateFire(dayInMinutes * 7, dayInMinutes * 7);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toEqual(0);
     expect(engine.fireDidStop).toBe(true);
   });
@@ -108,7 +108,7 @@ describe("FireEngine", () => {
     const engine = new FireEngine(cells, wind, config);
     engine.setSparks(sparks);
     engine.cells.forEach(c => expect(c.isUnburntIsland).toEqual(false));
-    engine.updateFire(dayInMinutes);
+    engine.updateFire(dayInMinutes, dayInMinutes);
     expect(engine.cells.filter(c => c.isBurningOrWillBurn).length).toBeGreaterThan(0);
   });
 
@@ -119,9 +119,9 @@ describe("FireEngine", () => {
       const engine = new FireEngine(generateCells(zone), wind, config);
       engine.setSparks(sparks);
       expect(engine.cells.filter(c => c.fireState === FireState.Survived).length).toEqual(0);
-      engine.updateFire(dayInMinutes);
-      engine.updateFire(dayInMinutes);
-      engine.updateFire(dayInMinutes);
+      engine.updateFire(dayInMinutes, dayInMinutes);
+      engine.updateFire(dayInMinutes, dayInMinutes);
+      engine.updateFire(dayInMinutes, dayInMinutes);
       return engine.cells.filter(c => c.fireState === FireState.Survived).length;
     };
 
