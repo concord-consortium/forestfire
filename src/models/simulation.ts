@@ -9,10 +9,6 @@ import { FireEngine } from "./fire-engine/fire-engine";
 import { RegrowthEngine } from "./regrowth-engine/regrowth-engine";
 import { getGridIndexForLocation } from "./utils/grid-utils";
 
-// When config.changeWindOnDay is defined, but config.newWindSpeed is not, the model will use random value limited
-// by this constant.
-const NEW_WIND_MAX_SPEED = 20; // mph
-
 const DEFAULT_ZONE_DIVISION = {
   2: [
     [0, 1]
@@ -35,7 +31,6 @@ export class SimulationModel {
   // Cells are not directly observable. Changes are broadcasted using cellsStateFlag and cellsElevationFlag.
   public cells: Cell[] = [];
 
-  public userDefinedWind: IWindProps | undefined = undefined;
   // This property is also used by the UI to highlight wind info box.
   @observable public windDidChange = false;
 
@@ -303,18 +298,6 @@ export class SimulationModel {
     this.fireEngine = null;
     this.regrowthEngine = null;
     this.windDidChange = false;
-    if (this.userDefinedWind) {
-      this.wind.speed = this.userDefinedWind.speed;
-      this.wind.direction = this.userDefinedWind.direction;
-      // Clear the saved wind settings. Otherwise, the following scenario might fail:
-      // - simulation is started, userDefinedWind is saved when the wind settings are updated during the simulation
-      // - user restarts simulation, userDefinedWind props are restored (as expected)
-      // - user manually updates wind properties to new values
-      // - simulation started and then restarted again BEFORE the new wind settings are applied
-      // If userDefinedWind value isn't cleared, the user would see wrong wind setting after the second model restart.
-      // This use case is coved by one of the tests in the simulation.test.ts
-      this.userDefinedWind = undefined;
-    }
     this.isFireActive = false;
     this.fireEvents = [];
     this.sparks = [];
@@ -389,8 +372,6 @@ export class SimulationModel {
       this.setDroughtLevel(newDroughtLevel);
     }
 
-    this.changeWindIfNecessary();
-
     if (this.fireEngine) {
       this.processSparks();
       this.fireEngine.updateFire(this.fireEventTime, this.time);
@@ -417,28 +398,6 @@ export class SimulationModel {
     const notProcessedSparks = this.sparks.filter(spark => !spark.locked);
     this.fireEngine?.setSparks(notProcessedSparks.map(spark => spark.position));
     notProcessedSparks.forEach(spark => spark.locked = true);
-  }
-
-  @action.bound public changeWindIfNecessary() {
-    if (this.config.changeWindOnDay !== undefined && this.timeInDays >= this.config.changeWindOnDay && this.windDidChange === false) {
-      const newDirection = this.config.newWindDirection !== undefined ? this.config.newWindDirection : Math.random() * 360;
-      const newSpeed = (this.config.newWindSpeed !== undefined ? this.config.newWindSpeed : Math.random() * NEW_WIND_MAX_SPEED) * this.config.windScaleFactor;
-      // Save user defined values that will be restored when model is reset or reloaded.
-      this.userDefinedWind = {
-        speed: this.wind.speed,
-        direction: this.wind.direction
-      };
-      // Update UI.
-      this.wind.direction = newDirection;
-      this.wind.speed = newSpeed;
-      // Update fireEngine.
-      if (this.fireEngine) {
-        this.fireEngine.wind.direction = newDirection;
-        this.fireEngine.wind.speed = newSpeed;
-      }
-      // Mark that the change just happened.
-      this.windDidChange = true;
-    }
   }
 
   @action.bound public updateCellsElevationFlag() {
@@ -486,7 +445,9 @@ export class SimulationModel {
     this.stop();
     // Wind is randomly updated at the beginning of each fire event.
     this.setWindDirection(Math.random() * 360);
-    this.setWindSpeed(0.5 + Math.random() * 1.5);
+    const minWind = 0.666;
+    const maxWind = 2.000;
+    this.setWindSpeed(minWind + Math.random() * (maxWind - minWind));
     this.windDidChange = true; // notify user wind has been updated
     this.fireEvents.push({ time: this.time });
   }
