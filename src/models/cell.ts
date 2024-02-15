@@ -1,5 +1,6 @@
-import { Zone, moistureLookups } from "./zone";
+import { Zone } from "./zone";
 import { Vegetation, DroughtLevel, yearInMinutes, IFireHistory, BurnIndex, FireState } from "../types";
+import { interpolate } from "./utils/interpolate";
 
 const carbonAccumulationRate = (vegetation: Vegetation) => { // in kg/m2 per year
   // Cap and regrowth values are based on the reference provided in the PT story:
@@ -29,6 +30,27 @@ const carbonMaxCapacity = (vegetation: Vegetation) => { // in kg/m2
     case Vegetation.ConiferousForest:
       return 8.1;
   }
+};
+
+// values for each level of drought: 0 - no drought, 1 - mild, 2 - medium, 3 - severe
+export const moistureLookups: {[key in Vegetation]: number[]} = {
+  [Vegetation.Grass]: [0.1275, 0.09, 0.0525, 0.015],
+  [Vegetation.Shrub]: [0.255, 0.18, 0.105, 0.03],
+  [Vegetation.DeciduousForest]: [0.17, 0.12, 0.07, 0.02],
+  [Vegetation.ConiferousForest]: [0.2125, 0.15, 0.0875, 0.025]
+};
+
+export const getInterpolatedMoisture = (vegetationType: Vegetation, droughtLevel: number): number => {
+  if (droughtLevel < DroughtLevel.NoDrought || droughtLevel > DroughtLevel.SevereDrought) {
+    throw new Error("Drought level must be between DroughtLevel.NoDrought and DroughtLevel.SevereDrought");
+  }
+
+  const moistureLevels = moistureLookups[vegetationType];
+  if (!moistureLevels) {
+    throw new Error("Invalid vegetation type");
+  }
+
+  return interpolate(moistureLevels, droughtLevel);
 };
 
 export interface CellOptions {
@@ -90,7 +112,7 @@ export class Cell {
     if (this.isNonburnable) {
       return Infinity;
     }
-    return moistureLookups[this.droughtLevel][this.vegetation];
+    return getInterpolatedMoisture(this.vegetation, this.droughtLevel);
   }
 
   public get droughtLevel() {

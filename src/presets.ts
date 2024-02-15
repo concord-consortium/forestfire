@@ -65,32 +65,34 @@ const presets: { [key: string]: Partial<ISimulationConfig> } = {
   default: {
     zonesCount: 2,
     zones: [
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MediumDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest },
     ],
     towns: []
   },
   mildDrought: {
     zonesCount: 2,
+    climateChange: [DroughtLevel.MildDrought, DroughtLevel.SevereDrought],
     zones: [
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MildDrought },
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.MildDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest },
     ],
     towns: []
   },
   severeDrought: {
     zonesCount: 2,
+    climateChange: [DroughtLevel.SevereDrought, DroughtLevel.SevereDrought],
     zones: [
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.SevereDrought },
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest, droughtLevel: DroughtLevel.SevereDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.ConiferousForest },
     ],
     towns: []
   },
   grass: {
     zonesCount: 2,
     zones: [
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass, droughtLevel: DroughtLevel.MediumDrought },
-      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass, droughtLevel: DroughtLevel.MediumDrought },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass },
     ],
     towns: []
   }

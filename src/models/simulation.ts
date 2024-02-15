@@ -1,5 +1,5 @@
 import { action, computed, observable, makeObservable } from "mobx";
-import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vegetation, FireState, VegetationStatistics } from "../types";
+import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vegetation, FireState, VegetationStatistics, DroughtLevel } from "../types";
 import { Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
@@ -131,6 +131,24 @@ export class SimulationModel {
     return this.fireEventTime * this.config.fireEventDisplayTimeScale;
   }
 
+  @computed public get initialDroughtLevel() {
+    return this.config.climateChange[0];
+  }
+
+  @computed public get finalDroughtLevel() {
+    return this.config.climateChange[1];
+  }
+
+  @computed public get droughtLevel() {
+    // average drought level of all zones
+    return this.zones.reduce((sum, zone) => sum + zone.droughtLevel, 0) / this.zones.length;
+  }
+
+  public setDroughtLevel(value: number) {
+    // set drought level of all zones
+    this.zones.forEach(zone => zone.droughtLevel = value);
+  }
+
   public calculateVegetationStatistics(): VegetationStatistics {
     const statistics: VegetationStatistics = {
       [Vegetation.Grass]: 0,
@@ -185,7 +203,7 @@ export class SimulationModel {
 
   @action.bound public setInputParamsFromConfig() {
     const config = this.config;
-    this.zones = config.zones.map(options => new Zone(options));
+    this.zones = config.zones.map(options => new Zone({ ...options, droughtLevel: this.initialDroughtLevel }));
     if (config.zonesCount) {
       this.zones.length = config.zonesCount;
     }
@@ -365,6 +383,10 @@ export class SimulationModel {
     if (yearDidChange) {
       this.yearlyVegetationStatistics.push(this.calculateVegetationStatistics());
       this.yearlyTotalCarbon.push(this.calculateTotalStoredCarbon());
+
+      const simulationProgress = newYear / this.config.simulationEndYear;
+      const newDroughtLevel = this.initialDroughtLevel + (this.finalDroughtLevel - this.initialDroughtLevel) * simulationProgress;
+      this.setDroughtLevel(newDroughtLevel);
     }
 
     this.changeWindIfNecessary();

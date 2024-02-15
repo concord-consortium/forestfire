@@ -2,7 +2,7 @@ import { Cell } from "../cell";
 import { FireEngine, getGridCellNeighbors, nonburnableCellBetween } from "./fire-engine";
 import { Vector2 } from "three";
 import { Zone } from "../zone";
-import { Vegetation, dayInMinutes, FireState, BurnIndex } from "../../types";
+import { Vegetation, dayInMinutes, FireState, BurnIndex, TerrainType, DroughtLevel } from "../../types";
 
 describe("nonburnableCellBetween", () => {
   it("returns true if there's any nonburnable cell between two points", () => {
@@ -58,7 +58,11 @@ describe("FireEngine", () => {
   };
   const wind = { speed: 0, direction: 0 };
   const sparks = [new Vector2(50000, 50000)];
-  const defaultZone = new Zone({});
+  const defaultZone = new Zone({
+    vegetation: Vegetation.Grass,
+    terrainType: TerrainType.Foothills,
+    droughtLevel: DroughtLevel.MildDrought
+  });
   const generateCells = (zone = defaultZone) => {
     const res = [];
     for (let x = 0; x < config.gridWidth; x += 1) {
@@ -115,7 +119,7 @@ describe("FireEngine", () => {
 
   describe("fire survivors", () => {
     const testVegetationAndGetNumberOfFireSurvivors = (vegetation: Vegetation) => {
-      const zone = new Zone({ vegetation });
+      const zone = new Zone({ vegetation, terrainType: TerrainType.Foothills, droughtLevel: DroughtLevel.MildDrought });
       const engine = new FireEngine(generateCells(zone), wind, config);
       engine.setSparks(sparks);
       expect(engine.cells.filter(c => c.fireState === FireState.Survived).length).toEqual(0);
