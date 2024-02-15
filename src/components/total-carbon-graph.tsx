@@ -5,7 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import annotationPlugin from "chartjs-plugin-annotation";
 import { Line } from "react-chartjs-2";
 import { yearInMinutes } from "../types";
-import { Y_AXIS_WIDTH } from "./graph-common";
+import { Y_AXIS_WIDTH, tooltipTitle } from "./graph-common";
 
 import cssExports from "./common.scss";
 
@@ -28,6 +28,11 @@ export const defaultOptions: ChartOptions<"line"> = {
       font: {
         size: 15,
         weight: "bold"
+      }
+    },
+    tooltip: {
+      callbacks: {
+        title: tooltipTitle
       }
     },
     annotation: {

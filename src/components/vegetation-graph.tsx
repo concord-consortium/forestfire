@@ -7,7 +7,7 @@ import { Bar } from "react-chartjs-2";
 import { Vegetation, yearInMinutes } from "../types";
 import { renderToString } from "react-dom/server";
 import FireEventSpark from "../assets/bottom-bar/Fire Event.svg";
-import { Y_AXIS_WIDTH } from "./graph-common";
+import { Y_AXIS_WIDTH, tooltipTitle } from "./graph-common";
 
 import cssExports from "./common.scss";
 
@@ -38,6 +38,11 @@ export const defaultOptions: ChartOptions<"bar"> = {
       font: {
         size: 15,
         weight: "bold"
+      }
+    },
+    tooltip: {
+      callbacks: {
+        title: tooltipTitle
       }
     },
     annotation: {
