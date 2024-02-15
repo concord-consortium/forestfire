@@ -43,6 +43,14 @@
     margin-top: 6px;
   }
 
+  .text {
+    font-family: $robotoCondensed;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: condensed;
+    margin-bottom: 5px;
+  }
+
   .vegetationStats {
 
     .stat {
@@ -104,14 +112,6 @@
 
     .windDidChange {
       animation: highlight 2s ease-in-out;
-    }
-
-    .windText {
-      font-family: $robotoCondensed;
-      font-size: 14px;
-      font-weight: normal;
-      font-stretch: condensed;
-      margin-bottom: 5px;
     }
 
     .windDial {

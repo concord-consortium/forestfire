@@ -1,4 +1,3 @@
-import { ZoneOptions } from "./models/zone";
 import { DroughtLevel, Vegetation, TerrainType, dayInMinutes } from "./types";
 
 import riverTexture from "./assets/data/river-texmap.png";
@@ -10,6 +9,11 @@ interface TownOptions {
   x: number; // [0, 1], position relative to model width
   y: number; // [0, 1], position relative to model height
   terrainType?: TerrainType; // limit town marker to given terrain type
+}
+
+interface ZoneConfig {
+  vegetation: Vegetation;
+  terrainType: TerrainType;
 }
 
 export interface ISimulationConfig {
@@ -55,7 +59,7 @@ export interface ISimulationConfig {
   heightmapMaxElevation: number; // ft
   // Number of zones that the model is using. Zones are used to keep properties of some area of the model.
   zonesCount?: 2 | 3;
-  zones: [ZoneOptions, ZoneOptions, ZoneOptions?];
+  zones: [ZoneConfig, ZoneConfig] | [ZoneConfig, ZoneConfig, ZoneConfig];
   towns: TownOptions[];
   // Visually fills edges of the terrain by setting elevation to 0.
   fillTerrainEdges: boolean;
@@ -85,10 +89,6 @@ export interface ISimulationConfig {
   // River color, RGBA values (range: [0, 1]). Suggested colors:
   // [0.663,0.855,1,1], [0.337,0.69,0.957,1] or [0.067,0.529,0.882,1]
   riverColor: [number, number, number, number];
-  // Authors may want to disable the fireline and helitack features completely
-  fireLineAvailable: boolean;
-  helitackAvailable: boolean;
-  forestWithSuppressionAvailable: boolean;
   // If set to a number, the wind direction and strength will change during the model run.
   changeWindOnDay: number | undefined;
   // Works together with `changeWindOnDay`. Sets the new wind direction (0 to 360). If undefined, it'll be random.
@@ -99,6 +99,8 @@ export interface ISimulationConfig {
   graphBarPercentage: number;
   // When true, "Show All Data" will expand the right panel to 75% of the screen width.
   graphWideAllData: boolean;
+  // Range of drought levels that change over time due to climate change.
+  climateChange: [number, number];
   // Regrowth probabilities:
   successionMinYears: number;
   grassToShrub: number;
@@ -155,18 +157,15 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   zones: [
     {
       terrainType: TerrainType.Plains,
-      vegetation: Vegetation.Grass,
-      droughtLevel: DroughtLevel.MildDrought
+      vegetation: Vegetation.Grass
     },
     {
       terrainType: TerrainType.Plains,
-      vegetation: Vegetation.Shrub,
-      droughtLevel: DroughtLevel.MediumDrought
+      vegetation: Vegetation.Shrub
     },
     {
       terrainType: TerrainType.Plains,
-      vegetation: Vegetation.DeciduousForest,
-      droughtLevel: DroughtLevel.SevereDrought
+      vegetation: Vegetation.DeciduousForest
     }
   ],
   towns: [],
@@ -186,14 +185,12 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   droughtIndexLocked: false,
   severeDroughtAvailable: true,
   riverColor: [0.067, 0.529, 0.882, 1],
-  fireLineAvailable: true,
-  helitackAvailable: true,
-  forestWithSuppressionAvailable: true,
   changeWindOnDay: undefined,
   newWindDirection: undefined,
   newWindSpeed: undefined,
   graphBarPercentage: 0.85,
   graphWideAllData: true,
+  climateChange: [DroughtLevel.MediumDrought, DroughtLevel.SevereDrought],
   // Regrowth probabilities:
   successionMinYears: 3,
   grassToShrub: 0.1,

@@ -1,15 +1,10 @@
 import { Cell } from "../cell";
-import { Vegetation, yearInMinutes, FireState, BurnIndex, DroughtLevel } from "../../types";
+import { Vegetation, yearInMinutes, FireState, BurnIndex } from "../../types";
 import { getGridIndexForLocation } from "../utils/grid-utils";
+import { interpolate } from "../utils/interpolate";
 
 
-const DroughtLevelToRegrowthMultiplier: Record<DroughtLevel, number> = {
-  [DroughtLevel.NoDrought]: 0.5,
-  [DroughtLevel.MildDrought]: 0.8,
-  [DroughtLevel.MediumDrought]: 1,
-  [DroughtLevel.SevereDrought]: 1.5,
-};
-
+const DroughtLevelToRegrowthMultiplier = [0.5, 0.8, 1, 1.5];
 export interface IRegrowthEngineConfig {
   gridWidth: number;
   gridHeight: number;
@@ -86,7 +81,7 @@ export class RegrowthEngine {
     for (let i = 0; i < numCells; i++) {
       const cell = this.cells[i];
       cell.vegetationAge += yearInMinutes;
-      const droughtLevelFactor = DroughtLevelToRegrowthMultiplier[cell.droughtLevel];
+      const droughtLevelFactor = interpolate(DroughtLevelToRegrowthMultiplier, cell.droughtLevel);
 
       const randomNumber = Math.random() * droughtLevelFactor;
 
