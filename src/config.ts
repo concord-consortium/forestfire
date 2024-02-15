@@ -89,12 +89,6 @@ export interface ISimulationConfig {
   // River color, RGBA values (range: [0, 1]). Suggested colors:
   // [0.663,0.855,1,1], [0.337,0.69,0.957,1] or [0.067,0.529,0.882,1]
   riverColor: [number, number, number, number];
-  // If set to a number, the wind direction and strength will change during the model run.
-  changeWindOnDay: number | undefined;
-  // Works together with `changeWindOnDay`. Sets the new wind direction (0 to 360). If undefined, it'll be random.
-  newWindDirection: number | undefined;
-  // Works together with `changeWindOnDay`. Sets the new wind speed (mph). If undefined, it'll be random.
-  newWindSpeed: number | undefined;
   // Adjusts spacing between bars in the vegetation bar chart, [0, 1].
   graphBarPercentage: number;
   // When true, "Show All Data" will expand the right panel to 75% of the screen width.
@@ -171,7 +165,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   towns: [],
   fillTerrainEdges: true,
   riverData: riverTexture,
-  windScaleFactor: 0.2, // Note that model is very sensitive to wind.
+  windScaleFactor: 0.0666, // Note that model is very sensitive to wind.
   // Scale wind values down for now, so changes are less dramatic.
   showModelDimensions: false,
   fireLineDelay: dayInMinutes, // a day
@@ -185,9 +179,6 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   droughtIndexLocked: false,
   severeDroughtAvailable: true,
   riverColor: [0.067, 0.529, 0.882, 1],
-  changeWindOnDay: undefined,
-  newWindDirection: undefined,
-  newWindSpeed: undefined,
   graphBarPercentage: 0.85,
   graphWideAllData: true,
   climateChange: [DroughtLevel.MediumDrought, DroughtLevel.SevereDrought],
