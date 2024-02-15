@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../use-stores";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, ChartOptions } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { Bar } from "react-chartjs-2";
 import { Vegetation, yearInMinutes } from "../types";
 import { renderToString } from "react-dom/server";
 import FireEventSpark from "../assets/bottom-bar/Fire Event.svg";
+import { Y_AXIS_WIDTH } from "./graph-common";
 
 import cssExports from "./common.scss";
 
@@ -17,7 +18,7 @@ FireEventImage.src = `data:image/svg+xml;base64,${btoa(FireEventSparkString)}`;
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, annotationPlugin);
 
-export const defaultOptions: any = {
+export const defaultOptions: ChartOptions<"bar"> = {
   responsive: true,
   maintainAspectRatio: false,
   animation: {
@@ -46,6 +47,7 @@ export const defaultOptions: any = {
       }
     }
   },
+  // @ts-expect-error - barPercentage is not in the types, but it's a valid option.
   categoryPercentage: 1, // no additional spacing between bar categories
   barPercentage: 0.85,
   scales: {
@@ -77,6 +79,10 @@ export const defaultOptions: any = {
       title: {
         display: true,
         text: "Vegetation (%)"
+      },
+      afterFit(scaleInstance) {
+        // Enforce fixed with so both total carbon and vegetation graphs have the same Y axis width.
+        scaleInstance.width = Y_AXIS_WIDTH;
       }
     }
   }
@@ -209,14 +215,14 @@ export const VegetationGraph: React.FC<IProps> = observer(({ allData, recentData
     barPercentage: allData ? (wideAllData ? barPercentage : 1) : barPercentage
   };
 
-  options.plugins.annotation.annotations = {};
+  (options.plugins as any).annotation.annotations = {};
   simulation.fireEvents.forEach((fireEvent, idx) => {
     const xPos = Math.floor(fireEvent.time / yearInMinutes) - startPoint;
     if (xPos < 0) {
       return;
     }
     const newAnnotations = getFireEventAnnotations(idx, xPos);
-    Object.assign(options.plugins.annotation.annotations, newAnnotations);
+    Object.assign((options.plugins as any).annotation.annotations, newAnnotations);
   });
 
   return (
