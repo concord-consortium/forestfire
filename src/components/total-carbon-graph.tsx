@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../use-stores";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, defaults } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, ChartOptions } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { Line } from "react-chartjs-2";
 import { yearInMinutes } from "../types";
+import { Y_AXIS_WIDTH } from "./graph-common";
 
 import cssExports from "./common.scss";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Filler, Legend, annotationPlugin);
 
-export const defaultOptions: any = {
+export const defaultOptions: ChartOptions<"line"> = {
   responsive: true,
   maintainAspectRatio: false,
   animation: {
@@ -69,6 +70,10 @@ export const defaultOptions: any = {
       title: {
         display: true,
         text: "Total Stored Carbon (kg/m²)"
+      },
+      afterFit(scaleInstance) {
+        // Enforce fixed with so both total carbon and vegetation graphs have the same Y axis width.
+        scaleInstance.width = Y_AXIS_WIDTH;
       }
     }
   }
@@ -137,14 +142,14 @@ export const TotalCarbonGraph: React.FC<IProps> = observer(({ allData, recentDat
     ...defaultOptions
   };
 
-  options.plugins.annotation.annotations = {};
+  (options.plugins as any).annotation.annotations = {};
   simulation.fireEvents.forEach((fireEvent, idx) => {
     const xPos = Math.floor(fireEvent.time / yearInMinutes) - startPoint;
     if (xPos < 0) {
       return;
     }
     const newAnnotations = getFireEventAnnotations(idx, xPos);
-    Object.assign(options.plugins.annotation.annotations, newAnnotations);
+    Object.assign((options.plugins as any).annotation.annotations, newAnnotations);
   });
 
   return (
