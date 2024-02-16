@@ -95,6 +95,14 @@ const presets: { [key: string]: Partial<ISimulationConfig> } = {
       { terrainType: TerrainType.Foothills, vegetation: Vegetation.Grass },
     ],
     towns: []
+  },
+  deciduous: {
+    zonesCount: 2,
+    zones: [
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.DeciduousForest },
+      { terrainType: TerrainType.Foothills, vegetation: Vegetation.DeciduousForest },
+    ],
+    towns: []
   }
 };
 

@@ -192,9 +192,9 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   deciduousToConiferous: 0.01,
   deciduousToConiferousAdjacent: 0.05,
   lowIntensityBurntAreaMinYears: 2,
-  lowIntensityBurntShrubToGrass: 0.8,
-  lowIntensityBurntDeciduousToGrass: 0.7,
-  lowIntensityBurntConiferousToGrass: 0.6,
+  lowIntensityBurntShrubToGrass: 0.7,
+  lowIntensityBurntDeciduousToGrass: 0.1,
+  lowIntensityBurntConiferousToGrass: 0.1,
   highIntensityBurntAreaMinYears: 5,
   highIntensityBurntAreaToGrass: 0.9
 });
