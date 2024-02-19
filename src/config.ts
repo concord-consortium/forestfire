@@ -181,7 +181,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   riverColor: [0.067, 0.529, 0.882, 1],
   graphBarPercentage: 0.85,
   graphWideAllData: true,
-  climateChange: [DroughtLevel.MediumDrought, DroughtLevel.SevereDrought],
+  climateChange: [DroughtLevel.NoDrought, DroughtLevel.SevereDrought],
   // Regrowth probabilities:
   successionMinYears: 3,
   grassToShrub: 0.1,
