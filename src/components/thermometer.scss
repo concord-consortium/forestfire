@@ -1,0 +1,43 @@
+@import "common.scss";
+
+.thermometerContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  height: 44px;
+  position: relative;
+
+  .thermometer {
+    position: absolute;
+    left: 14px;
+    top: -2px;
+    margin-right: 10px;
+
+    .temperatureStem {
+      position: absolute;
+      top: 9px;
+      left: 11px;
+      width: 3px;
+      background: red;
+      // so the stem grows up rather than down
+      transform: rotate(180deg);
+      // rotate around center of maximum height stem
+      transform-origin: 50% 9px;
+      height: 4px;
+    }
+  }
+
+  .label {
+    position: absolute;
+    left: 40px;
+    top: 10px;
+    width: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: $robotoCondensed;
+    font-size: 14px;
+    font-stretch: condensed;
+  }
+}
