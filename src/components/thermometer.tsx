@@ -1,6 +1,6 @@
 import React from "react";
 import ThermometerSVG from "../assets/average-temp-meter-normal.svg";
-import { DroughtLevel } from "../types";
+import { DroughtLevel, extremeDroughtConditions } from "../types";
 
 import css from "./thermometer.scss";
 
@@ -17,7 +17,7 @@ export const Thermometer = ({ droughtLevel }: IProps) => {
   let label = "High";
   if (droughtLevelRelative < 0.4) {
     label = "Normal";
-  } else if (droughtLevelRelative >= 0.8) {
+  } else if (droughtLevelRelative >= extremeDroughtConditions / DroughtLevel.SevereDrought) {
     label = "Extreme";
   }
   return (

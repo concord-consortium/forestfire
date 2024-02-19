@@ -1,0 +1,36 @@
+@import "common.scss";
+
+.fireDangerContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .fireDanger {
+    position: relative;
+    height: 54px;
+    width: 99px;
+    margin-bottom: 6px;
+
+    svg {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .arrow {
+      width: 99px;
+      height: 99px;
+      transform-origin: 50% 50%;
+      transition: transform 0.5s ease-in-out;
+    }
+  }
+
+  .label {
+    font-family: $robotoCondensed;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: condensed;
+    margin-bottom: 5px;
+  }
+}

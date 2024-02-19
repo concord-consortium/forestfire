@@ -46,6 +46,8 @@ export enum DroughtLevel {
   SevereDrought = 3
 }
 
+export const extremeDroughtConditions = DroughtLevel.SevereDrought * 0.8;
+
 export const droughtLabels: Record<DroughtLevel, string> = {
   [DroughtLevel.NoDrought]: "No Drought",
   [DroughtLevel.MildDrought]: "Mild Drought",

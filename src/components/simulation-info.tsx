@@ -1,17 +1,19 @@
 import React from "react";
 import { observer } from "mobx-react";
+import { clsx } from "clsx";
 import { useStores } from "../use-stores";
 import { WindDial, degToCompass } from "./wind-dial";
 import { Vegetation } from "../types";
-import { clsx } from "clsx";
+import { Thermometer } from "./thermometer";
+import { FireDanger } from "./fire-danger";
 
 import css from "./simulation-info.scss";
-import { Thermometer } from "./thermometer";
 
 export const SimulationInfo = observer(function WrappedComponent() {
   const { simulation } = useStores();
   const scaledWind = simulation.wind.speed / simulation.config.windScaleFactor;
   const stats = simulation.vegetationStatistics;
+  const fireEventActive = simulation.isFireEventActive;
 
   const getStat = (vegetation: Vegetation | "burned") => `${Math.round(stats[vegetation] * 100)}%`;
 
@@ -33,7 +35,12 @@ export const SimulationInfo = observer(function WrappedComponent() {
         <Thermometer droughtLevel={simulation.droughtLevel} />
       </div>
 
-      <div className={clsx(css.container, css.wind, { [css.windDidChange] : simulation.windDidChange })} >
+      <div className={clsx(css.container, { [css.inactive]: !fireEventActive})} >
+        <div className={css.header}>Fire Danger</div>
+        <FireDanger droughtLevel={simulation.droughtLevel} scaledWindSpeed={scaledWind} />
+      </div>
+
+      <div className={clsx(css.container, css.wind, { [css.windDidChange] : simulation.windDidChange, [css.inactive]: !fireEventActive })} >
         <div className={css.header}>Wind</div>
         <div className={css.text}>
             {`${Math.round(scaledWind)} MPH from ${degToCompass(simulation.wind.direction)}`}
