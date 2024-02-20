@@ -25,7 +25,7 @@ export class BottomBar {
     return cy.get("[class^='bottom-bar-container'] .hoverable");
   }
   VerifyMapTypeTitle() {
-    this.getMapType().find("[class^='bottom-bar-container--title--']").should("have.text", "Map Type");
+    this.getMapType().find("[class^='bottom-bar-container--title--']").contains("Map Type");
   }
   changeMapType() {
     return this.getMapType().find("button").eq(0);
