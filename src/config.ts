@@ -94,7 +94,9 @@ export interface ISimulationConfig {
   // When true, "Show All Data" will expand the right panel to 75% of the screen width.
   graphWideAllData: boolean;
   // Range of drought levels that change over time due to climate change.
-  climateChange: [number, number];
+  climateChange: [number, number] | false;
+  // Drought level that is used when climate change is not active.
+  nonClimateChangeDroughtLevel: DroughtLevel;
   // Regrowth probabilities:
   successionMinYears: number;
   grassToShrub: number;
@@ -182,6 +184,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   graphBarPercentage: 0.85,
   graphWideAllData: true,
   climateChange: [DroughtLevel.NoDrought, DroughtLevel.SevereDrought],
+  nonClimateChangeDroughtLevel: DroughtLevel.MildDrought,
   // Regrowth probabilities:
   successionMinYears: 3,
   grassToShrub: 0.1,

@@ -30,10 +30,13 @@ export const SimulationInfo = observer(function WrappedComponent() {
         <div className={css.stat}><div className={clsx(css.box, css.burned)}>{ getStat("burned") }</div> Burned</div>
       </div>
 
-      <div className={css.container} >
-        <div className={css.header}>Average Temp.</div>
-        <Thermometer droughtLevel={simulation.droughtLevel} />
-      </div>
+      {
+        simulation.config.climateChange &&
+        <div className={css.container} >
+          <div className={css.header}>Average Temp.</div>
+          <Thermometer droughtLevel={simulation.droughtLevel} />
+        </div>
+      }
 
       <div className={clsx(css.container, { [css.inactive]: !fireEventActive})} >
         <div className={css.header}>Fire Danger</div>
