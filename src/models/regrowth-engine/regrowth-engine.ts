@@ -90,13 +90,15 @@ export class RegrowthEngine {
           if (randomNumber < (adjacentShrub ? p.grassToShrubAdjacent : p.grassToShrub)) {
             cell.vegetation = Vegetation.Shrub;
           }
-        } else if (cell.vegetation === Vegetation.Shrub && cell.vegetationAgeInYears > p.successionMinYears) {
+        } else if (cell.vegetation === Vegetation.Shrub &&
+            !cell.isInTripleBurnState(time) && // When cell experienced 3 burns within short time span, deciduous trees will not grow.
+            cell.vegetationAgeInYears > p.successionMinYears) {
           const adjacentDeciduousForest = this.isAdjacentVegetationPresent(cell, Vegetation.DeciduousForest);
           if (randomNumber < (adjacentDeciduousForest ? p.shrubToDeciduousAdjacent : p.shrubToDeciduous)) {
             cell.vegetation = Vegetation.DeciduousForest;
           }
         } else if (cell.vegetation === Vegetation.DeciduousForest &&
-            !cell.isInMultipleBurnsState(time) && // When cell experienced multiple burns within short time span, coniferous trees will not grow.
+            !cell.isInDoubleBurnState(time) && // When cell experienced 2 burns within short time span, coniferous trees will not grow.
             cell.vegetationAgeInYears > p.deciduousToConiferousMinYears) {
           const adjacentConiferousForest = this.isAdjacentVegetationPresent(cell, Vegetation.ConiferousForest);
           if (randomNumber < (adjacentConiferousForest ? p.deciduousToConiferousAdjacent : p.deciduousToConiferous)) {
