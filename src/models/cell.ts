@@ -36,8 +36,9 @@ const carbonMaxCapacity = (vegetation: Vegetation) => { // in kg/m2
 export const moistureLookups: {[key in Vegetation]: number[]} = {
   [Vegetation.Grass]: [0.1275, 0.09, 0.0525, 0.015],
   [Vegetation.Shrub]: [0.255, 0.18, 0.105, 0.03],
-  [Vegetation.DeciduousForest]: [0.17, 0.12, 0.07, 0.02],
-  [Vegetation.ConiferousForest]: [0.2125, 0.15, 0.0875, 0.025]
+  [Vegetation.DeciduousForest]: [0.2125, 0.1, 0.017, 0.005],
+  [Vegetation.ConiferousForest]: [0.085, 0.06, 0.035, 0.01]
+
 };
 
 export const getInterpolatedMoisture = (vegetationType: Vegetation, droughtLevel: number): number => {
@@ -134,32 +135,26 @@ export class Cell {
   public get burnIndex() {
     // Values based on: https://www.pivotaltracker.com/story/show/170344417/comments/209774367
     if (this.vegetation === Vegetation.Grass) {
-      if (this.spreadRate < 45) {
+      if (this.spreadRate < 10) {
         return BurnIndex.Low;
       }
-      return BurnIndex.Medium;
+      return BurnIndex.High;
     }
     if (this.vegetation === Vegetation.Shrub) {
       if (this.spreadRate < 10) {
         return BurnIndex.Low;
       }
-      if (this.spreadRate < 50) {
-        return BurnIndex.Medium;
-      }
       return BurnIndex.High;
     }
     if (this.vegetation === Vegetation.DeciduousForest) {
-      if (this.spreadRate < 25) {
+      if (this.spreadRate < 5) {
         return BurnIndex.Low;
       }
-      return BurnIndex.Medium;
+      return BurnIndex.High;
     }
     // this.vegetation === Vegetation.ConiferousForest
-    if (this.spreadRate < 12) {
+    if (this.spreadRate < 5) {
       return BurnIndex.Low;
-    }
-    if (this.spreadRate < 40) {
-      return BurnIndex.Medium;
     }
     return BurnIndex.High;
   }

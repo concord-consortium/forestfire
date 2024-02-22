@@ -1,10 +1,7 @@
 import { Cell } from "../cell";
 import { Vegetation, yearInMinutes, FireState, BurnIndex } from "../../types";
 import { getGridIndexForLocation } from "../utils/grid-utils";
-import { interpolate } from "../utils/interpolate";
 
-
-const DroughtLevelToRegrowthMultiplier = [0.5, 0.8, 1, 1.5];
 export interface IRegrowthEngineConfig {
   gridWidth: number;
   gridHeight: number;
@@ -81,9 +78,8 @@ export class RegrowthEngine {
     for (let i = 0; i < numCells; i++) {
       const cell = this.cells[i];
       cell.vegetationAge += yearInMinutes;
-      const droughtLevelFactor = interpolate(DroughtLevelToRegrowthMultiplier, cell.droughtLevel);
 
-      const randomNumber = Math.random() * droughtLevelFactor;
+      const randomNumber = Math.random();
 
       // Growth of existing vegetation
       if (cell.fireState === FireState.Unburnt) {
@@ -101,7 +97,7 @@ export class RegrowthEngine {
           }
         } else if (cell.vegetation === Vegetation.DeciduousForest &&
             !cell.isInMultipleBurnsState(time) && // When cell experienced multiple burns within short time span, coniferous trees will not grow.
-            cell.vegetationAgeInYears > p.deciduousToConiferousMinYears * droughtLevelFactor) {
+            cell.vegetationAgeInYears > p.deciduousToConiferousMinYears) {
           const adjacentConiferousForest = this.isAdjacentVegetationPresent(cell, Vegetation.ConiferousForest);
           if (randomNumber < (adjacentConiferousForest ? p.deciduousToConiferousAdjacent : p.deciduousToConiferous)) {
             cell.vegetation = Vegetation.ConiferousForest;

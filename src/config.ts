@@ -181,7 +181,7 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   riverColor: [0.067, 0.529, 0.882, 1],
   graphBarPercentage: 0.85,
   graphWideAllData: true,
-  climateChange: [DroughtLevel.MediumDrought, DroughtLevel.SevereDrought],
+  climateChange: [DroughtLevel.NoDrought, DroughtLevel.SevereDrought],
   // Regrowth probabilities:
   successionMinYears: 3,
   grassToShrub: 0.1,
@@ -192,9 +192,9 @@ export const getDefaultConfig: () => IUrlConfig = () => ({
   deciduousToConiferous: 0.01,
   deciduousToConiferousAdjacent: 0.05,
   lowIntensityBurntAreaMinYears: 2,
-  lowIntensityBurntShrubToGrass: 0.8,
-  lowIntensityBurntDeciduousToGrass: 0.7,
-  lowIntensityBurntConiferousToGrass: 0.6,
+  lowIntensityBurntShrubToGrass: 0.7,
+  lowIntensityBurntDeciduousToGrass: 0.1,
+  lowIntensityBurntConiferousToGrass: 0.1,
   highIntensityBurntAreaMinYears: 5,
   highIntensityBurntAreaToGrass: 0.9
 });
