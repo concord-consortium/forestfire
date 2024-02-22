@@ -41,6 +41,14 @@
     text-align: center;
     color: $controlText;
     margin-top: 6px;
+
+    transition: filter 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
+
+    &.inactive {
+      opacity: 0.65;
+      filter: grayscale(100%);
+    }
   }
 
   .text {

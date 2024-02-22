@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 99 99">
+  <g id="Fire_Danger_Arrow_Color" data-name="Fire Danger Arrow Color">
+    <rect width="99" height="99" fill="none"/>
+    <g id="arrow">
+      <g>
+        <path id="back" d="m49.50098,52.00049c-1.37891,0-2.5-1.12158-2.5-2.5l-.00098-12.44922h-3.68262l6.18164-12.69531,6.18359,12.69482h-3.68262l.00098,12.44922c0,1.37891-1.12109,2.50049-2.5,2.50049Z" fill="#fff"/>
+        <path id="front" d="m44.91699,36.05127h3.08301l.00098,13.44922c0,.82715.67285,1.5,1.5,1.5s1.5-.67334,1.5-1.50049l-.00098-13.44922h3.08301l-4.58398-9.41064-4.58203,9.41113Z" fill="#434343"/>
+      </g>
+      <circle id="pin" cx="49.5" cy="49.50004" r=".5" fill="#fff"/>
+    </g>
+  </g>
+</svg>
