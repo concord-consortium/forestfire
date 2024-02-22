@@ -1,0 +1,81 @@
+@import "common.scss";
+
+.sliderSwitch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 7px;
+  margin-left: 8px;
+  cursor: pointer;
+
+  &:hover {
+    .thumbHighlight {
+      background: #ffffff80;
+    }
+  }
+  &:active {
+    .thumbHighlight {
+      background: #ffffff;
+    }
+  }
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  .track {
+    width: 27px;
+    height: 10px;
+    margin-left: 20px;
+    border-radius: 11px;
+    background: #797979;
+
+    &:global(.on) {
+      background-color: #ff0000;
+    }
+  }
+
+  .thumbHighlight {
+    position: absolute;
+    left: 10px;
+    transition: left .25s;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+      background: #797979;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .thumbInterior {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: white;
+        &:global(.on) {
+          background: #ff7373;
+        }
+      }
+    }
+  }
+
+  label {
+    cursor: pointer;
+    margin-left: 15px;
+    font-family: $robotoCondensed;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: condensed;
+    font-style: normal;
+  }
+}

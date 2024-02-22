@@ -1,5 +1,5 @@
 import { action, computed, observable, makeObservable } from "mobx";
-import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vegetation, FireState, VegetationStatistics } from "../types";
+import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vegetation, FireState, VegetationStatistics, DroughtLevel } from "../types";
 import { Cell, CellOptions } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
@@ -40,6 +40,7 @@ export class SimulationModel {
   @observable public sparks: ISpark[] = [];
   @observable public townMarkers: Town[] = [];
   @observable public zones: Zone[] = [];
+  @observable public climateChangeEnabled = true;
   @observable public simulationStarted = false;
   @observable public simulationRunning = false;
   @observable public fireEvents: IFireEvent[] = [];
@@ -127,14 +128,14 @@ export class SimulationModel {
   }
 
   @computed public get initialDroughtLevel() {
-    return this.config.climateChange[0];
+    return this.climateChangeEnabled && this.config.climateChange ? this.config.climateChange?.[0] : this.config.nonClimateChangeDroughtLevel;
   }
 
   @computed public get finalDroughtLevel() {
-    return this.config.climateChange[1];
+    return this.config.climateChange ? this.config.climateChange[1] : this.config.nonClimateChangeDroughtLevel;
   }
 
-  @computed public get droughtLevel() {
+   public get droughtLevel() {
     // average drought level of all zones
     return this.zones.reduce((sum, zone) => sum + zone.droughtLevel, 0) / this.zones.length;
   }
@@ -194,6 +195,12 @@ export class SimulationModel {
     const gridX = Math.floor(x / this.config.cellSize);
     const gridY = Math.floor(y / this.config.cellSize);
     return this.cells[getGridIndexForLocation(gridX, gridY, this.config.gridWidth)];
+  }
+
+  @action.bound public setClimateChangeEnabled(value: boolean) {
+    this.climateChangeEnabled = value;
+    // Note that climate change affects initial drought level, so we need to update it when climate change is updated.
+    this.setDroughtLevel(this.initialDroughtLevel);
   }
 
   @action.bound public setInputParamsFromConfig() {
@@ -291,6 +298,7 @@ export class SimulationModel {
   @action.bound public restart() {
     this.simulationRunning = false;
     this.simulationStarted = false;
+    this.setDroughtLevel(this.initialDroughtLevel);
     this.cells.forEach(cell => cell.reset());
     this.updateCellsStateFlag();
     this.updateCellsElevationFlag();
@@ -367,9 +375,11 @@ export class SimulationModel {
       this.yearlyVegetationStatistics.push(this.calculateVegetationStatistics());
       this.yearlyTotalCarbon.push(this.calculateTotalStoredCarbon());
 
-      const simulationProgress = newYear / this.config.simulationEndYear;
-      const newDroughtLevel = this.initialDroughtLevel + (this.finalDroughtLevel - this.initialDroughtLevel) * simulationProgress;
-      this.setDroughtLevel(newDroughtLevel);
+      if (this.climateChangeEnabled) {
+        const simulationProgress = newYear / this.config.simulationEndYear;
+        const newDroughtLevel = this.initialDroughtLevel + (this.finalDroughtLevel - this.initialDroughtLevel) * simulationProgress;
+        this.setDroughtLevel(newDroughtLevel);
+      }
     }
 
     if (this.fireEngine) {

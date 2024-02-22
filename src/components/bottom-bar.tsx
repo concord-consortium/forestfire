@@ -17,6 +17,7 @@ import FireEventSpark from "../assets/bottom-bar/Fire Event.svg";
 import FireEventAdd from "../assets/bottom-bar/Fire Event Add.svg";
 
 import css from "./bottom-bar.scss";
+import { SliderSwitch } from "./slider-switch";
 
 export const BottomBar: React.FC = observer(function WrappedComponent() {
   const { simulation, ui } = useStores();
@@ -61,6 +62,11 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
       simulation.cancelFireEventSetup();
       log("FireEventCancelled");
     }
+  };
+
+  const setClimateChange = (on: boolean) => {
+    simulation.setClimateChangeEnabled(on);
+    log(on ? "ClimateChangeEnabled" : "ClimateChangeDisabled");
   };
 
   useEffect(() => {
@@ -138,6 +144,17 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         ui.showFireHistoryOverlay &&
         <BottomBarWidgetGroup title="Fire History Scale">
           <FireHistoryScale />
+        </BottomBarWidgetGroup>
+      }
+      {
+        simulation.config.climateChange &&
+        <BottomBarWidgetGroup title="Climate Change" hoverable={true}>
+          <SliderSwitch
+            disabled={simulation.simulationStarted}
+            label={simulation.climateChangeEnabled ? "ON" : "OFF"}
+            isOn={simulation.climateChangeEnabled}
+            onSet={setClimateChange}
+          />
         </BottomBarWidgetGroup>
       }
     </BottomBarContainer>
