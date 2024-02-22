@@ -24,6 +24,7 @@ export const defaultOptions: ChartOptions<"line"> = {
     title: {
       display: true,
       text: "Total Stored Carbon vs. Time",
+      color: cssExports.controlText,
       fullSize: false, // center over chart area only
       font: {
         size: 15,
@@ -46,6 +47,7 @@ export const defaultOptions: ChartOptions<"line"> = {
     x: {
       ticks: {
         maxTicksLimit: 7,
+        color: cssExports.controlText
       },
       grid: {
         display: false
@@ -56,7 +58,8 @@ export const defaultOptions: ChartOptions<"line"> = {
       stacked: true,
       title: {
         display: true,
-        text: "Time (years)"
+        text: "Time (years)",
+        color: cssExports.controlText
       }
     },
     y: {
@@ -65,6 +68,7 @@ export const defaultOptions: ChartOptions<"line"> = {
       max: 10,
       ticks: {
         stepSize: 1,
+        color: cssExports.controlText
       },
       grid: {
         display: false
@@ -74,7 +78,8 @@ export const defaultOptions: ChartOptions<"line"> = {
       },
       title: {
         display: true,
-        text: "Total Stored Carbon (kg/m²)"
+        text: "Total Stored Carbon (kg/m²)",
+        color: cssExports.controlText
       },
       afterFit(scaleInstance) {
         // Enforce fixed with so both total carbon and vegetation graphs have the same Y axis width.

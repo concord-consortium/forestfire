@@ -31,6 +31,7 @@ export const defaultOptions: ChartOptions<"bar"> = {
     title: {
       display: true,
       text: "Vegetation vs. Time",
+      color: cssExports.controlText,
       fullSize: false, // center over chart area only
       padding: {
         bottom: SPARK_HEIGHT
@@ -59,6 +60,7 @@ export const defaultOptions: ChartOptions<"bar"> = {
     x: {
       ticks: {
         maxTicksLimit: 7,
+        color: cssExports.controlText
       },
       grid: {
         display: false
@@ -74,6 +76,7 @@ export const defaultOptions: ChartOptions<"bar"> = {
       max: 100,
       ticks: {
         stepSize: 20,
+        color: cssExports.controlText
       },
       grid: {
         display: false
@@ -83,7 +86,8 @@ export const defaultOptions: ChartOptions<"bar"> = {
       },
       title: {
         display: true,
-        text: "Vegetation (%)"
+        text: "Vegetation (%)",
+        color: cssExports.controlText
       },
       afterFit(scaleInstance) {
         // Enforce fixed with so both total carbon and vegetation graphs have the same Y axis width.
