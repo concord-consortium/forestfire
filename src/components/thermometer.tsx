@@ -9,10 +9,14 @@ const MIN_STEM_HEIGHT = 4;
 
 interface IProps {
   droughtLevel: number;
+  climateChangeEnabled: boolean;
 }
 
-export const Thermometer = ({ droughtLevel }: IProps) => {
-  const droughtLevelRelative = droughtLevel / DroughtLevel.SevereDrought;
+export const Thermometer = ({ droughtLevel, climateChangeEnabled }: IProps) => {
+  // When climate change toggle is disabled by user, always show the thermometer at normal level. It might not be accurate,
+  // as the default drought level is 1 in such case, but that way we can avoid jump of the thermometer stem when user toggles
+  // the climate change.
+  const droughtLevelRelative = climateChangeEnabled ? droughtLevel / DroughtLevel.SevereDrought : 0;
   const stemHeight = MIN_STEM_HEIGHT + (MAX_STEM_HEIGHT - MIN_STEM_HEIGHT) * droughtLevelRelative;
   let label = "High";
   if (droughtLevelRelative < 0.4) {

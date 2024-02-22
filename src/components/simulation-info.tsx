@@ -34,7 +34,7 @@ export const SimulationInfo = observer(function WrappedComponent() {
         simulation.config.climateChange &&
         <div className={css.container} >
           <div className={css.header}>Average Temp.</div>
-          <Thermometer droughtLevel={simulation.droughtLevel} />
+          <Thermometer climateChangeEnabled={simulation.climateChangeEnabled} droughtLevel={simulation.droughtLevel} />
         </div>
       }
 
