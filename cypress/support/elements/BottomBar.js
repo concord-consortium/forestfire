@@ -70,7 +70,7 @@ export class BottomBar {
     this.getClimateChangeToggle().find("[class^='bottom-bar-container--title--']").should("contain", "Climate Change");
   }
   verifyClimateChangeStatus(status) {
-    this.getClimateChangeToggle().find('label').should("contain", status);
+    this.getClimateChangeToggle().find("label").should("contain", status);
   }
   switchToggle() {
     this.getClimateChangeToggle().find("[class^='slider-switch--sliderSwitch--__forestfire-v1__']").click({ force: true });
