@@ -63,5 +63,23 @@ export class BottomBar {
     .should("contain", "Few")
     .should("contain", "Many");
   }
+  getClimateChangeToggle() {
+    return cy.get("[class^='bottom-bar-container--widgetGroup--__forestfire-v1__']").last();
+  }
+  verifyClimateChangeToggleTitle() {
+    this.getClimateChangeToggle().find("[class^='bottom-bar-container--title--']").should("contain", "Climate Change");
+  }
+  verifyClimateChangeStatus(status) {
+    this.getClimateChangeToggle().find('label').should("contain", status);
+  }
+  switchToggle() {
+    this.getClimateChangeToggle().find("[class^='slider-switch--sliderSwitch--__forestfire-v1__']").click({ force: true });
+  }
+  verifyClimateChangeToggleDisabled() {
+    this.getClimateChangeToggle().find("[class^='slider-switch--sliderSwitch--__forestfire-v1__']").invoke("attr", "class").should("contain", "disabled");
+  }
+  verifyClimateChangeToggleEnabled() {
+    this.getClimateChangeToggle().find("[class^='slider-switch--sliderSwitch--__forestfire-v1__']").invoke("attr", "class").should("not.contain", "disabled");
+  }
 }
 
