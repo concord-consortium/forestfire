@@ -19,9 +19,8 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const progressPercentage = simulation.timeInYears / simulation.config.simulationEndYear;
   const timeProgress = `${progressPercentage * 100}%`;
   const marks = ticks.map((tick) => ({ value: tick, label: tick }));
-
   useEffect(() => {
-    setDisabled(simulation.simulationStarted && simulation.simulationRunning && !simulation.simulationEnded);
+    setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
   }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
 
   useLayoutEffect(() => {

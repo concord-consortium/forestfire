@@ -76,6 +76,7 @@
           height: 30px;
           background-image: url("../../assets/slider-thumb.svg");
           box-shadow: none;
+          transition: 0.05s;
 
           &:hover {
             box-shadow: 0 0 0 3px rgba($controlGray, 0.15);
