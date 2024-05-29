@@ -3,7 +3,7 @@
 .timelineContainer {
   width: 70%;
   min-width: 500px;
-  height: 85px;
+  height: 115px;
   padding: 0 10px;
   border-radius: 10px;
   background-color: rgba(#fff, 0.5);
@@ -27,6 +27,7 @@
 
     .labelCondensed {
       font-family: $robotoCondensed;
+      margin-top: 34px;
     }
   }
 
@@ -36,41 +37,63 @@
     justify-content: space-around;
     padding: 5px 10px 0 0;
 
-    .time {
-      height: 31px;
+    .sliderContainer {
+      height: 61px;
+      width: 100%;
       position: relative;
+      top: 0;
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 3px;
 
-      .axis {
+      .slider {
         width: 100%;
-        height: 1px;
-        background-color: $controlText;
+
+        .rail {
+          height: 4px;
+          background-color: #fff;
+          opacity: 1;
+        }
+        .track {
+          height: 4px;
+          background-color: $controlGray;
+          opacity: 1;
+          border: none;
+        }
+        .mark {
+          width: 1px;
+          height: 6px;
+          margin-top: 15px;
+          background-color: $controlText
+        }
+        .markLabel {
+          font-family: $robotoCondensed;
+          font-size: 14px;
+        }
+
+        .sliderThumb {
+          width: 30px;
+          height: 30px;
+          background-image: url("../../assets/slider-thumb.svg");
+          box-shadow: none;
+
+          &:hover {
+            box-shadow: 0 0 0 3px rgba($controlGray, 0.15);
+          }
+
+          &:active,
+          &:global(.Mui-active) {
+            box-shadow: 0 0 0 3px rgba($controlGray, 0.25);
+          }
+        }
       }
 
       .progressBar {
         background-color: #86e2ff;
-        height: 30px;
+        height: 61px;
         width: 100px;
-      }
-
-      .tickContainer {
         position: absolute;
         top: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        // It may seem strange, but content will overflow easily and it helps with centering the container perfectly.
-        width: 0px;
-
-        .tickSymbol {
-          width: 1px;
-          height: 6px;
-          background-color: $controlText;
-        }
-
-        .tickLabel {
-          font-family: $robotoCondensed;
-        }
       }
     }
   }
