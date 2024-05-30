@@ -1,23 +1,24 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../../use-stores";
 import { VegetationStats } from "./vegetation-stats";
 import { FireEvents } from "./fire-events";
-
-import css from "./timeline.scss";
 import { Slider } from "@mui/material";
 
+import css from "./timeline.scss";
+
 const TICK_COUNT = 16;
+const LOADING_DELAY = 100; // ms
 
 export const Timeline: React.FC = observer(function WrappedComponent() {
-  const { simulation } = useStores();
+  const { simulation, snapshotsManager } = useStores();
+  const timeoutId = useRef(0);
   const [val, setVal] = useState(simulation.timeInYears);
   const [disabled, setDisabled] = useState(true);
 
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
-  const progressPercentage = simulation.timeInYears / simulation.config.simulationEndYear;
-  const timeProgress = `${progressPercentage * 100}%`;
+  const timeProgress = `${val / simulation.config.simulationEndYear * 100}%`;
   const marks = ticks.map((tick) => ({ value: tick, label: tick }));
   useEffect(() => {
     setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
@@ -28,7 +29,12 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   }, [simulation.timeInYears]);
 
   const handleSliderChange = (e: Event, value: number) => {
+    value = Math.min(snapshotsManager.snapshots.length, value);
     setVal(value);
+    window.clearTimeout(timeoutId.current);
+    timeoutId.current = window.setTimeout(() => {
+      snapshotsManager.restoreSnapshot(value);
+    }, LOADING_DELAY);
   };
 
   return (

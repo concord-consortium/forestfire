@@ -3,6 +3,7 @@ import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vege
 import { Cell, CellOptions, ICellSnapshot } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
+import { EventEmitter } from "eventemitter3";
 import { getElevationData, getRiverData, getUnburntIslandsData, getZoneIndex } from "./utils/data-loaders";
 import { Zone } from "./zone";
 import { FireEngine } from "./fire-engine/fire-engine";
@@ -18,8 +19,11 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
+export type Event = "yearChange" | "restart" | "start";
+
 export interface ISimulationSnapshot {
   time: number;
+  yearlyVegetationStatistics: VegetationStatistics[];
   cellSnapshots: ICellSnapshot[];
 }
 
@@ -58,6 +62,10 @@ export class SimulationModel {
   // specific moments and usually for all the cells, so this approach can be way more efficient.
   @observable public cellsStateFlag = 0;
   @observable public cellsElevationFlag = 0;
+  @observable public cellsBaseStateFlag = 0;
+  @observable public cellsSimulationStateFlag = 0;
+
+  private emitter = new EventEmitter();
 
   constructor(presetConfig: Partial<ISimulationConfig>) {
     makeObservable(this);
@@ -140,14 +148,32 @@ export class SimulationModel {
     return this.config.climateChange ? this.config.climateChange[1] : this.config.nonClimateChangeDroughtLevel;
   }
 
-   public get droughtLevel() {
+  public get droughtLevel() {
     // average drought level of all zones
     return this.zones.reduce((sum, zone) => sum + zone.droughtLevel, 0) / this.zones.length;
+  }
+
+  public on(event: Event, callback: any) {
+    this.emitter.on(event, callback);
+  }
+
+  public off(event: Event, callback: any) {
+    this.emitter.off(event, callback);
+  }
+
+  public emit(event: Event) {
+    this.emitter.emit(event);
   }
 
   public setDroughtLevel(value: number) {
     // set drought level of all zones
     this.zones.forEach(zone => zone.droughtLevel = value);
+  }
+
+  public setTimeInYears(value: number) {
+    if (!this.simulationRunning && this.time !== value * yearInMinutes) {
+      this.time = value * yearInMinutes;
+    }
   }
 
   public calculateVegetationStatistics(): VegetationStatistics {
@@ -385,6 +411,7 @@ export class SimulationModel {
         const newDroughtLevel = this.initialDroughtLevel + (this.finalDroughtLevel - this.initialDroughtLevel) * simulationProgress;
         this.setDroughtLevel(newDroughtLevel);
       }
+      this.emit("yearChange");
     }
 
     if (this.fireEngine) {
@@ -473,5 +500,32 @@ export class SimulationModel {
       this.fireEvents.pop();
       this.sparks.length = 0;
     }
+  }
+
+  @action.bound public updateCellsBaseStateFlag() {
+    this.cellsBaseStateFlag += 1;
+  }
+
+  @action.bound public updateCellsSimulationStateFlag() {
+    this.cellsSimulationStateFlag += 1;
+  }
+
+  public snapshot(): ISimulationSnapshot {
+    console.log("in simulation snapshot");
+    return {
+      time: this.time,
+      yearlyVegetationStatistics: this.yearlyVegetationStatistics,
+      cellSnapshots: this.cells.map(c => c.snapshot())
+    };
+  }
+
+  public restoreSnapshot(snapshot: ISimulationSnapshot) {
+    this.time = snapshot.time;
+    this.yearlyVegetationStatistics = snapshot.yearlyVegetationStatistics;
+    snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
+      this.cells[idx].restoreSnapshot(cellSnapshot);
+    });
+    this.updateCellsBaseStateFlag();
+    this.updateCellsSimulationStateFlag();
   }
 }
