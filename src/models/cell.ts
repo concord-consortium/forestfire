@@ -68,6 +68,21 @@ export interface CellOptions {
   isFireLineUnderConstruction?: boolean;
 }
 
+export interface ICellSnapshot {
+  spreadRate: number;
+  vegetationAge: number;
+  storedCarbon: number;
+  burnTime: number;
+  helitackDropCount: number;
+  fireIdx: number | null;
+  fireHistory: IFireHistory[];
+  fireState: FireState;
+  isFireLineUnderConstruction: boolean;
+  isFireLine: boolean;
+  vegetation: Vegetation;
+  ignitionTime: number;
+}
+
 const FIRE_LINE_DEPTH = 2000;
 const MAX_BURN_TIME = 500;
 

@@ -1,6 +1,6 @@
 import { action, computed, observable, makeObservable } from "mobx";
 import { IWindProps, Town, IFireEvent, ISpark, dayInMinutes, yearInMinutes, Vegetation, FireState, VegetationStatistics, DroughtLevel } from "../types";
-import { Cell, CellOptions } from "./cell";
+import { Cell, CellOptions, ICellSnapshot } from "./cell";
 import { getDefaultConfig, ISimulationConfig, getUrlConfig } from "../config";
 import { Vector2 } from "three";
 import { getElevationData, getRiverData, getUnburntIslandsData, getZoneIndex } from "./utils/data-loaders";
@@ -17,6 +17,11 @@ const DEFAULT_ZONE_DIVISION = {
     [0, 1, 2],
   ]
 };
+
+export interface ISimulationSnapshot {
+  time: number;
+  cellSnapshots: ICellSnapshot[];
+}
 
 // This class is responsible for data loading, adding sparks and fire lines and so on. It's more focused
 // on management and interactions handling. Core calculations are delegated to FireEngine.
