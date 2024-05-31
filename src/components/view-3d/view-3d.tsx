@@ -42,7 +42,7 @@ export const View3d = () => {
       <Provider stores={stores}>
         <PerspectiveCamera makeDefault={true} fov={33} position={cameraPos} up={DEFAULT_UP}/>
         <OrbitControls
-          target={[PLANE_WIDTH * 0.5, planeHeight(simulation) * 0.45, 0.05]}
+          target={[PLANE_WIDTH * 0.5, planeHeight(simulation) * 0.45, -0.15]}
           enableDamping={true}
           enableRotate={!ui.dragging} // disable rotation when something is being dragged
           enablePan={false}
