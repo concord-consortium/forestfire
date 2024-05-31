@@ -18,9 +18,10 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
 
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
-  const timeProgress = `${val / simulation.config.simulationEndYear * 100}%`;
-  const timeProgress = `${simulation.timeInYears / simulation.config.simulationEndYear * 100}%`;
+  const timeProgress = `${snapshotsManager.maxYear / simulation.config.simulationEndYear * 100}%`;
   const marks = ticks.map((tick) => ({ value: tick, label: tick }));
+console.log("simulation.timeInYears", simulation.timeInYears);
+console.log("val", val);
   useEffect(() => {
     setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
   }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
@@ -30,7 +31,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   }, [simulation.timeInYears]);
 
   const handleSliderChange = (e: Event, value: number) => {
-    value = Math.min(snapshotsManager.snapshots.length, value);
+    value = Math.min(snapshotsManager.maxYear, value);
     setVal(value);
     window.clearTimeout(timeoutId.current);
     timeoutId.current = window.setTimeout(() => {
@@ -39,7 +40,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   };
 
   const handleTimeChangeCommitted = (event: Event, value: number) => {
-    value = Math.min(snapshotsManager.snapshots.length, value);
+    value = Math.min(snapshotsManager.maxYear, value);
   };
 
   return (
@@ -72,6 +73,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
               onChange={handleSliderChange}
               onChangeCommitted={handleTimeChangeCommitted}
             />
+            <div className={css.timeProgressTrack} style={{ width: timeProgress }} />
           </div>
         </div>
         <FireEvents />

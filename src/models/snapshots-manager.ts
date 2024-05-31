@@ -27,7 +27,7 @@ export class SnapshotsManager {
     const year = Math.floor(this.simulation.timeInYears);
     if (year % SNAPSHOT_INTERVAL === 0) {
       //Change to last time step
-      this.maxYear = this.simulation.simulationEndTime / yearInMinutes;
+      this.maxYear = this.simulation.timeInYears;
       const arrayIndex = year / SNAPSHOT_INTERVAL;
       this.snapshots[arrayIndex] = {
         simulationSnapshot: this.simulation.snapshot()

@@ -6,15 +6,13 @@ import { Vegetation } from "../../types";
 import css from "./vegetation-stats.scss";
 
 export const VegetationStats: React.FC = observer(function WrappedComponent() {
-  const { simulation, snapshotsManager } = useStores();
+  const { simulation } = useStores();
   const endYear = simulation.config.simulationEndYear;
-  const index = Math.floor(simulation.timeInYears);
 
   // why * 1.1? The bar is 10% wider than it should be, so they slightly overlap and there's no visual artifact.
   // Otherwise, depending on the zoom level or browser window size, some small gaps may appear between the bars.
   const statsBarWidth = `${(100 / endYear) * 1.1}%`;
-  const vegetationStats = snapshotsManager.snapshots[index]?.simulationSnapshot.yearlyVegetationStatistics.slice(0,index)
-                            || simulation.yearlyVegetationStatistics;
+  const vegetationStats = simulation.yearlyVegetationStatistics;
   return (
     <div className={css.vegetation}>
       {
