@@ -511,7 +511,6 @@ export class SimulationModel {
   }
 
   public snapshot(): ISimulationSnapshot {
-    console.log("in simulation snapshot");
     return {
       time: this.time,
       yearlyVegetationStatistics: this.yearlyVegetationStatistics,
@@ -521,7 +520,6 @@ export class SimulationModel {
 
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
-    this.yearlyVegetationStatistics = snapshot.yearlyVegetationStatistics;
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });

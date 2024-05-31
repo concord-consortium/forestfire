@@ -37,6 +37,10 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     }, LOADING_DELAY);
   };
 
+  const handleTimeChangeCommitted = (event: Event, value: number) => {
+    value = Math.min(snapshotsManager.snapshots.length, value);
+  };
+
   return (
     <div className={css.timelineContainer}>
       <div className={css.labels}>
@@ -65,6 +69,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
               marks={marks}
               disabled={disabled}
               onChange={handleSliderChange}
+              onChangeCommitted={handleTimeChangeCommitted}
             />
           </div>
         </div>

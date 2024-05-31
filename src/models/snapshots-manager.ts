@@ -25,8 +25,6 @@ export class SnapshotsManager {
 
   @action.bound public onYearChange() {
     const year = Math.floor(this.simulation.timeInYears);
-    console.log("in onYearChange", year,
-      this.simulation.simulationEndTime, year % SNAPSHOT_INTERVAL);
     if (year % SNAPSHOT_INTERVAL === 0) {
       //Change to last time step
       this.maxYear = this.simulation.simulationEndTime / yearInMinutes;
@@ -41,13 +39,12 @@ export class SnapshotsManager {
     const arrayIndex = year / SNAPSHOT_INTERVAL;
 
     const snapshot = this.snapshots[arrayIndex];
-    console.log("in restoreSnapshot", snapshot, year, arrayIndex);
     if (!snapshot) {
       return;
     }
-    console.log("in restoreSnapshot", snapshot.simulationSnapshot);
     this.simulation.stop();
     this.simulation.restoreSnapshot(snapshot.simulationSnapshot);
+    this.simulation.updateCellsStateFlag();
   }
 
   @action.bound public reset() {
@@ -56,7 +53,6 @@ export class SnapshotsManager {
   }
 
   @action.bound public start() {
-    console.log("in snapshots-manager start", this.simulation.simulationEndTime);
     const year = this.simulation.timeInYears * 10000;
     const arrayIndex = Math.floor(year / SNAPSHOT_INTERVAL);
     this.snapshots.length = arrayIndex + 1;

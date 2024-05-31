@@ -69,18 +69,12 @@ export interface CellOptions {
 }
 
 export interface ICellSnapshot {
-  spreadRate: number;
-  vegetationAge: number;
-  storedCarbon: number;
-  // burnTime: number;
-  // helitackDropCount: number;
-  // fireIdx: number | null;
-  // fireHistory: IFireHistory[];
-  // fireState: FireState;
-  // isFireLineUnderConstruction: boolean;
-  // isFireLine: boolean;
+  zone: Zone;
+  zoneIdx?: number;
+  fireIdx: number | null;
+  fireHistory: IFireHistory[];
+  fireState: FireState;
   vegetation: Vegetation;
-  // ignitionTime: number;
 }
 
 const FIRE_LINE_DEPTH = 2000;
@@ -261,20 +255,13 @@ export class Cell {
   }
 
   public snapshot(): ICellSnapshot {
-    // console.log("in cell snapshot", this);
     return {
-      spreadRate: this.spreadRate,
-      vegetationAge: this.vegetationAge,
-      storedCarbon: this.storedCarbon,
-      // burnTime: this.burnTime,
-      // helitackDropCount: this.helitackDropCount,
-      // fireIdx: this.fireIdx,
-      // fireHistory: this.fireHistory,
-      // fireState: this.fireState,
-      // isFireLineUnderConstruction: this.isFireLineUnderConstruction,
-      // isFireLine: this.isFireLine,
+      zone: this.zone,
+      zoneIdx: this.zoneIdx,
+      fireIdx: this.fireIdx,
+      fireHistory: this.fireHistory,
+      fireState: this.fireState,
       vegetation: this.vegetation,
-      // ignitionTime: this.ignitionTime
     };
   }
 
