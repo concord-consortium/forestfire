@@ -3,9 +3,9 @@ import { observer } from "mobx-react";
 import { useStores } from "../../use-stores";
 import { VegetationStats } from "./vegetation-stats";
 import { FireEvents } from "./fire-events";
+import { Slider } from "@mui/material";
 
 import css from "./timeline.scss";
-import { Slider } from "@mui/material";
 
 const TICK_COUNT = 16;
 
