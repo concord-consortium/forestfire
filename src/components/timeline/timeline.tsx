@@ -15,20 +15,30 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const timeoutId = useRef(0);
   const [val, setVal] = useState(simulation.timeInYears);
   const [disabled, setDisabled] = useState(true);
+  const [timeProgress, setTimeProgress] = useState("0%");
 
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
-  const timeProgress = `${snapshotsManager.maxYear / simulation.config.simulationEndYear * 100}%`;
   const marks = ticks.map((tick) => ({ value: tick, label: tick }));
-console.log("simulation.timeInYears", simulation.timeInYears);
-console.log("val", val);
   useEffect(() => {
     setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
   }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
 
   useLayoutEffect(() => {
-    setVal(simulation.timeInYears);
-  }, [simulation.timeInYears]);
+    if (simulation.simulationRunning) {
+      if (snapshotsManager.maxYear > val) {
+        setVal(snapshotsManager.maxYear);
+        simulation.setTimeInYears(snapshotsManager.maxYear);
+        setTimeProgress(`${snapshotsManager.maxYear / simulation.config.simulationEndYear * 100}%`);
+      }
+    } else if (!simulation.simulationStarted) {
+      setTimeProgress("0%");
+      setVal(0);
+      simulation.setTimeInYears(0);
+    } else {
+      setVal(simulation.timeInYears);
+    }
+}, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears]);
 
   const handleSliderChange = (e: Event, value: number) => {
     value = Math.min(snapshotsManager.maxYear, value);

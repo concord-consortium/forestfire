@@ -171,9 +171,7 @@ export class SimulationModel {
   }
 
   public setTimeInYears(value: number) {
-    if (!this.simulationRunning && this.time !== value * yearInMinutes) {
-      this.time = value * yearInMinutes;
-    }
+    this.time = value * yearInMinutes;
   }
 
   public calculateVegetationStatistics(): VegetationStatistics {
@@ -345,6 +343,7 @@ export class SimulationModel {
     this.config.sparks.forEach(s => {
       this.addSpark(s[0], s[1]);
     });
+    this.emit("restart");
   }
 
   @action.bound public reload() {

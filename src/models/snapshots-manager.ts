@@ -1,6 +1,5 @@
 import { action, observable, makeObservable } from "mobx";
 import { ISimulationSnapshot, SimulationModel } from "./simulation";
-import { yearInMinutes } from "../types";
 
 export const SNAPSHOT_INTERVAL = 1; // years
 
@@ -53,9 +52,9 @@ export class SnapshotsManager {
   }
 
   @action.bound public start() {
-    const year = this.simulation.timeInYears * 10000;
+    const year = Math.max(this.simulation.timeInYears * 10000, this.snapshots.length);
     const arrayIndex = Math.floor(year / SNAPSHOT_INTERVAL);
     this.snapshots.length = arrayIndex + 1;
-    this.maxYear = this.simulation.simulationEndTime / yearInMinutes;
+    this.maxYear = this.snapshots.length;
   }
 }
