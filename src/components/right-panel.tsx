@@ -12,7 +12,7 @@ import css from "./right-panel.scss";
 const RECENT_DATA_RANGE = 51;
 
 export const RightPanel = observer(() => {
-  const { ui, simulation } = useStores();
+  const { ui, simulation, snapshotsManager } = useStores();
   const [allData, setAllData] = useState(false);
   const [graphEndPoint, setGraphEndPoint] = useState(0);
 
@@ -37,12 +37,14 @@ export const RightPanel = observer(() => {
   };
 
   const handleSliderChange = (e: Event, value: number | number[]) => {
-    setGraphEndPoint(value as number);
+    const val = Math.floor(value as number);
+    setGraphEndPoint(val);
+    simulation.setTimeInYears(val);
   };
 
   useEffect(() => {
     const yearInt = Math.floor(simulation.timeInYears);
-    if (!simulation.simulationRunning && yearInt < simulation.yearlyVegetationStatistics.length) {
+    if (!simulation.simulationRunning){
       setGraphEndPoint(yearInt);
     } else {
     // Reset graph offset when simulation is running and new data point is added.
@@ -71,7 +73,7 @@ export const RightPanel = observer(() => {
                   size="small"
                   step={1}
                   min={RECENT_DATA_RANGE}
-                  max={simulation.yearlyVegetationStatistics.length}
+                  max={snapshotsManager.maxYear}
                   value={graphEndPoint}
                   onChange={handleSliderChange}
                 />
