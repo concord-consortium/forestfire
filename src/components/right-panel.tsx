@@ -41,9 +41,14 @@ export const RightPanel = observer(() => {
   };
 
   useEffect(() => {
+    const yearInt = Math.floor(simulation.timeInYears);
+    if (!simulation.simulationRunning && yearInt < simulation.yearlyVegetationStatistics.length) {
+      setGraphEndPoint(yearInt);
+    } else {
     // Reset graph offset when simulation is running and new data point is added.
-    setGraphEndPoint(simulation.yearlyVegetationStatistics.length);
-  }, [simulation.yearlyVegetationStatistics.length]);
+      setGraphEndPoint(simulation.yearlyVegetationStatistics.length);
+    }
+  }, [simulation.simulationRunning, simulation.timeInYears, simulation.yearlyVegetationStatistics.length]);
 
   const showRangeSlider = !allData && simulation.yearlyVegetationStatistics.length > RECENT_DATA_RANGE;
 
