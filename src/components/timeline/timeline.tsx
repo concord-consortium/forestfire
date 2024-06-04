@@ -25,6 +25,13 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
 
   useLayoutEffect(() => {
+    if (simulation.simulationRunning && snapshotsManager.maxYear > val) {
+      snapshotsManager.restoreLastSnapshot();
+      simulation.start(); //when we restoreLastSnapshot, we need to start the simulation again
+    }
+  },[simulation, simulation.simulationRunning, snapshotsManager, val]);
+
+  useLayoutEffect(() => {
     if (simulation.simulationRunning) {
       if (snapshotsManager.maxYear > val) {
         setVal(snapshotsManager.maxYear);
@@ -38,6 +45,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     } else {
       setVal(simulation.timeInYears);
     }
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears]);
 
   const handleSliderChange = (e: Event, value: number) => {

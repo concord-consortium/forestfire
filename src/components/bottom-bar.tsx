@@ -20,7 +20,7 @@ import css from "./bottom-bar.scss";
 import { SliderSwitch } from "./slider-switch";
 
 export const BottomBar: React.FC = observer(function WrappedComponent() {
-  const { simulation, ui } = useStores();
+  const { simulation, ui, snapshotsManager } = useStores();
 
   // Temporarily unnecessary, as reload and restart would result in the same state. Reload can become useful
   // when there is some input state that needs to be zeroed out.
@@ -107,7 +107,9 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
           dataTest="fire-event-button"
           onClick={toggleFireEvent}
           selected={simulation.isFireEventActive}
-          disabled={simulation.isFireActive || simulation.simulationEnded} // user cannot cancel active fire
+           // user cannot cancel active fire or when user has scrubbed timeline back
+          disabled={simulation.isFireActive || simulation.simulationEnded
+                      || (!simulation.simulationRunning && (simulation.timeInYears < snapshotsManager.maxYear)) }
         />
         <div className={clsx(css.sparksCount, {[css.disabled]: sparkCountDisabled})}>{simulation.remainingSparks}</div>
         <IconButton

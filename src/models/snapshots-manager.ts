@@ -18,7 +18,7 @@ export class SnapshotsManager {
     this.simulation = simulation;
     simulation.on("yearChange", this.onYearChange);
     simulation.on("restart", this.reset);
-    simulation.on("start", this.start);
+    // simulation.on("start", this.start);
     this.reset();
   }
 
@@ -35,9 +35,21 @@ export class SnapshotsManager {
   }
 
   public restoreSnapshot(year: number) {
-    const arrayIndex = year / SNAPSHOT_INTERVAL;
+    const arrayIndex = Math.floor(year / SNAPSHOT_INTERVAL);
 
     const snapshot = this.snapshots[arrayIndex];
+    if (!snapshot) {
+      return;
+    }
+    this.simulation.stop();
+    this.simulation.restoreSnapshot(snapshot.simulationSnapshot);
+    this.simulation.updateCellsStateFlag();
+  }
+
+  public restoreLastSnapshot() {
+    const arrayIndex = this.snapshots.length - 1;
+    const snapshot = this.snapshots[arrayIndex];
+    console.log("in restoreLastSnapshot", arrayIndex);
     if (!snapshot) {
       return;
     }
@@ -51,10 +63,10 @@ export class SnapshotsManager {
     this.maxYear = 0;
   }
 
-  @action.bound public start() {
-    const year = Math.max(this.simulation.timeInYears * 10000, this.snapshots.length);
-    const arrayIndex = Math.floor(year / SNAPSHOT_INTERVAL);
-    this.snapshots.length = arrayIndex + 1;
-    this.maxYear = this.snapshots.length;
-  }
+  // @action.bound public start() {
+  //   console.log("in start timeInYears", this.simulation.timeInYears);
+  //   const arrayIndex = Math.floor(this.simulation.timeInYears/10000 / SNAPSHOT_INTERVAL);
+  //   this.snapshots.length = arrayIndex + 1;
+  //   this.maxYear = this.snapshots.length;
+  // }
 }
