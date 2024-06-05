@@ -17,6 +17,11 @@
     top: $topBarHeight;
     left: 0;
     transition: $rightPanelTransition;
+
+    > div:nth-child(2) {//override 3js default 100% width to center terrain with sim info div on left
+      width: calc(100% - 123px) !important;
+      left: 123px;
+    }
   }
 
   .rightContent {
