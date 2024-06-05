@@ -15,6 +15,11 @@ export const RightPanel = observer(() => {
   const { ui, simulation, snapshotsManager } = useStores();
   const [allData, setAllData] = useState(false);
   const [graphEndPoint, setGraphEndPoint] = useState(0);
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
+  }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
 
   const handleToggleDrawer = (e: React.SyntheticEvent) => {
     ui.toggleChart();
@@ -75,6 +80,7 @@ export const RightPanel = observer(() => {
                   min={RECENT_DATA_RANGE}
                   max={snapshotsManager.maxYear}
                   value={graphEndPoint}
+                  disabled={disabled}
                   onChange={handleSliderChange}
                 />
               </div>
