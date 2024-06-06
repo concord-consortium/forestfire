@@ -22,17 +22,18 @@ import { SliderSwitch } from "./slider-switch";
 export const BottomBar: React.FC = observer(function WrappedComponent() {
   const { simulation, ui, snapshotsManager } = useStores();
 
+
+  const handleReload = () => {
+    simulation.reload();
+    log("SimulationReloaded");
+  };
+
   // Temporarily unnecessary, as reload and restart would result in the same state. Reload can become useful
   // when there is some input state that needs to be zeroed out.
-  // const handleReload = () => {
-  //   simulation.reload();
-  //   log("SimulationReloaded");
+  // const handleRestart = () => {
+  //   simulation.restart();
+  //   log("SimulationRestarted");
   // };
-
-  const handleRestart = () => {
-    simulation.restart();
-    log("SimulationRestarted");
-  };
 
   const handleStart = () => {
     simulation.start();
@@ -124,8 +125,8 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
         />
       </BottomBarWidgetGroup>
       <PlaybackControls
-        // onReload={handleReload}
-        onRestart={handleRestart}
+        onReload={handleReload}
+        // onRestart={handleRestart}
         onStart={handleStart}
         onStop={handleStop}
         playing={simulation.simulationRunning}
