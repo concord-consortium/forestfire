@@ -49,7 +49,6 @@ export class SnapshotsManager {
   public restoreLastSnapshot() {
     const arrayIndex = this.snapshots.length - 1;
     const snapshot = this.snapshots[arrayIndex];
-    console.log("in restoreLastSnapshot", arrayIndex);
     if (!snapshot) {
       return;
     }
@@ -62,11 +61,4 @@ export class SnapshotsManager {
     this.snapshots = [];
     this.maxYear = 0;
   }
-
-  // @action.bound public start() {
-  //   console.log("in start timeInYears", this.simulation.timeInYears);
-  //   const arrayIndex = Math.floor(this.simulation.timeInYears/10000 / SNAPSHOT_INTERVAL);
-  //   this.snapshots.length = arrayIndex + 1;
-  //   this.maxYear = this.snapshots.length;
-  // }
 }
