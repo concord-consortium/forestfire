@@ -19,12 +19,20 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start";
+export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "sparkAdded";
 
 export interface ISimulationSnapshot {
   time: number;
   yearlyVegetationStatistics: VegetationStatistics[];
   cellSnapshots: ICellSnapshot[];
+}
+
+export interface IFireEventSnapshot {
+  time: number;
+  climateChangeEnabled: boolean;
+  droughtLevel: DroughtLevel;
+  wind: IWindProps;
+  sparks: ISpark[];
 }
 
 // This class is responsible for data loading, adding sparks and fire lines and so on. It's more focused
@@ -465,7 +473,8 @@ export class SimulationModel {
 
   @action.bound public addSpark(x: number, y: number) {
     if (this.canAddSpark) {
-      this.sparks.push({ position: new Vector2(x, y), locked: false });
+      this.sparks.push({ time: this.time, position: new Vector2(x, y), locked: false });
+      this.emit("sparkAdded");
     }
   }
 
@@ -491,6 +500,7 @@ export class SimulationModel {
     this.setWindSpeed(minWind + Math.random() * (maxWind - minWind));
     this.windDidChange = true; // notify user wind has been updated
     this.fireEvents.push({ time: this.time });
+    this.emit("fireEventAdded");
   }
 
   @action.bound public cancelFireEventSetup() {
@@ -517,6 +527,16 @@ export class SimulationModel {
     };
   }
 
+  public fireEventSnapshot(): IFireEventSnapshot {
+    return {
+      time: this.time,
+      climateChangeEnabled: this.climateChangeEnabled,
+      droughtLevel: this.droughtLevel,
+      wind: {...this.wind },
+      sparks: [...this.sparks]
+    };
+  }
+
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
@@ -524,5 +544,14 @@ export class SimulationModel {
     });
     this.updateCellsBaseStateFlag();
     this.updateCellsSimulationStateFlag();
+  }
+
+  public restoreFireEventSnapshot(snapshot: IFireEventSnapshot) {
+    this.setWindDirection(snapshot.wind.direction);
+    this.setWindSpeed(snapshot.wind.speed);
+    this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
+    this.setDroughtLevel(snapshot.droughtLevel);
+    this.windDidChange = true;
+    this.sparks = snapshot.sparks;
   }
 }

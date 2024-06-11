@@ -54,6 +54,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     window.clearTimeout(timeoutId.current);
     timeoutId.current = window.setTimeout(() => {
       snapshotsManager.restoreSnapshot(value);
+      snapshotsManager.restoreFireEventSnapshot(value);
     }, LOADING_DELAY);
   };
 

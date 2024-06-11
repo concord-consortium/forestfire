@@ -1,5 +1,5 @@
 import { action, observable, makeObservable } from "mobx";
-import { ISimulationSnapshot, SimulationModel } from "./simulation";
+import { IFireEventSnapshot, ISimulationSnapshot, SimulationModel } from "./simulation";
 
 export const SNAPSHOT_INTERVAL = 1; // years
 
@@ -7,8 +7,14 @@ export interface ISnapshot {
   simulationSnapshot: ISimulationSnapshot
 }
 
+export interface IEventSnapshot {
+  fireEventSnapshot: IFireEventSnapshot;
+}
+
 export class SnapshotsManager {
   public snapshots: ISnapshot[] = [];
+  public fireEventSnapshots: IEventSnapshot[] = [];
+
   @observable public maxYear = 0;
 
   private simulation: SimulationModel;
@@ -18,8 +24,26 @@ export class SnapshotsManager {
     this.simulation = simulation;
     simulation.on("yearChange", this.onYearChange);
     simulation.on("restart", this.reset);
-    // simulation.on("start", this.start);
+    simulation.on("fireEventAdded", this.onFireEventAdded);
+    simulation.on("sparkAdded", this.onSparkAdded);
     this.reset();
+  }
+
+  @action.bound public onFireEventAdded() {
+    const fireEventsLength = this.simulation.fireEvents.length;
+    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+    this.fireEventSnapshots[fireEventsIndex] = {
+      fireEventSnapshot: this.simulation.fireEventSnapshot()
+    };
+  }
+
+  @action.bound public onSparkAdded() {
+    const fireEventsLength = this.fireEventSnapshots.length;
+    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+    if (!this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks) {
+      this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks = [];
+    }
+    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks.push(this.simulation.sparks[this.simulation.sparks.length - 1]);
   }
 
   @action.bound public onYearChange() {
@@ -46,10 +70,21 @@ export class SnapshotsManager {
     this.simulation.updateCellsStateFlag();
   }
 
+  public restoreFireEventSnapshot(time: number) {
+    const timeInMinutes = time * 60 * 24 * 365;
+    // Reverse the array and find the first snapshot less than current timeInMinutes
+    const eventSnapshot = this.fireEventSnapshots.slice().reverse().find(snapshot => snapshot.fireEventSnapshot.time <= timeInMinutes);
+    if (!eventSnapshot) {
+      return;
+    }
+    this.simulation.stop();
+    this.simulation.restoreFireEventSnapshot(eventSnapshot.fireEventSnapshot);
+    this.simulation.updateCellsStateFlag();
+  }
+
   public restoreLastSnapshot() {
     const arrayIndex = this.snapshots.length - 1;
     const snapshot = this.snapshots[arrayIndex];
-    console.log("in restoreLastSnapshot", arrayIndex);
     if (!snapshot) {
       return;
     }
@@ -62,11 +97,4 @@ export class SnapshotsManager {
     this.snapshots = [];
     this.maxYear = 0;
   }
-
-  // @action.bound public start() {
-  //   console.log("in start timeInYears", this.simulation.timeInYears);
-  //   const arrayIndex = Math.floor(this.simulation.timeInYears/10000 / SNAPSHOT_INTERVAL);
-  //   this.snapshots.length = arrayIndex + 1;
-  //   this.maxYear = this.snapshots.length;
-  // }
 }
