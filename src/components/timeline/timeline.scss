@@ -75,9 +75,10 @@
         .sliderThumb {
           width: 30px;
           height: 30px;
-          background-image: url("../../assets/slider-thumb.svg");
+          background-image: url("../../assets/square-slider-thumb.svg");
           box-shadow: none;
           transition: 0.01s;
+          border-radius: 6px;
 
           &:hover {
             box-shadow: 0 0 0 3px rgba($controlGray, 0.15);
@@ -91,7 +92,7 @@
       }
 
       .progressBar {
-        background-color: #86e2ff;
+        background-color: #d9d9d9;
         height: 61px;
         width: 100px;
         position: absolute;
