@@ -23,7 +23,6 @@ export type Event = "yearChange" | "restart" | "start";
 
 export interface ISimulationSnapshot {
   time: number;
-  yearlyVegetationStatistics: VegetationStatistics[];
   cellSnapshots: ICellSnapshot[];
 }
 
@@ -62,9 +61,6 @@ export class SimulationModel {
   // specific moments and usually for all the cells, so this approach can be way more efficient.
   @observable public cellsStateFlag = 0;
   @observable public cellsElevationFlag = 0;
-  @observable public cellsBaseStateFlag = 0;
-  @observable public cellsSimulationStateFlag = 0;
-
   private emitter = new EventEmitter();
 
   constructor(presetConfig: Partial<ISimulationConfig>) {
@@ -501,18 +497,9 @@ export class SimulationModel {
     }
   }
 
-  @action.bound public updateCellsBaseStateFlag() {
-    this.cellsBaseStateFlag += 1;
-  }
-
-  @action.bound public updateCellsSimulationStateFlag() {
-    this.cellsSimulationStateFlag += 1;
-  }
-
   public snapshot(): ISimulationSnapshot {
     return {
       time: this.time,
-      yearlyVegetationStatistics: this.yearlyVegetationStatistics,
       cellSnapshots: this.cells.map(c => c.snapshot())
     };
   }
@@ -522,7 +509,5 @@ export class SimulationModel {
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });
-    this.updateCellsBaseStateFlag();
-    this.updateCellsSimulationStateFlag();
   }
 }

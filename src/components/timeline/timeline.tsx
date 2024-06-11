@@ -24,13 +24,17 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
   }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
 
-  useLayoutEffect(() => {
+    // if user has scrubbed back on the timeline, and then starts the sim again
+    // we need to restore the last snapshot and move the timeline scrubber to the max year
+    useLayoutEffect(() => {
     if (simulation.simulationRunning && snapshotsManager.maxYear > val) {
       snapshotsManager.restoreLastSnapshot();
       simulation.start(); //when we restoreLastSnapshot, we need to start the simulation again
     }
   },[simulation, simulation.simulationRunning, snapshotsManager, val]);
 
+  //we use the second useEffect to update the timeline scrubber when the simulation is running
+  // progress bar and regrowth of vegetation
   useLayoutEffect(() => {
     if (simulation.simulationRunning) {
       if (snapshotsManager.maxYear > val) {
@@ -38,15 +42,16 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
         simulation.setTimeInYears(snapshotsManager.maxYear);
         setTimeProgress(`${snapshotsManager.maxYear / simulation.config.simulationEndYear * 100}%`);
       }
-    } else if (!simulation.simulationStarted) {
+    } else if (!simulation.simulationStarted) { // if the simulation is reloaded, reset the timeline
       setTimeProgress("0%");
       setVal(0);
       simulation.setTimeInYears(0);
     } else {
       setVal(simulation.timeInYears);
     }
+// adding val to the dependencies array causes the thumbnail to be less responsive
 // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears]);
+}, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation]);
 
   const handleSliderChange = (e: Event, value: number) => {
     value = Math.min(snapshotsManager.maxYear, value);
@@ -55,10 +60,6 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     timeoutId.current = window.setTimeout(() => {
       snapshotsManager.restoreSnapshot(value);
     }, LOADING_DELAY);
-  };
-
-  const handleTimeChangeCommitted = (event: Event, value: number) => {
-    value = Math.min(snapshotsManager.maxYear, value);
   };
 
   return (
@@ -89,7 +90,6 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
               marks={marks}
               disabled={disabled}
               onChange={handleSliderChange}
-              onChangeCommitted={handleTimeChangeCommitted}
             />
             <div className={css.timeProgressTrack} style={{ width: timeProgress }} />
           </div>
