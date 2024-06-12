@@ -46,12 +46,8 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
       setTimeProgress("0%");
       setVal(0);
       simulation.setTimeInYears(0);
-    } else {
-      setVal(simulation.timeInYears);
     }
-// adding val to the dependencies array causes the thumbnail to be less responsive
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation]);
+}, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation, val]);
 
   const handleSliderChange = (e: Event, value: number) => {
     value = Math.min(snapshotsManager.maxYear, value);
