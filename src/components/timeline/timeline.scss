@@ -55,11 +55,7 @@
           opacity: 1;
         }
         .track {
-          height: 4px;
-          background-color: $controlGray;
-          opacity: 1;
-          border: none;
-          transition: 0.05s;
+          visibility: hidden
         }
         .mark {
           width: 1px;
@@ -79,6 +75,7 @@
           box-shadow: none;
           transition: 0.01s;
           border-radius: 6px;
+          z-index: 5;
 
           &:hover {
             box-shadow: 0 0 0 3px rgba($controlGray, 0.15);
@@ -88,6 +85,16 @@
           &:global(.Mui-active) {
             box-shadow: 0 0 0 3px rgba($controlGray, 0.25);
           }
+        }
+
+        .timeProgressTrack {
+          height: 4px;
+          background-color: $controlGray;
+          opacity: 1;
+          border: none;
+          transition: 0.01s;
+          position: absolute;
+          top: 16px;
         }
       }
 

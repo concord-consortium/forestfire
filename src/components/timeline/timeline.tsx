@@ -59,6 +59,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
               disabled={disabled}
               onChange={handleSliderChange}
             />
+            <div className={css.timeProgressTrack} style={{ width: timeProgress }} />
           </div>
         </div>
         <FireEvents />
