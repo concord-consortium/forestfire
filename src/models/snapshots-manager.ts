@@ -26,6 +26,7 @@ export class SnapshotsManager {
     simulation.on("restart", this.reset);
     simulation.on("fireEventAdded", this.onFireEventAdded);
     simulation.on("sparkAdded", this.onSparkAdded);
+    simulation.on("fireEventRemoved", this.onFireEventRemoved);
     this.reset();
   }
 
@@ -35,6 +36,10 @@ export class SnapshotsManager {
     this.fireEventSnapshots[fireEventsIndex] = {
       fireEventSnapshot: this.simulation.fireEventSnapshot()
     };
+  }
+
+  @action.bound public onFireEventRemoved() {
+    this.fireEventSnapshots.pop();
   }
 
   @action.bound public onSparkAdded() {

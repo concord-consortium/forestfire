@@ -19,7 +19,7 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "sparkAdded";
+export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded";
 
 export interface ISimulationSnapshot {
   time: number;
@@ -74,6 +74,7 @@ export class SimulationModel {
   @observable public cellsSimulationStateFlag = 0;
 
   private emitter = new EventEmitter();
+  private prevWind: IWindProps = {direction: 0, speed: 0};
 
   constructor(presetConfig: Partial<ISimulationConfig>) {
     makeObservable(this);
@@ -494,6 +495,7 @@ export class SimulationModel {
   @action.bound public addFireEvent() {
     this.stop();
     // Wind is randomly updated at the beginning of each fire event.
+    this.prevWind = { ...this.wind };
     this.setWindDirection(Math.random() * 360);
     const minWind = 0.666;
     const maxWind = 2.000;
@@ -508,6 +510,10 @@ export class SimulationModel {
       // Fire event was just added and not started yet, so it's still safe to cancel it.
       this.fireEvents.pop();
       this.sparks.length = 0;
+      this.setWindDirection(this.prevWind?.direction || 0);
+      this.setWindSpeed(this.prevWind?.speed || 0);
+      this.emit("fireEventRemoved");
+
     }
   }
 
