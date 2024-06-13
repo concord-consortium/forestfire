@@ -10,6 +10,8 @@ import * as THREE from "three";
 import { TownMarkersContainer } from "./town-marker";
 import Shutterbug from "shutterbug";
 
+import css from "../app.scss";
+
 // This needs to be a separate component, as useThree depends on context provided by <Canvas> component.
 const ShutterbugSupport = () => {
   const { gl, scene, camera } = useThree();
@@ -36,7 +38,7 @@ export const View3d = () => {
     // flat=true disables tone mapping that is not a default in threejs, but is enabled by default in react-three-fiber.
     // It makes textures match colors in the original image.
     // resize.debounce=0 ensures that canvas will resize immediately when container size changes (right tab animation).
-    <Canvas camera={{manual: true}} flat={true} resize={{ debounce: 0 }}>
+    <Canvas camera={{manual: true}} flat={true} resize={{ debounce: 0 }} className={css.canvasContainer}>
       {/* Why do we need to setup provider again? No idea. It seems that components inside Canvas don't have
           access to MobX stores anymore. */}
       <Provider stores={stores}>
