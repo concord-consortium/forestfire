@@ -68,6 +68,15 @@ export interface CellOptions {
   isFireLineUnderConstruction?: boolean;
 }
 
+export interface ICellSnapshot {
+  zone: Zone;
+  zoneIdx?: number;
+  fireIdx: number | null;
+  fireHistory: IFireHistory[];
+  fireState: FireState;
+  vegetation: Vegetation;
+}
+
 const FIRE_LINE_DEPTH = 2000;
 const MAX_BURN_TIME = 500;
 
@@ -243,5 +252,20 @@ export class Cell {
     this.helitackDropCount = 0;
     this.vegetation = this.zone.vegetation;
     this.fireHistory = [];
+  }
+
+  public snapshot(): ICellSnapshot {
+    return {
+      zone: this.zone,
+      zoneIdx: this.zoneIdx,
+      fireIdx: this.fireIdx,
+      fireHistory: this.fireHistory,
+      fireState: this.fireState,
+      vegetation: this.vegetation,
+    };
+  }
+
+  public restoreSnapshot(snapshot: ICellSnapshot) {
+    Object.assign(this, snapshot);
   }
 }

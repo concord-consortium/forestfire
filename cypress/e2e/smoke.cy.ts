@@ -22,7 +22,7 @@ context("Forest Fire Smoke Test", () => {
     });
 
     it("restarts mode", () => {
-      bottomBar.getRestartButton().click({ force: true });
+      bottomBar.getReloadButton().click({ force: true });
       bottomBar.getStartButton().should("contain", "Start");
     });
   });

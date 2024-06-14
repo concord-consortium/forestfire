@@ -47,7 +47,7 @@ context("Test the overall app", () => {
       bottomBar.getStartButton().click({ force: true });
       cy.wait(1000);
       bottomBar.verifyClimateChangeToggleDisabled();
-      bottomBar.getRestartButton().click({ force: true });
+      bottomBar.getReloadButton().click({ force: true });
       cy.wait(1000);
       bottomBar.verifyClimateChangeToggleEnabled();
     });
