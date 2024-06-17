@@ -11,6 +11,8 @@
   align-content: center;
   justify-content: center;
   font-size: 14px;
+  position: relative;
+  left: 63px;
 
   .labels {
     width: 95px;
@@ -55,7 +57,7 @@
           opacity: 1;
         }
         .track {
-          visibility: hidden
+          visibility: hidden;
         }
         .mark {
           width: 1px;
