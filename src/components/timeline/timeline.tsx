@@ -77,7 +77,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
                 rail: css.rail,
                 mark: css.mark,
                 markLabel: css.markLabel,
-                thumb: css.sliderThumb,
+                thumb: disabled ? css.sliderThumbDisabled : css.sliderThumb,
               }}
               size="medium"
               step={1}
