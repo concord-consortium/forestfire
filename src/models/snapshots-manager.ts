@@ -57,7 +57,7 @@ export class SnapshotsManager {
     const simSnapshot = this.simulation.snapshot();
     const fireEventsLength = this.simulation.fireEvents.length;
     const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
-    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.simulationSnapshots.push(simSnapshot);
+    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.simulationSnapshot = simSnapshot;
   }
 
   @action.bound public onFireEventEnded() {

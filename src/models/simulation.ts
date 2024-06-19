@@ -33,7 +33,7 @@ export interface IFireEventSnapshot {
   droughtLevel: DroughtLevel;
   wind: IWindProps;
   sparks: ISpark[];
-  simulationSnapshots: ISimulationSnapshot[];
+  simulationSnapshot: ISimulationSnapshot;
 }
 
 // This class is responsible for data loading, adding sparks and fire lines and so on. It's more focused
@@ -536,7 +536,7 @@ export class SimulationModel {
       droughtLevel: this.droughtLevel,
       wind: {...this.wind },
       sparks: [...this.sparks],
-      simulationSnapshots: []
+      simulationSnapshot: this.snapshot()
     };
   }
 
@@ -552,7 +552,6 @@ export class SimulationModel {
     const year = this.time;
     const prevYear = year - minutesInYear;
     const nextYear = year + minutesInYear;
-    const numSimSnapshots = snapshot?.simulationSnapshots.length || 0;
     // if snapshot.startTime is within the current year, we need to restore the fireEvent snapshot
     // otherwise, we show the default state of the simulation
     if (!snapshot || (snapshot.startTime !== 0 && (snapshot.startTime < prevYear || snapshot.startTime > nextYear))) {
@@ -569,7 +568,7 @@ export class SimulationModel {
       this.setDroughtLevel(snapshot.droughtLevel);
       this.windDidChange = true;
       this.sparks = snapshot.sparks;
-      snapshot.simulationSnapshots[numSimSnapshots - 1].cellSnapshots.forEach((cellSnapshot, idx) => {
+      snapshot.simulationSnapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
         this.cells[idx].restoreSnapshot(cellSnapshot);
       });
     }
