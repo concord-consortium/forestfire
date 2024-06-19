@@ -259,7 +259,7 @@ export class Cell {
       zone: this.zone,
       zoneIdx: this.zoneIdx,
       fireIdx: this.fireIdx,
-      fireHistory: this.fireHistory,
+      fireHistory: [...this.fireHistory],
       fireState: this.fireState,
       vegetation: this.vegetation,
     };
