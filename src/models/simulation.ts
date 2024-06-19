@@ -19,7 +19,7 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded";
+export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded" | "fireEventUpdated" | "fireEventEnded";
 
 export interface ISimulationSnapshot {
   time: number;
@@ -27,11 +27,13 @@ export interface ISimulationSnapshot {
 }
 
 export interface IFireEventSnapshot {
-  time: number;
+  startTime: number;
+  endTime: number;
   climateChangeEnabled: boolean;
   droughtLevel: DroughtLevel;
   wind: IWindProps;
   sparks: ISpark[];
+  simulationSnapshots: ISimulationSnapshot[];
 }
 
 // This class is responsible for data loading, adding sparks and fire lines and so on. It's more focused
@@ -405,6 +407,8 @@ export class SimulationModel {
     this.time += timeStep;
     const newYear = Math.floor(this.timeInYears);
     const yearDidChange = newYear !== oldYear;
+    // take a snapshot every three days. If we do it to often, the animation suffers
+    const getSnapshot = Math.floor(this.timeInDays) % 3 === 0;
 
     if (yearDidChange) {
       this.yearlyVegetationStatistics.push(this.calculateVegetationStatistics());
@@ -425,8 +429,13 @@ export class SimulationModel {
       this.isFireActive = !this.fireEngine.fireDidStop;
       if (!this.isFireActive) {
         this.fireEngine = null;
-        // Fire event just ended. Remove all the spark markers.
+        // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger
+        this.setWindDirection(this.config.windDirection);
+        this.setWindSpeed(this.config.windSpeed);
         this.sparks.length = 0;
+        this.emit("fireEventEnded");
+      } else {
+        getSnapshot && this.emit("fireEventUpdated");
       }
     }
 
@@ -509,7 +518,6 @@ export class SimulationModel {
       this.setWindDirection(this.prevWind?.direction || 0);
       this.setWindSpeed(this.prevWind?.speed || 0);
       this.emit("fireEventRemoved");
-
     }
   }
 
@@ -522,11 +530,13 @@ export class SimulationModel {
 
   public fireEventSnapshot(): IFireEventSnapshot {
     return {
-      time: this.time,
+      startTime: this.time,
+      endTime: this.time,
       climateChangeEnabled: this.climateChangeEnabled,
       droughtLevel: this.droughtLevel,
       wind: {...this.wind },
-      sparks: [...this.sparks]
+      sparks: [...this.sparks],
+      simulationSnapshots: []
     };
   }
 
@@ -537,12 +547,31 @@ export class SimulationModel {
     });
   }
 
-  public restoreFireEventSnapshot(snapshot: IFireEventSnapshot) {
-    this.setWindDirection(snapshot.wind.direction);
-    this.setWindSpeed(snapshot.wind.speed);
-    this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
-    this.setDroughtLevel(snapshot.droughtLevel);
-    this.windDidChange = true;
-    this.sparks = snapshot.sparks;
+  public restoreFireEventSnapshot(snapshot: IFireEventSnapshot | undefined) {
+    const minutesInYear = 525600;
+    const year = this.time;
+    const prevYear = year - minutesInYear;
+    const nextYear = year + minutesInYear;
+    const numSimSnapshots = snapshot?.simulationSnapshots.length || 0;
+    // if snapshot.startTime is within the current year, we need to restore the fireEvent snapshot
+    // otherwise, we show the default state of the simulation
+    if (!snapshot || (snapshot.startTime !== 0 && (snapshot.startTime < prevYear || snapshot.startTime > nextYear))) {
+      this.setWindDirection(this.config.windDirection);
+      this.setWindSpeed(this.config.windSpeed);
+      this.setClimateChangeEnabled(this.climateChangeEnabled);
+      this.setDroughtLevel(this.initialDroughtLevel);
+      this.windDidChange = true;
+      this.sparks = [];
+    } else {
+      this.setWindDirection(snapshot.wind.direction);
+      this.setWindSpeed(snapshot.wind.speed);
+      this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
+      this.setDroughtLevel(snapshot.droughtLevel);
+      this.windDidChange = true;
+      this.sparks = snapshot.sparks;
+      snapshot.simulationSnapshots[numSimSnapshots - 1].cellSnapshots.forEach((cellSnapshot, idx) => {
+        this.cells[idx].restoreSnapshot(cellSnapshot);
+      });
+    }
   }
 }

@@ -27,6 +27,8 @@ export class SnapshotsManager {
     simulation.on("fireEventAdded", this.onFireEventAdded);
     simulation.on("sparkAdded", this.onSparkAdded);
     simulation.on("fireEventRemoved", this.onFireEventRemoved);
+    simulation.on("fireEventUpdated", this.onFireEventUpdated);
+    simulation.on("fireEventEnded", this.onFireEventEnded);
     this.reset();
   }
 
@@ -49,6 +51,19 @@ export class SnapshotsManager {
       this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks = [];
     }
     this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks.push(this.simulation.sparks[this.simulation.sparks.length - 1]);
+  }
+
+  @action.bound public onFireEventUpdated() {
+    const simSnapshot = this.simulation.snapshot();
+    const fireEventsLength = this.simulation.fireEvents.length;
+    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.simulationSnapshots.push(simSnapshot);
+  }
+
+  @action.bound public onFireEventEnded() {
+    const fireEventsLength = this.simulation.fireEvents.length;
+    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.endTime = this.simulation.time;
   }
 
   @action.bound public onYearChange() {
@@ -76,15 +91,21 @@ export class SnapshotsManager {
   }
 
   public restoreFireEventSnapshot(time: number) {
-    const timeInMinutes = time * 60 * 24 * 365;
-    // Reverse the array and find the first snapshot less than current timeInMinutes
-    const eventSnapshot = this.fireEventSnapshots.slice().reverse().find(snapshot => snapshot.fireEventSnapshot.time <= timeInMinutes);
-    if (!eventSnapshot) {
-      return;
-    }
+    const yearInMinutes = 60 * 24 * 365;
+    const timeInMinutes = time * yearInMinutes;
+    const timeRangeStart = timeInMinutes - yearInMinutes;
+    const timeRangeEnd = timeInMinutes + yearInMinutes;
+
+    // Reverse the array and find the snapshot where startTime or endTime falls within the defined range
+    const eventSnapshot = this.fireEventSnapshots.slice().reverse()
+      .find(snapshot =>
+        (snapshot.fireEventSnapshot.startTime <= timeRangeEnd && snapshot.fireEventSnapshot.startTime >= timeRangeStart) ||
+        (snapshot.fireEventSnapshot.endTime <= timeRangeEnd && snapshot.fireEventSnapshot.endTime >= timeRangeStart)
+      );
     this.simulation.stop();
-    this.simulation.restoreFireEventSnapshot(eventSnapshot.fireEventSnapshot);
+    this.simulation.restoreFireEventSnapshot(eventSnapshot?.fireEventSnapshot);
     this.simulation.updateCellsStateFlag();
+    this.simulation.updateCellsElevationFlag();
   }
 
   public restoreLastSnapshot() {
