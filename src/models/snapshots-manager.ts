@@ -1,10 +1,12 @@
 import { action, observable, makeObservable } from "mobx";
 import { IFireEventSnapshot, ISimulationSnapshot, SimulationModel } from "./simulation";
+import { deepEqual } from "../utils";
+import { yearInMinutes } from "../types";
 
-export const SNAPSHOT_INTERVAL = 1; // years
+export const SNAPSHOT_INTERVAL = 3; // years
 
 export interface ISnapshot {
-  simulationSnapshot: ISimulationSnapshot
+  simulationSnapshot: ISimulationSnapshot | undefined
 }
 
 export interface IEventSnapshot {
@@ -22,12 +24,12 @@ export class SnapshotsManager {
   constructor(simulation: SimulationModel) {
     makeObservable(this);
     this.simulation = simulation;
+    simulation.on("start", this.onStart);
     simulation.on("yearChange", this.onYearChange);
     simulation.on("restart", this.reset);
     simulation.on("fireEventAdded", this.onFireEventAdded);
     simulation.on("sparkAdded", this.onSparkAdded);
     simulation.on("fireEventRemoved", this.onFireEventRemoved);
-    simulation.on("fireEventUpdated", this.onFireEventUpdated);
     simulation.on("fireEventEnded", this.onFireEventEnded);
     this.reset();
   }
@@ -66,32 +68,52 @@ export class SnapshotsManager {
     this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.endTime = this.simulation.time;
   }
 
+  @action.bound public onStart() {
+    this.maxYear = 0;
+    this.snapshots[0] = {
+      simulationSnapshot: this.simulation.snapshot()
+    };
+    console.log("onStart", this.snapshots[0].simulationSnapshot);
+  }
+
   @action.bound public onYearChange() {
-    const year = Math.floor(this.simulation.timeInYears);
-    if (year % SNAPSHOT_INTERVAL === 0) {
-      //Change to last time step
+    if (this.simulation.timeInYears > this.maxYear) {
       this.maxYear = this.simulation.timeInYears;
-      const arrayIndex = year / SNAPSHOT_INTERVAL;
-      this.snapshots[arrayIndex] = {
-        simulationSnapshot: this.simulation.snapshot()
-      };
+    }
+    // We only take a snapshot every 3 years, and only if the vegetation statistics have changed
+    // Otherwise, we just store undefined. This should improve performance.
+    if (this.simulation.timeInYears % SNAPSHOT_INTERVAL !== 0) {
+      if (this.simulation.yearlyVegetationStatistics.length > 1) {
+        const arrayIndex = this.snapshots.length;
+        const currentYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 1];
+        const previousYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 2];
+        if (!deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
+          this.snapshots[arrayIndex] = {
+            simulationSnapshot: this.simulation.snapshot()
+          };
+        } else {
+          this.snapshots[arrayIndex] = {
+            simulationSnapshot: undefined
+          };
+        }
+      }
     }
   }
 
   public restoreSnapshot(year: number) {
-    const arrayIndex = Math.floor(year / SNAPSHOT_INTERVAL);
-
-    const snapshot = this.snapshots[arrayIndex];
+    const arrayIndex = year > 0 ? Math.floor(year) - 1 : 0;
+    const snapshot = this.snapshots[arrayIndex].simulationSnapshot
+                        ?? (this.snapshots.slice().reverse().find(s => s.simulationSnapshot
+                          && s.simulationSnapshot.time < year * yearInMinutes))?.simulationSnapshot;
     if (!snapshot) {
       return;
     }
     this.simulation.stop();
-    this.simulation.restoreSnapshot(snapshot.simulationSnapshot);
+    this.simulation.restoreSnapshot(snapshot);
     this.simulation.updateCellsStateFlag();
   }
 
   public restoreFireEventSnapshot(time: number) {
-    const yearInMinutes = 60 * 24 * 365;
     const timeInMinutes = time * yearInMinutes;
     const timeRangeStart = timeInMinutes - yearInMinutes;
     const timeRangeEnd = timeInMinutes + yearInMinutes;
@@ -110,12 +132,12 @@ export class SnapshotsManager {
 
   public restoreLastSnapshot() {
     const arrayIndex = this.snapshots.length - 1;
-    const snapshot = this.snapshots[arrayIndex];
+    const snapshot = this.snapshots[arrayIndex].simulationSnapshot ?? (this.snapshots.slice().reverse().find(s => s.simulationSnapshot))?.simulationSnapshot;
     if (!snapshot) {
       return;
     }
     this.simulation.stop();
-    this.simulation.restoreSnapshot(snapshot.simulationSnapshot);
+    this.simulation.restoreSnapshot(snapshot);
     this.simulation.updateCellsStateFlag();
   }
 

@@ -19,7 +19,7 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded" | "fireEventUpdated" | "fireEventEnded";
+export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded" | "fireEventEnded";
 
 export interface ISimulationSnapshot {
   time: number;
@@ -313,6 +313,7 @@ export class SimulationModel {
     }
     if (!this.simulationStarted) {
       this.simulationStarted = true;
+      this.emit("start");
     }
     if (this.sparks.length > 0 && !this.fireEngine) {
       this.fireEngine = new FireEngine(this.cells, this.wind, this.config);
@@ -407,8 +408,6 @@ export class SimulationModel {
     this.time += timeStep;
     const newYear = Math.floor(this.timeInYears);
     const yearDidChange = newYear !== oldYear;
-    // take a snapshot every three days. If we do it to often, the animation suffers
-    const getSnapshot = Math.floor(this.timeInDays) % 3 === 0;
 
     if (yearDidChange) {
       this.yearlyVegetationStatistics.push(this.calculateVegetationStatistics());
@@ -429,13 +428,11 @@ export class SimulationModel {
       this.isFireActive = !this.fireEngine.fireDidStop;
       if (!this.isFireActive) {
         this.fireEngine = null;
-        // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger
+        // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger to default values.
         this.setWindDirection(this.config.windDirection);
         this.setWindSpeed(this.config.windSpeed);
         this.sparks.length = 0;
         this.emit("fireEventEnded");
-      } else {
-        getSnapshot && this.emit("fireEventUpdated");
       }
     }
 
@@ -568,9 +565,7 @@ export class SimulationModel {
       this.setDroughtLevel(snapshot.droughtLevel);
       this.windDidChange = true;
       this.sparks = snapshot.sparks;
-      snapshot.simulationSnapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
-        this.cells[idx].restoreSnapshot(cellSnapshot);
-      });
+      this.setTimeInYears(snapshot.simulationSnapshot.time / yearInMinutes);
     }
   }
 }
