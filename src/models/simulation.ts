@@ -23,6 +23,7 @@ export type Event = "yearChange" | "restart" | "start";
 
 export interface ISimulationSnapshot {
   time: number;
+  droughtLevel: number;
   cellSnapshots: ICellSnapshot[];
 }
 
@@ -500,12 +501,14 @@ export class SimulationModel {
   public snapshot(): ISimulationSnapshot {
     return {
       time: this.time,
+      droughtLevel: this.droughtLevel,
       cellSnapshots: this.cells.map(c => c.snapshot())
     };
   }
 
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
+    this.setDroughtLevel(snapshot.droughtLevel);
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });
