@@ -417,8 +417,10 @@ export class SimulationModel {
       this.isFireActive = !this.fireEngine.fireDidStop;
       if (!this.isFireActive) {
         this.fireEngine = null;
-        // Fire event just ended. Remove all the spark markers.
+        // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger to default values.
         this.sparks.length = 0;
+        this.setWindDirection(this.config.windDirection);
+        this.setWindSpeed(this.config.windSpeed);
       }
     }
 
