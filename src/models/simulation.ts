@@ -23,6 +23,7 @@ export type Event = "yearChange" | "restart" | "start";
 
 export interface ISimulationSnapshot {
   time: number;
+  droughtLevel: number;
   cellSnapshots: ICellSnapshot[];
 }
 
@@ -416,8 +417,10 @@ export class SimulationModel {
       this.isFireActive = !this.fireEngine.fireDidStop;
       if (!this.isFireActive) {
         this.fireEngine = null;
-        // Fire event just ended. Remove all the spark markers.
+        // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger to default values.
         this.sparks.length = 0;
+        this.setWindDirection(this.config.windDirection);
+        this.setWindSpeed(this.config.windSpeed);
       }
     }
 
@@ -500,12 +503,14 @@ export class SimulationModel {
   public snapshot(): ISimulationSnapshot {
     return {
       time: this.time,
+      droughtLevel: this.droughtLevel,
       cellSnapshots: this.cells.map(c => c.snapshot())
     };
   }
 
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
+    this.setDroughtLevel(snapshot.droughtLevel);
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });
