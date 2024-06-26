@@ -13,7 +13,6 @@ export const deepEqual = (object1: any, object2: any) =>{
     if (typeof val1 === "number" && typeof val2 === "number") {
       val1 = parseFloat(val1.toFixed(3));
       val2 = parseFloat(val2.toFixed(3));
-      console.log("val1", val1, "val2", val2);
     }
     if (
       areObjects && !deepEqual(val1, val2) ||

@@ -55,17 +55,23 @@ export class SnapshotsManager {
     this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks.push(this.simulation.sparks[this.simulation.sparks.length - 1]);
   }
 
-  @action.bound public onFireEventUpdated() {
-    const simSnapshot = this.simulation.snapshot();
-    const fireEventsLength = this.simulation.fireEvents.length;
-    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
-    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.simulationSnapshot = simSnapshot;
-  }
-
   @action.bound public onFireEventEnded() {
     const fireEventsLength = this.simulation.fireEvents.length;
     const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
-    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.endTime = this.simulation.time;
+    const currentSnapshot = this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot;
+    const newSnapshot = this.simulation.fireEventSnapshot();
+
+    this.fireEventSnapshots[fireEventsIndex] = {
+      fireEventSnapshot: {
+        startTime: currentSnapshot.startTime,
+        endTime: newSnapshot.endTime,
+        climateChangeEnabled: newSnapshot.climateChangeEnabled,
+        droughtLevel: newSnapshot.droughtLevel,
+        wind: { ...newSnapshot.wind },
+        sparks: currentSnapshot.sparks,
+        simulationSnapshot: newSnapshot.simulationSnapshot
+      }
+    };
   }
 
   @action.bound public onStart() {
@@ -73,7 +79,6 @@ export class SnapshotsManager {
     this.snapshots[0] = {
       simulationSnapshot: this.simulation.snapshot()
     };
-    console.log("onStart", this.snapshots[0].simulationSnapshot);
   }
 
   @action.bound public onYearChange() {
@@ -101,10 +106,8 @@ export class SnapshotsManager {
   }
 
   public restoreSnapshot(year: number) {
-    const arrayIndex = year > 0 ? Math.floor(year) - 1 : 0;
-    const snapshot = this.snapshots[arrayIndex].simulationSnapshot
-                        ?? (this.snapshots.slice().reverse().find(s => s.simulationSnapshot
-                          && s.simulationSnapshot.time < year * yearInMinutes))?.simulationSnapshot;
+    const arrayIndex = year > 1 ? Math.floor(year) - 1 : 0;
+    const snapshot = this.snapshots[arrayIndex].simulationSnapshot;
     if (!snapshot) {
       return;
     }

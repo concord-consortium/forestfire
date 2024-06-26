@@ -51,9 +51,6 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
 
   const handleSliderChange = (e: Event, value: number) => {
     value = Math.min(snapshotsManager.maxYear, value);
-    //get the times when there is a snapshot taken
-    const snapshotSteps = snapshotsManager.snapshots.map((snapshot) => snapshot.simulationSnapshot?.time);
-    console.log("in handleSliderChange snapshotSteps", snapshotSteps);
     setVal(value);
     window.clearTimeout(timeoutId.current);
     timeoutId.current = window.setTimeout(() => {

@@ -566,6 +566,9 @@ export class SimulationModel {
       this.windDidChange = true;
       this.sparks = snapshot.sparks;
       this.setTimeInYears(snapshot.simulationSnapshot.time / yearInMinutes);
+      snapshot.simulationSnapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
+        this.cells[idx].restoreSnapshot(cellSnapshot);
+      });
     }
   }
 }
