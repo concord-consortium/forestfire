@@ -23,6 +23,7 @@ export type Event = "yearChange" | "restart" | "start" | "stop" | "fireEventAdde
 
 export interface ISimulationSnapshot {
   time: number;
+  droughtLevel: number;
   cellSnapshots: ICellSnapshot[];
 }
 
@@ -522,6 +523,7 @@ export class SimulationModel {
   public snapshot(): ISimulationSnapshot {
     return {
       time: this.time,
+      droughtLevel: this.droughtLevel,
       cellSnapshots: this.cells.map(c => c.snapshot())
     };
   }
