@@ -19,12 +19,22 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start";
+export type Event = "yearChange" | "restart" | "start" | "stop" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded" | "fireEventEnded";
 
 export interface ISimulationSnapshot {
   time: number;
   droughtLevel: number;
   cellSnapshots: ICellSnapshot[];
+}
+
+export interface IFireEventSnapshot {
+  startTime: number;
+  endTime: number;
+  climateChangeEnabled: boolean;
+  droughtLevel: DroughtLevel;
+  wind: IWindProps;
+  sparks: ISpark[];
+  simulationSnapshot: ISimulationSnapshot;
 }
 
 // This class is responsible for data loading, adding sparks and fire lines and so on. It's more focused
@@ -63,6 +73,7 @@ export class SimulationModel {
   @observable public cellsStateFlag = 0;
   @observable public cellsElevationFlag = 0;
   private emitter = new EventEmitter();
+  private prevWind: IWindProps = {direction: 0, speed: 0};
 
   constructor(presetConfig: Partial<ISimulationConfig>) {
     makeObservable(this);
@@ -303,6 +314,7 @@ export class SimulationModel {
     }
     if (!this.simulationStarted) {
       this.simulationStarted = true;
+      this.emit("start");
     }
     if (this.sparks.length > 0 && !this.fireEngine) {
       this.fireEngine = new FireEngine(this.cells, this.wind, this.config);
@@ -319,6 +331,7 @@ export class SimulationModel {
 
   @action.bound public stop() {
     this.simulationRunning = false;
+    this.emit("stop");
   }
 
   @action.bound public restart() {
@@ -418,9 +431,10 @@ export class SimulationModel {
       if (!this.isFireActive) {
         this.fireEngine = null;
         // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger to default values.
-        this.sparks.length = 0;
         this.setWindDirection(this.config.windDirection);
         this.setWindSpeed(this.config.windSpeed);
+        this.sparks.length = 0;
+        this.emit("fireEventEnded");
       }
     }
 
@@ -464,7 +478,8 @@ export class SimulationModel {
 
   @action.bound public addSpark(x: number, y: number) {
     if (this.canAddSpark) {
-      this.sparks.push({ position: new Vector2(x, y), locked: false });
+      this.sparks.push({ time: this.time, position: new Vector2(x, y), locked: false });
+      this.emit("sparkAdded");
     }
   }
 
@@ -484,12 +499,14 @@ export class SimulationModel {
   @action.bound public addFireEvent() {
     this.stop();
     // Wind is randomly updated at the beginning of each fire event.
+    this.prevWind = { ...this.wind };
     this.setWindDirection(Math.random() * 360);
     const minWind = 0.666;
     const maxWind = 2.000;
     this.setWindSpeed(minWind + Math.random() * (maxWind - minWind));
     this.windDidChange = true; // notify user wind has been updated
     this.fireEvents.push({ time: this.time });
+    this.emit("fireEventAdded");
   }
 
   @action.bound public cancelFireEventSetup() {
@@ -497,6 +514,9 @@ export class SimulationModel {
       // Fire event was just added and not started yet, so it's still safe to cancel it.
       this.fireEvents.pop();
       this.sparks.length = 0;
+      this.setWindDirection(this.prevWind?.direction || 0);
+      this.setWindSpeed(this.prevWind?.speed || 0);
+      this.emit("fireEventRemoved");
     }
   }
 
@@ -508,10 +528,40 @@ export class SimulationModel {
     };
   }
 
+  public fireEventSnapshot(): IFireEventSnapshot {
+    return {
+      startTime: this.time,
+      endTime: this.time,
+      climateChangeEnabled: this.climateChangeEnabled,
+      droughtLevel: this.droughtLevel,
+      wind: {...this.wind },
+      sparks: [...this.sparks],
+      simulationSnapshot: this.snapshot()
+    };
+  }
+
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
-    this.setDroughtLevel(snapshot.droughtLevel);
+    this.setWindDirection(this.config.windDirection);
+    this.setWindSpeed(this.config.windSpeed);
+    this.setClimateChangeEnabled(this.climateChangeEnabled);
+    this.setDroughtLevel(this.initialDroughtLevel);
+    this.windDidChange = true;
+    this.sparks = [];
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
+      this.cells[idx].restoreSnapshot(cellSnapshot);
+    });
+  }
+
+  public restoreFireEventSnapshot(snapshot: IFireEventSnapshot) {
+    this.setWindDirection(snapshot.wind.direction);
+    this.setWindSpeed(snapshot.wind.speed);
+    this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
+    this.setDroughtLevel(snapshot.droughtLevel);
+    this.windDidChange = true;
+    this.sparks = snapshot.sparks;
+    this.setTimeInYears(snapshot.simulationSnapshot.time / yearInMinutes);
+    snapshot.simulationSnapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });
   }

@@ -33,12 +33,12 @@ describe("SnapshotsManager", () => {
     }
 
     expect(Math.floor(snapshotsManager.maxYear)).toBe(2);
-    expect(snapshotsManager.snapshots).toHaveLength(3);
+    expect(snapshotsManager.snapshots).toHaveLength(1);
     while (simulation.timeInYears < 5) {
       simulation.tick(timeStep);
     }
 
     expect(Math.floor(snapshotsManager.maxYear)).toBe(5);
-    expect(snapshotsManager.snapshots).toHaveLength(6);
+    expect(snapshotsManager.snapshots).toHaveLength(4);
   });
 });

@@ -68,6 +68,7 @@ export interface IFireEvent {
 }
 
 export interface ISpark {
+  time: number
   position: Vector2;
   locked: boolean;
 }

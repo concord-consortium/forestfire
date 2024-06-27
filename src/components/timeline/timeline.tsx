@@ -26,14 +26,21 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
 
     // if user has scrubbed back on the timeline, and then starts the sim again
     // we need to restore the last snapshot and move the timeline scrubber to the max year
-    useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (simulation.simulationRunning && snapshotsManager.maxYear > val) {
       snapshotsManager.restoreLastSnapshot();
       simulation.start(); //when we restoreLastSnapshot, we need to start the simulation again
     }
   },[simulation, simulation.simulationRunning, snapshotsManager, val]);
 
-  //we use the second useEffect to update the timeline scrubber when the simulation is running
+  useLayoutEffect(() => {
+    if (simulation.isFireEventActive && simulation.simulationRunning && snapshotsManager.maxYear > val) {
+      snapshotsManager.restoreLastFireEventSnapshot();
+      simulation.start();
+    }
+  }, [simulation, simulation.simulationRunning, snapshotsManager, val]);
+
+  // This useEffect is to update the timeline scrubber when the simulation is running
   // progress bar and regrowth of vegetation
   useLayoutEffect(() => {
     if (simulation.simulationRunning) {
@@ -76,7 +83,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
                 rail: css.rail,
                 mark: css.mark,
                 markLabel: css.markLabel,
-                thumb: css.sliderThumb,
+                thumb: disabled ? css.sliderThumbDisabled : css.sliderThumb,
               }}
               size="medium"
               step={1}
