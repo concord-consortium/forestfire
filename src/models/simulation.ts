@@ -540,36 +540,27 @@ export class SimulationModel {
 
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
+    this.setWindDirection(this.config.windDirection);
+    this.setWindSpeed(this.config.windSpeed);
+    this.setClimateChangeEnabled(this.climateChangeEnabled);
+    this.setDroughtLevel(this.initialDroughtLevel);
+    this.windDidChange = true;
+    this.sparks = [];
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });
   }
 
-  public restoreFireEventSnapshot(snapshot: IFireEventSnapshot | undefined) {
-    const minutesInYear = 525600;
-    const year = this.time;
-    const prevYear = year - minutesInYear;
-    const nextYear = year + minutesInYear;
-    // if snapshot.startTime is within the current year, we need to restore the fireEvent snapshot
-    // otherwise, we show the default state of the simulation
-    if (!snapshot || (snapshot.startTime !== 0 && (snapshot.startTime < prevYear || snapshot.startTime > nextYear))) {
-      this.setWindDirection(this.config.windDirection);
-      this.setWindSpeed(this.config.windSpeed);
-      this.setClimateChangeEnabled(this.climateChangeEnabled);
-      this.setDroughtLevel(this.initialDroughtLevel);
-      this.windDidChange = true;
-      this.sparks = [];
-    } else {
-      this.setWindDirection(snapshot.wind.direction);
-      this.setWindSpeed(snapshot.wind.speed);
-      this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
-      this.setDroughtLevel(snapshot.droughtLevel);
-      this.windDidChange = true;
-      this.sparks = snapshot.sparks;
-      this.setTimeInYears(snapshot.simulationSnapshot.time / yearInMinutes);
-      snapshot.simulationSnapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
-        this.cells[idx].restoreSnapshot(cellSnapshot);
-      });
-    }
+  public restoreFireEventSnapshot(snapshot: IFireEventSnapshot) {
+    this.setWindDirection(snapshot.wind.direction);
+    this.setWindSpeed(snapshot.wind.speed);
+    this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
+    this.setDroughtLevel(snapshot.droughtLevel);
+    this.windDidChange = true;
+    this.sparks = snapshot.sparks;
+    this.setTimeInYears(snapshot.simulationSnapshot.time / yearInMinutes);
+    snapshot.simulationSnapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
+      this.cells[idx].restoreSnapshot(cellSnapshot);
+    });
   }
 }

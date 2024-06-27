@@ -23,8 +23,8 @@ export const deepEqual = (object1: any, object2: any) =>{
   }
 
   return true;
-}
+};
 
 const isObject = (object: any) => {
   return object != null && typeof object === "object";
-}
+};

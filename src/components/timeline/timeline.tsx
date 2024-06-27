@@ -33,7 +33,14 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     }
   },[simulation, simulation.simulationRunning, snapshotsManager, val]);
 
-  //we use the second useEffect to update the timeline scrubber when the simulation is running
+  useLayoutEffect(() => {
+    if (simulation.isFireEventActive && simulation.simulationRunning && snapshotsManager.maxYear > val) {
+      snapshotsManager.restoreLastFireEventSnapshot();
+      simulation.start();
+    }
+  }, [simulation, simulation.simulationRunning, snapshotsManager, val]);
+
+  // This useEffect is to update the timeline scrubber when the simulation is running
   // progress bar and regrowth of vegetation
   useLayoutEffect(() => {
     if (simulation.simulationRunning) {
@@ -49,20 +56,12 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     }
 }, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation, val]);
 
-  useLayoutEffect(() => {
-    if (simulation.isFireEventActive && simulation.simulationRunning && snapshotsManager.maxYear > val) {
-      snapshotsManager.restoreLastFireEventSnapshot();
-      simulation.start();
-    }
-  }, [simulation, simulation.simulationRunning, snapshotsManager, val]);
-
   const handleSliderChange = (e: Event, value: number) => {
     value = Math.min(snapshotsManager.maxYear, value);
     setVal(value);
     window.clearTimeout(timeoutId.current);
     timeoutId.current = window.setTimeout(() => {
       snapshotsManager.restoreSnapshot(value);
-      snapshotsManager.restoreFireEventSnapshot(value);
     }, LOADING_DELAY);
   };
 

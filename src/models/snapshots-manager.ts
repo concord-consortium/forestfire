@@ -132,31 +132,39 @@ export class SnapshotsManager {
   }
 
   public restoreSnapshot(year: number) {
-    const arrayIndex = year > 1 ? Math.floor(year) - 1 : 0;
-    const snapshot = this.snapshots[arrayIndex].simulationSnapshot;
-    if (!snapshot) {
-      return;
-    }
-    this.simulation.stop();
-    this.simulation.restoreSnapshot(snapshot);
-    this.simulation.updateCellsStateFlag();
-  }
-
-  public restoreFireEventSnapshot(time: number) {
-    const timeInMinutes = time * yearInMinutes;
+    const timeInMinutes = year * yearInMinutes;
     const timeRangeStart = timeInMinutes - yearInMinutes;
     const timeRangeEnd = timeInMinutes + yearInMinutes;
-
-    // Reverse the array and find the snapshot where startTime or endTime falls within the defined range
     const eventSnapshot = this.fireEventSnapshots.slice().reverse()
-      .find(snapshot =>
-        (snapshot.fireEventSnapshot.startTime <= timeRangeEnd && snapshot.fireEventSnapshot.startTime >= timeRangeStart) ||
-        (snapshot.fireEventSnapshot.endTime <= timeRangeEnd && snapshot.fireEventSnapshot.endTime >= timeRangeStart)
-      );
-    this.simulation.stop();
-    this.simulation.restoreFireEventSnapshot(eventSnapshot?.fireEventSnapshot);
-    this.simulation.updateCellsStateFlag();
-    this.simulation.updateCellsElevationFlag();
+    .find(snapshot =>
+      (snapshot.fireEventSnapshot.startTime <= timeRangeEnd && snapshot.fireEventSnapshot.startTime >= timeRangeStart) ||
+      (snapshot.fireEventSnapshot.endTime <= timeRangeEnd && snapshot.fireEventSnapshot.endTime >= timeRangeStart)
+    );
+    if (eventSnapshot) {
+      this.simulation.stop();
+      this.simulation.restoreFireEventSnapshot(eventSnapshot?.fireEventSnapshot);
+      this.simulation.updateCellsStateFlag();
+      this.simulation.updateCellsElevationFlag();
+    } else {
+      const arrayIndex = year > 1 ? Math.floor(year) - 1 : 0;
+      // Find the first previous snapshot that is not undefined
+      let previousSnapshotIndex = -1;
+      for (let i = arrayIndex - 1; i >= 0; i--) {
+        if (this.snapshots[i].simulationSnapshot) {
+          previousSnapshotIndex = i;
+          break;
+        }
+      }
+      if (previousSnapshotIndex !== -1) {
+        const snapshot = this.snapshots[previousSnapshotIndex].simulationSnapshot;
+        if (snapshot !== undefined) {
+          this.simulation.stop();
+          this.simulation.restoreSnapshot(snapshot);
+          this.simulation.updateCellsStateFlag();
+          this.simulation.updateCellsElevationFlag();
+        }
+      }
+    }
   }
 
   public restoreLastSnapshot() {
