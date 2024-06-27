@@ -27,6 +27,7 @@ export class SnapshotsManager {
     simulation.on("start", this.onStart);
     simulation.on("yearChange", this.onYearChange);
     simulation.on("restart", this.reset);
+    simulation.on("stop", this.onStop);
     simulation.on("fireEventAdded", this.onFireEventAdded);
     simulation.on("sparkAdded", this.onSparkAdded);
     simulation.on("fireEventRemoved", this.onFireEventRemoved);
@@ -34,9 +35,13 @@ export class SnapshotsManager {
     this.reset();
   }
 
-  @action.bound public onFireEventAdded() {
+  getFireEventIndex = () => {
     const fireEventsLength = this.simulation.fireEvents.length;
-    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+    return fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+  };
+
+  @action.bound public onFireEventAdded() {
+    const fireEventsIndex = this.getFireEventIndex();
     this.fireEventSnapshots[fireEventsIndex] = {
       fireEventSnapshot: this.simulation.fireEventSnapshot()
     };
@@ -47,8 +52,7 @@ export class SnapshotsManager {
   }
 
   @action.bound public onSparkAdded() {
-    const fireEventsLength = this.fireEventSnapshots.length;
-    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+    const fireEventsIndex = this.getFireEventIndex();
     if (!this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks) {
       this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks = [];
     }
@@ -56,8 +60,7 @@ export class SnapshotsManager {
   }
 
   @action.bound public onFireEventEnded() {
-    const fireEventsLength = this.simulation.fireEvents.length;
-    const fireEventsIndex = fireEventsLength > 0 ? fireEventsLength - 1 : 0;
+    const fireEventsIndex = this.getFireEventIndex();
     const currentSnapshot = this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot;
     const newSnapshot = this.simulation.fireEventSnapshot();
 
@@ -79,6 +82,29 @@ export class SnapshotsManager {
     this.snapshots[0] = {
       simulationSnapshot: this.simulation.snapshot()
     };
+  }
+
+  @action.bound public onStop() {
+    if (this.simulation.isFireActive) {
+      const fireEventsIndex = this.getFireEventIndex();
+      if (this.simulation.time < this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.startTime) {
+        return;
+      }
+      const currentSnapshot = this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot;
+      const newSnapshot = this.simulation.fireEventSnapshot();
+
+      this.fireEventSnapshots[fireEventsIndex] = {
+        fireEventSnapshot: {
+          startTime: currentSnapshot.startTime,
+          endTime: newSnapshot.endTime,
+          climateChangeEnabled: newSnapshot.climateChangeEnabled,
+          droughtLevel: newSnapshot.droughtLevel,
+          wind: { ...newSnapshot.wind },
+          sparks: currentSnapshot.sparks,
+          simulationSnapshot: newSnapshot.simulationSnapshot
+        }
+      };
+    }
   }
 
   @action.bound public onYearChange() {
@@ -141,6 +167,17 @@ export class SnapshotsManager {
     }
     this.simulation.stop();
     this.simulation.restoreSnapshot(snapshot);
+    this.simulation.updateCellsStateFlag();
+  }
+
+  public restoreLastFireEventSnapshot() {
+    const arrayIndex = this.fireEventSnapshots.length - 1;
+    const snapshot = this.fireEventSnapshots[arrayIndex] ?? (this.snapshots.slice().reverse().find(s => s.simulationSnapshot))?.simulationSnapshot;
+    if (!snapshot) {
+      return;
+    }
+    this.simulation.stop();
+    this.simulation.restoreFireEventSnapshot(snapshot.fireEventSnapshot);
     this.simulation.updateCellsStateFlag();
   }
 

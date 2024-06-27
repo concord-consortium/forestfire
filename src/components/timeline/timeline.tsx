@@ -26,7 +26,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
 
     // if user has scrubbed back on the timeline, and then starts the sim again
     // we need to restore the last snapshot and move the timeline scrubber to the max year
-    useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (simulation.simulationRunning && snapshotsManager.maxYear > val) {
       snapshotsManager.restoreLastSnapshot();
       simulation.start(); //when we restoreLastSnapshot, we need to start the simulation again
@@ -48,6 +48,13 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
       simulation.setTimeInYears(0);
     }
 }, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation, val]);
+
+  useLayoutEffect(() => {
+    if (simulation.isFireEventActive && simulation.simulationRunning && snapshotsManager.maxYear > val) {
+      snapshotsManager.restoreLastFireEventSnapshot();
+      simulation.start();
+    }
+  }, [simulation, simulation.simulationRunning, snapshotsManager, val]);
 
   const handleSliderChange = (e: Event, value: number) => {
     value = Math.min(snapshotsManager.maxYear, value);

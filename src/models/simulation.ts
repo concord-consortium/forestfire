@@ -19,7 +19,7 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded" | "fireEventEnded";
+export type Event = "yearChange" | "restart" | "start" | "stop" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded" | "fireEventEnded";
 
 export interface ISimulationSnapshot {
   time: number;
@@ -330,6 +330,7 @@ export class SimulationModel {
 
   @action.bound public stop() {
     this.simulationRunning = false;
+    this.emit("stop");
   }
 
   @action.bound public restart() {
