@@ -23,19 +23,22 @@ export type Event = "yearChange" | "restart" | "start" | "stop" | "fireEventAdde
 
 export interface ISimulationSnapshot {
   time: number;
-  droughtLevel: number;
+  droughtLevel: DroughtLevel;
+  climateChangeEnabled: boolean;
+  wind: IWindProps;
+  sparks: ISpark[];
   cellSnapshots: ICellSnapshot[];
 }
 
-export interface IFireEventSnapshot {
-  startTime: number;
-  endTime: number;
-  climateChangeEnabled: boolean;
-  droughtLevel: DroughtLevel;
-  wind: IWindProps;
-  sparks: ISpark[];
-  simulationSnapshot: ISimulationSnapshot;
-}
+// export interface IFireEventSnapshot {
+//   startTime: number;
+//   endTime: number;
+//   climateChangeEnabled: boolean;
+//   droughtLevel: DroughtLevel;
+//   wind: IWindProps;
+//   sparks: ISpark[];
+//   simulationSnapshot: ISimulationSnapshot;
+// }
 
 // This class is responsible for data loading, adding sparks and fire lines and so on. It's more focused
 // on management and interactions handling. Core calculations are delegated to FireEngine.
@@ -506,6 +509,7 @@ export class SimulationModel {
     this.setWindSpeed(minWind + Math.random() * (maxWind - minWind));
     this.windDidChange = true; // notify user wind has been updated
     this.fireEvents.push({ time: this.time });
+    console.log("in addFireEvent this.simulationStarted", this.simulationStarted, "this.simulationRunning", this.simulationRunning, "this.simulationEnded");
     this.emit("fireEventAdded");
   }
 
@@ -524,44 +528,22 @@ export class SimulationModel {
     return {
       time: this.time,
       droughtLevel: this.droughtLevel,
-      cellSnapshots: this.cells.map(c => c.snapshot())
-    };
-  }
-
-  public fireEventSnapshot(): IFireEventSnapshot {
-    return {
-      startTime: this.time,
-      endTime: this.time,
       climateChangeEnabled: this.climateChangeEnabled,
-      droughtLevel: this.droughtLevel,
       wind: {...this.wind },
       sparks: [...this.sparks],
-      simulationSnapshot: this.snapshot()
+      cellSnapshots: this.cells.map(c => c.snapshot())
     };
   }
 
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
-    this.setWindDirection(this.config.windDirection);
-    this.setWindSpeed(this.config.windSpeed);
-    this.setClimateChangeEnabled(this.climateChangeEnabled);
-    this.setDroughtLevel(this.initialDroughtLevel);
-    this.windDidChange = true;
-    this.sparks = [];
-    snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
-      this.cells[idx].restoreSnapshot(cellSnapshot);
-    });
-  }
-
-  public restoreFireEventSnapshot(snapshot: IFireEventSnapshot) {
     this.setWindDirection(snapshot.wind.direction);
     this.setWindSpeed(snapshot.wind.speed);
     this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
     this.setDroughtLevel(snapshot.droughtLevel);
     this.windDidChange = true;
     this.sparks = snapshot.sparks;
-    this.setTimeInYears(snapshot.simulationSnapshot.time / yearInMinutes);
-    snapshot.simulationSnapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
+    snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });
   }

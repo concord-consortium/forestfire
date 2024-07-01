@@ -6,6 +6,7 @@ import { FireEvents } from "./fire-events";
 import { Slider } from "@mui/material";
 
 import css from "./timeline.scss";
+import { SNAPSHOT_INTERVAL } from "../../models/snapshots-manager";
 
 const TICK_COUNT = 16;
 const LOADING_DELAY = 100; // ms
@@ -24,21 +25,14 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
   }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
 
-    // if user has scrubbed back on the timeline, and then starts the sim again
-    // we need to restore the last snapshot and move the timeline scrubber to the max year
+  // if user has scrubbed back on the timeline, and then starts the sim again
+  // we need to restore the last snapshot and move the timeline scrubber to the max year
   useLayoutEffect(() => {
     if (simulation.simulationRunning && snapshotsManager.maxYear > val) {
       snapshotsManager.restoreLastSnapshot();
       simulation.start(); //when we restoreLastSnapshot, we need to start the simulation again
     }
   },[simulation, simulation.simulationRunning, snapshotsManager, val]);
-
-  useLayoutEffect(() => {
-    if (simulation.isFireEventActive && simulation.simulationRunning && snapshotsManager.maxYear > val) {
-      snapshotsManager.restoreLastFireEventSnapshot();
-      simulation.start();
-    }
-  }, [simulation, simulation.simulationRunning, snapshotsManager, val]);
 
   // This useEffect is to update the timeline scrubber when the simulation is running
   // progress bar and regrowth of vegetation
@@ -54,10 +48,32 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
       setVal(0);
       simulation.setTimeInYears(0);
     }
-}, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation, val]);
+  }, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation, val]);
+
+  const findClosestSnapshotYear = (value: number) => {
+    let closestSnapshotYear = 0;
+    let minDiff = Infinity;
+    snapshotsManager.snapshots.forEach((snapshot, index) => {
+      const snapshotYear = index * SNAPSHOT_INTERVAL;
+      // if (snapshot.simulationSnapshot !== undefined) {
+        const diff = Math.abs(snapshotYear - value);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestSnapshotYear = snapshotYear;
+        }
+      // }
+    });
+    return closestSnapshotYear;
+  };
 
   const handleSliderChange = (e: Event, value: number) => {
-    value = Math.min(snapshotsManager.maxYear, value);
+    if (!simulation.simulationRunning) {
+      value = findClosestSnapshotYear(value);
+    }
+    // else {
+      value = Math.min(snapshotsManager.maxYear, value);
+    // }
+    // value = Math.min(snapshotsManager.maxYear, value);
     setVal(value);
     window.clearTimeout(timeoutId.current);
     timeoutId.current = window.setTimeout(() => {
