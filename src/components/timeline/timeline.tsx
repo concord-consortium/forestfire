@@ -70,10 +70,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     if (!simulation.simulationRunning) {
       value = findClosestSnapshotYear(value);
     }
-    // else {
-      value = Math.min(snapshotsManager.maxYear, value);
-    // }
-    // value = Math.min(snapshotsManager.maxYear, value);
+    value = Math.min(snapshotsManager.maxYear, value);
     setVal(value);
     window.clearTimeout(timeoutId.current);
     timeoutId.current = window.setTimeout(() => {

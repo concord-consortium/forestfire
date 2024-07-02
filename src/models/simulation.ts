@@ -509,7 +509,6 @@ export class SimulationModel {
     this.setWindSpeed(minWind + Math.random() * (maxWind - minWind));
     this.windDidChange = true; // notify user wind has been updated
     this.fireEvents.push({ time: this.time });
-    console.log("in addFireEvent this.simulationStarted", this.simulationStarted, "this.simulationRunning", this.simulationRunning, "this.simulationEnded");
     this.emit("fireEventAdded");
   }
 
