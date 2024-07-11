@@ -56,7 +56,7 @@ context("Test the overall app", () => {
     it("verify timeline scrubber", () => {
       timeLine.getTimeLineScrubber().should("exist");
       bottomBar.getStartButton().click({ force: true });
-      cy.wait(6000); // Added wait to run the simulation for few seconds
+      cy.wait(8000); // Added wait to run the simulation for few seconds
       bottomBar.getStartButton().click({ force: true });
       timeLine.moveTimeLineScrubber(0);
       timeLine.verifyTimeLineTrackWidth("0%");
