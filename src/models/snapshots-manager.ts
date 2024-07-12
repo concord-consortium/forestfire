@@ -32,8 +32,13 @@ export class SnapshotsManager {
     this.reset();
   }
 
-  // We only care about the last snapshot during a fire event
+  // We only care about the last snapshot during a fire event at fire event end.
+  // So we add a snapshot when the fire event starts to get the time the fire event started.
+  // and replace the snapshot when sparks are added to record where the sparks are. When the fire event ends,
+  // the sparks array is emptied, so we have to take the sparks array from the last spark event snapshot and
+  // copy it into the fire event end snapshot.
   @action.bound public onFireEventAdded() {
+    // We attach the fire event start to the closest year a snapshot would have been taken
     const currentYear = this.simulation.timeInYears;
     if (this.lastSnapshotYear !== null) {
       const yearsSinceLastSnapshot = currentYear - this.lastSnapshotYear;
