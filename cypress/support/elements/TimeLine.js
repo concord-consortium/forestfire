@@ -12,5 +12,13 @@ export class TimeLine {
   getFireEventIndex() {
     return cy.get("[class^='fire-events--fireEventIdx--']");
   }
+  getTimeLineScrubber() {
+    return cy.get("[class^='MuiSlider-thumb timeline--sliderThumb--']");
+  }
+  moveTimeLineScrubber(index) {
+    cy.get("[class^='MuiSlider-markLabel']").eq(index).click();
+  }
+  verifyTimeLineTrackWidth(width) {
+    cy.get("[class^='MuiSlider-track timeline--track--']").invoke("attr", "style").should("contain", width);
+  }
 }
-

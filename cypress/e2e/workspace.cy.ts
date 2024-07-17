@@ -1,10 +1,12 @@
 
 import { SimulationInfo } from "../support/elements/SimulationInfo";
 import { BottomBar } from "../support/elements/BottomBar";
+import { TimeLine } from "../support/elements/TimeLine";
 
 context("Test the overall app", () => {
   const simulationInfo = new SimulationInfo();
   const bottomBar = new BottomBar();
+  const timeLine = new TimeLine();
 
   beforeEach(() => {
     cy.visit("");
@@ -50,6 +52,16 @@ context("Test the overall app", () => {
       bottomBar.getReloadButton().click({ force: true });
       cy.wait(1000);
       bottomBar.verifyClimateChangeToggleEnabled();
+    });
+    it("verify timeline scrubber", () => {
+      timeLine.getTimeLineScrubber().should("exist");
+      bottomBar.getStartButton().click({ force: true });
+      cy.wait(8000); // Added wait to run the simulation for few seconds
+      bottomBar.getStartButton().click({ force: true });
+      timeLine.moveTimeLineScrubber(0);
+      timeLine.verifyTimeLineTrackWidth("0%");
+      timeLine.moveTimeLineScrubber(1);
+      timeLine.verifyTimeLineTrackWidth("6.25%");
     });
     it("verify graphs", () => {
       simulationInfo.verifyGraphsTitle();
