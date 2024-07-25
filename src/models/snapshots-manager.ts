@@ -105,9 +105,12 @@ export class SnapshotsManager {
       let existingCellSnapshots = undefined;
       const previousSnapshotYear = currentYear - SNAPSHOT_INTERVAL;
       if (this.simulation.yearlyVegetationStatistics[previousSnapshotYear]) {
+        // Vegetation stats are used as a proxy to determine if the cell snapshots are the same. The same stats don't
+        // guarantee the same cell snapshots, but this is a good enough heuristic in practice.
         const currentYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(currentYear);
         const previousYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(previousSnapshotYear);
         if (previousYearlyVegetationStats && deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
+          // Copy reference to the existing cell snapshots to save memory and time.
           existingCellSnapshots = this.snapshots[this.snapshots.length - 1].simulationSnapshot.cellSnapshots;
         }
       }
@@ -118,23 +121,16 @@ export class SnapshotsManager {
   }
 
   public restoreSnapshot(year: number) {
-    const arrayIndex = year > 1 ? Math.floor(year/SNAPSHOT_INTERVAL) : 0;
-    // Find the first previous snapshot that is not undefined
-    let previousSnapshotIndex = -1;
-    for (let i = arrayIndex; i >= 0; i--) {
-      if (this.snapshots[i].simulationSnapshot) {
-        previousSnapshotIndex = i;
-        break;
-      }
+    const arrayIndex = Math.floor(year / SNAPSHOT_INTERVAL);
+    const snapshot = this.snapshots[arrayIndex].simulationSnapshot;
+    if (!snapshot) {
+      // This should not happen in practice. Log a warning if it does so we can investigate.
+      console.warn(`Snapshot for year ${year} not found`);
+      return;
     }
-    if (previousSnapshotIndex !== -1) {
-      const snapshot = this.snapshots[previousSnapshotIndex].simulationSnapshot;
-      if (snapshot !== undefined) {
-        this.simulation.stop();
-        this.simulation.restoreSnapshot(snapshot);
-        this.simulation.updateCellsStateFlag();
-      }
-    }
+    this.simulation.stop();
+    this.simulation.restoreSnapshot(snapshot);
+    this.simulation.updateCellsStateFlag();
   }
 
   public restoreLastSnapshot() {
