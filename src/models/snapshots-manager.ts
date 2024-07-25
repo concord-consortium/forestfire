@@ -5,7 +5,7 @@ import { deepEqual } from "../utils";
 export const SNAPSHOT_INTERVAL = 3; // years
 
 export interface ISnapshot {
-  simulationSnapshot: ISimulationSnapshot | undefined
+  simulationSnapshot?: ISimulationSnapshot
 }
 
 export class SnapshotsManager {
@@ -15,8 +15,6 @@ export class SnapshotsManager {
 
   private simulation: SimulationModel;
   private lastSnapshotYear: number | null = null;
-  private fireEventDidEnd = false;
-  private snapshotOnPause = false;
 
   constructor(simulation: SimulationModel) {
     makeObservable(this);
@@ -81,7 +79,6 @@ export class SnapshotsManager {
       }
     }
     this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
-    this.fireEventDidEnd = true;
   }
 
   @action.bound public onStart() {
@@ -90,7 +87,6 @@ export class SnapshotsManager {
       this.snapshots.push({simulationSnapshot: this.simulation.snapshot()});
       this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
     }
-    this.snapshotOnPause = true;
   }
 
   @action.bound public onStop() {
@@ -104,20 +100,18 @@ export class SnapshotsManager {
       this.maxYear = this.simulation.timeInYears;
     }
     const currentYear = Math.floor(this.simulation.timeInYears);
-    if (this.lastSnapshotYear !== null) {
-      const yearsSinceLastSnapshot = currentYear - this.lastSnapshotYear;
-      if (yearsSinceLastSnapshot >= SNAPSHOT_INTERVAL) {
-        if (this.simulation.yearlyVegetationStatistics.length > 1) {
-          const currentYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 1];
-          const previousYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 2];
-          if (!deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
-            this.snapshots.push({ simulationSnapshot: this.simulation.snapshot() });
-          } else {
-            this.snapshots.push({ simulationSnapshot: undefined });
-          }
+    const yearsSinceLastSnapshot = currentYear - (this.lastSnapshotYear ?? 0);
+    if (yearsSinceLastSnapshot >= SNAPSHOT_INTERVAL) {
+      if (this.simulation.yearlyVegetationStatistics.length > 1) {
+        const currentYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 1];
+        const previousYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 2];
+        if (!deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
+          this.snapshots.push({ simulationSnapshot: this.simulation.snapshot() });
+        } else {
+          this.snapshots.push({ simulationSnapshot: undefined });
         }
-        this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
       }
+      this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
     }
   }
 
@@ -137,7 +131,6 @@ export class SnapshotsManager {
         this.simulation.stop();
         this.simulation.restoreSnapshot(snapshot);
         this.simulation.updateCellsStateFlag();
-        this.simulation.updateCellsElevationFlag();
       }
     }
   }
