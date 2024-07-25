@@ -5,7 +5,7 @@ import { deepEqual } from "../utils";
 export const SNAPSHOT_INTERVAL = 3; // years
 
 export interface ISnapshot {
-  simulationSnapshot?: ISimulationSnapshot
+  simulationSnapshot: ISimulationSnapshot
 }
 
 export class SnapshotsManager {
@@ -102,16 +102,18 @@ export class SnapshotsManager {
     const currentYear = Math.floor(this.simulation.timeInYears);
     const yearsSinceLastSnapshot = currentYear - (this.lastSnapshotYear ?? 0);
     if (yearsSinceLastSnapshot >= SNAPSHOT_INTERVAL) {
-      if (this.simulation.yearlyVegetationStatistics.length > 1) {
-        const currentYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 1];
-        const previousYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 2];
-        if (!deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
-          this.snapshots.push({ simulationSnapshot: this.simulation.snapshot() });
-        } else {
-          this.snapshots.push({ simulationSnapshot: undefined });
+      let existingCellSnapshots = undefined;
+      const previousSnapshotYear = currentYear - SNAPSHOT_INTERVAL;
+      if (this.simulation.yearlyVegetationStatistics[previousSnapshotYear]) {
+        const currentYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(currentYear);
+        const previousYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(previousSnapshotYear);
+        if (previousYearlyVegetationStats && deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
+          existingCellSnapshots = this.snapshots[this.snapshots.length - 1].simulationSnapshot.cellSnapshots;
         }
       }
-      this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
+      const simulationSnapshot = this.simulation.snapshot(existingCellSnapshots);
+      this.snapshots.push({ simulationSnapshot });
+      this.lastSnapshotYear = currentYear;
     }
   }
 

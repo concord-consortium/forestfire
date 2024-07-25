@@ -23,22 +23,11 @@ export type Event = "yearChange" | "restart" | "start" | "stop" | "fireEventAdde
 
 export interface ISimulationSnapshot {
   time: number;
-  droughtLevel: DroughtLevel;
-  climateChangeEnabled: boolean;
+  droughtLevel: DroughtLevel; // in fact that's average temperature
   wind: IWindProps;
   sparks: ISpark[];
   cellSnapshots: ICellSnapshot[];
 }
-
-// export interface IFireEventSnapshot {
-//   startTime: number;
-//   endTime: number;
-//   climateChangeEnabled: boolean;
-//   droughtLevel: DroughtLevel;
-//   wind: IWindProps;
-//   sparks: ISpark[];
-//   simulationSnapshot: ISimulationSnapshot;
-// }
 
 // This class is responsible for data loading, adding sparks and fire lines and so on. It's more focused
 // on management and interactions handling. Core calculations are delegated to FireEngine.
@@ -523,23 +512,28 @@ export class SimulationModel {
     }
   }
 
-  public snapshot(): ISimulationSnapshot {
+  public vegetationStatisticsForYear(year: number) {
+    // First vegetation statistic are calculated for year 1, so we need to subtract 1 from the year.
+    return this.yearlyVegetationStatistics[year - 1];
+  }
+
+  // Calculating cell snapshots is expensive, so we don't want to do it every time we need to save a snapshot.
+  // Sometimes it's possible to reuse previous snapshot when cells did not change in the meantime.
+  public snapshot(existingCellSnapshots?: ICellSnapshot[]): ISimulationSnapshot {
     return {
       time: this.time,
       droughtLevel: this.droughtLevel,
-      climateChangeEnabled: this.climateChangeEnabled,
       wind: {...this.wind },
       sparks: [...this.sparks],
-      cellSnapshots: this.cells.map(c => c.snapshot())
+      cellSnapshots: existingCellSnapshots ?? this.cells.map(c => c.snapshot())
     };
   }
 
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
+    this.setDroughtLevel(snapshot.droughtLevel);
     this.setWindDirection(snapshot.wind.direction);
     this.setWindSpeed(snapshot.wind.speed);
-    this.setClimateChangeEnabled(snapshot.climateChangeEnabled);
-    this.setDroughtLevel(snapshot.droughtLevel);
     this.windDidChange = true;
     this.sparks = snapshot.sparks;
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {

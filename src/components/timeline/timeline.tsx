@@ -21,6 +21,7 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
   const marks = ticks.map((tick) => ({ value: tick, label: tick }));
+
   useEffect(() => {
     setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
   }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
@@ -61,7 +62,6 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
           minDiff = diff;
           closestSnapshotYear = snapshotYear;
         }
-      // }
     });
     return closestSnapshotYear;
   };
