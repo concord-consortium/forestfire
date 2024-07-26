@@ -23,7 +23,7 @@ interface BottomBarContainerProps {
 }
 
 export const BottomBarContainer: React.FC<BottomBarContainerProps> = ({ children }) => {
-  const [ fullscreen, setFullscreen ] = useState<boolean>(false);
+  const [fullscreen, setFullscreen] = useState<boolean>(false);
 
   useEffect(() => {
     if (screenfull.isEnabled) {
@@ -52,7 +52,7 @@ export const BottomBarContainer: React.FC<BottomBarContainerProps> = ({ children
       <div className={css.mainContainer}>
         { children }
       </div>
-      {/* This empty container is necessary so the spacing works correctly */}
+      { /* This empty container is necessary so the spacing works correctly */ }
       <div className={css.rightContainer}>
         {
           screenfull?.isEnabled &&
@@ -71,7 +71,7 @@ interface BottomBarWidgetGroupProps {
 }
 // This component is meant to be used as a direct child of BottomBarContainer.
 export const BottomBarWidgetGroup: React.FC<BottomBarWidgetGroupProps> = ({ children, hoverable, title, className }) => {
-  const titleLines = typeof title === "string" ? [ title ] : title;
+  const titleLines = typeof title === "string" ? [title] : title;
   return (
     <div className={css.widgetGroup + (className ? ` ${className}` : "") + (hoverable ? " hoverable" : "")}>
       {

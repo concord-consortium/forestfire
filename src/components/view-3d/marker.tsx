@@ -66,7 +66,7 @@ export const Marker: React.FC<IProps> = observer(function WrappedComponent({
 
   const texture = draggingInteraction.hovered && highlightTexture ? highlightTexture : defTexture;
 
-  const eventHandlers = getEventHandlers([ draggingInteraction ]);
+  const eventHandlers = getEventHandlers([draggingInteraction]);
   return (
     /* eslint-disable react/no-unknown-property */
     // See: https://github.com/jsx-eslint/eslint-plugin-react/issues/3423

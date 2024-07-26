@@ -110,11 +110,11 @@ export const BottomBar: React.FC = observer(function WrappedComponent() {
           selected={simulation.isFireEventActive}
            // user cannot cancel active fire or when user has scrubbed timeline back
           disabled={simulation.isFireActive || simulation.simulationEnded
-                      || (!simulation.simulationRunning && (simulation.timeInYears < snapshotsManager.maxYear)) }
+                      || (!simulation.simulationRunning && (simulation.timeInYears < snapshotsManager.maxYear))}
         />
-        <div className={clsx(css.sparksCount, {[css.disabled]: sparkCountDisabled})}>{simulation.remainingSparks}</div>
+        <div className={clsx(css.sparksCount, { [css.disabled]: sparkCountDisabled })}>{ simulation.remainingSparks }</div>
         <IconButton
-          className={clsx({[css.grayscale]: !simulation.canAddSpark})}
+          className={clsx({ [css.grayscale]: !simulation.canAddSpark })}
           icon={<SparkIcon height={48} />}
           highlightIcon={<SparkHighlight height={48} />}
           disabled={sparkBtnDisabled}

@@ -20,7 +20,7 @@ export const MapTypeSwitch: React.FC = observer(function WrappedComponent() {
       <div className={css.topRow}>
         <Button onClick={handleClick}><ScrollIcon height={24} /></Button>
         { ui.showFireHistoryOverlay ? <MapTypeFireHistory height={22} /> : <MapTypeVegetation height={22} /> }
-        <Button onClick={handleClick}><ScrollIcon height={24} style={{transform: "rotate(180deg)"}} /></Button>
+        <Button onClick={handleClick}><ScrollIcon height={24} style={{ transform: "rotate(180deg)" }} /></Button>
       </div>
       <div className={css.label}>{ ui.showFireHistoryOverlay ? "Fire History" : "Vegetation" }</div>
     </div>

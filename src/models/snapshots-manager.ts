@@ -84,7 +84,7 @@ export class SnapshotsManager {
   @action.bound public onStart() {
     this.maxYear = 0;
     if (this.snapshots.length <= 0) {
-      this.snapshots.push({simulationSnapshot: this.simulation.snapshot()});
+      this.snapshots.push({ simulationSnapshot: this.simulation.snapshot() });
       this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
     }
   }

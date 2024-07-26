@@ -38,7 +38,7 @@ export const SimulationInfo = observer(function WrappedComponent() {
         </div>
       }
 
-      <div className={clsx(css.container, { [css.inactive]: !fireEventActive})} >
+      <div className={clsx(css.container, { [css.inactive]: !fireEventActive })} >
         <div className={css.header}>Fire Danger</div>
         <FireDanger droughtLevel={simulation.droughtLevel} scaledWindSpeed={scaledWind} />
       </div>
@@ -46,7 +46,7 @@ export const SimulationInfo = observer(function WrappedComponent() {
       <div className={clsx(css.container, css.wind, { [css.windDidChange] : simulation.windDidChange, [css.inactive]: !fireEventActive })} >
         <div className={css.header}>Wind</div>
         <div className={css.text}>
-            {`${Math.round(scaledWind)} MPH from ${degToCompass(simulation.wind.direction)}`}
+            { `${Math.round(scaledWind)} MPH from ${degToCompass(simulation.wind.direction)}` }
         </div>
         <div className={css.windDial}>
           <WindDial windDirection={simulation.wind.direction} />

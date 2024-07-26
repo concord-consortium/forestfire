@@ -37,14 +37,14 @@ export const AppComponent = observer(function WrappedComponent() {
       { showModelScale &&
         <div className={css.modelInfo}>
           <div>Model Dimensions: { config.modelWidth } ft x { config.modelHeight } ft</div>
-          <div>Highest Point Possible: {config.heightmapMaxElevation} ft</div>
+          <div>Highest Point Possible: { config.heightmapMaxElevation } ft</div>
         </div>
       }
-      <div id={mainContentId} className={clsx(css.mainContent, {[css.shrink]: ui.showChart})}>
+      <div id={mainContentId} className={clsx(css.mainContent, { [css.shrink]: ui.showChart })}>
         <SimulationInfo />
         <View3d />
       </div>
-      <div className={clsx(css.timeline, {[css.shrink]: ui.showChart})}>
+      <div className={clsx(css.timeline, { [css.shrink]: ui.showChart })}>
         <Timeline />
       </div>
       <div className={css.rightContent}>
