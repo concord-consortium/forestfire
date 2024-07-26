@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useStores } from "../../use-stores";
 import { VegetationStats } from "./vegetation-stats";
