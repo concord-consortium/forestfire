@@ -65,7 +65,7 @@ export const SliderSwitch: React.FC<IProps> = ({ label, isOn, onSet, disabled })
 
   const onClass = isOn ? "on" : "";
   return (
-    <div className={clsx(css.sliderSwitch, {[css.disabled]: disabled})} onClick={handleClick}>
+    <div className={clsx(css.sliderSwitch, { [css.disabled]: disabled })} onClick={handleClick}>
       <div className={`${css.track} ${onClass}`} />
       <Draggable axis="x" position={{ x: position, y: 0 }} bounds={dragBounds}
         onStart={handleStart} onDrag={handleDrag} onStop={handleStop}>

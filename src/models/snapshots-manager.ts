@@ -1,21 +1,18 @@
 import { action, observable, makeObservable } from "mobx";
-import { IFireEventSnapshot, ISimulationSnapshot, SimulationModel } from "./simulation";
+import { ISimulationSnapshot, SimulationModel } from "./simulation";
 import { deepEqual } from "../utils";
 import { yearInMinutes } from "../types";
 
+
 export const SNAPSHOT_INTERVAL = 3; // years
+export const MIN_DISTANCE_TO_FIRE_EVENT = 2; // years
 
 export interface ISnapshot {
-  simulationSnapshot: ISimulationSnapshot | undefined
-}
-
-export interface IEventSnapshot {
-  fireEventSnapshot: IFireEventSnapshot;
+  simulationSnapshot: ISimulationSnapshot
 }
 
 export class SnapshotsManager {
   public snapshots: ISnapshot[] = [];
-  public fireEventSnapshots: IEventSnapshot[] = [];
 
   @observable public maxYear = 0;
 
@@ -25,172 +22,134 @@ export class SnapshotsManager {
     makeObservable(this);
     this.simulation = simulation;
     simulation.on("start", this.onStart);
-    simulation.on("yearChange", this.onYearChange);
-    simulation.on("restart", this.reset);
+    simulation.on("resume", this.onResume);
     simulation.on("stop", this.onStop);
-    simulation.on("fireEventAdded", this.onFireEventAdded);
-    simulation.on("sparkAdded", this.onSparkAdded);
-    simulation.on("fireEventRemoved", this.onFireEventRemoved);
+    simulation.on("restart", this.reset);
+    simulation.on("yearChange", this.onYearChange);
     simulation.on("fireEventEnded", this.onFireEventEnded);
     this.reset();
   }
 
-  getFireEventIndex = () => {
-    const fireEventsLength = this.simulation.fireEvents.length;
-    return fireEventsLength > 0 ? fireEventsLength - 1 : 0;
-  };
-
-  @action.bound public onFireEventAdded() {
-    const fireEventsIndex = this.getFireEventIndex();
-    this.fireEventSnapshots[fireEventsIndex] = {
-      fireEventSnapshot: this.simulation.fireEventSnapshot()
-    };
+  get lastSnapshot(): ISnapshot | null {
+    return this.snapshots[this.snapshots.length - 1] ?? null;
   }
 
-  @action.bound public onFireEventRemoved() {
-    this.fireEventSnapshots.pop();
+  get lastSnapshotTime() {
+    return this.lastSnapshot ? this.lastSnapshot.simulationSnapshot.time : null;
   }
 
-  @action.bound public onSparkAdded() {
-    const fireEventsIndex = this.getFireEventIndex();
-    if (!this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks) {
-      this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks = [];
-    }
-    this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.sparks.push(this.simulation.sparks[this.simulation.sparks.length - 1]);
+  get lastSnapshotYear() {
+    return this.lastSnapshotTime !== null ? this.lastSnapshotTime / yearInMinutes : null;
   }
 
-  @action.bound public onFireEventEnded() {
-    const fireEventsIndex = this.getFireEventIndex();
-    const currentSnapshot = this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot;
-    const newSnapshot = this.simulation.fireEventSnapshot();
-
-    this.fireEventSnapshots[fireEventsIndex] = {
-      fireEventSnapshot: {
-        startTime: currentSnapshot.startTime,
-        endTime: newSnapshot.endTime,
-        climateChangeEnabled: newSnapshot.climateChangeEnabled,
-        droughtLevel: newSnapshot.droughtLevel,
-        wind: { ...newSnapshot.wind },
-        sparks: currentSnapshot.sparks,
-        simulationSnapshot: newSnapshot.simulationSnapshot
-      }
-    };
+  get pastStateLoaded() {
+    return this.lastSnapshotTime !== null && this.simulation.time < this.lastSnapshotTime;
   }
 
-  @action.bound public onStart() {
-    this.maxYear = 0;
-    this.snapshots[0] = {
-      simulationSnapshot: this.simulation.snapshot()
-    };
+  public tooCloseToLastSnapshot(year: number) {
+    return this.lastSnapshotYear !== null && Math.abs(year - this.lastSnapshotYear) < MIN_DISTANCE_TO_FIRE_EVENT;
   }
 
-  @action.bound public onStop() {
-    if (this.simulation.isFireActive) {
-      const fireEventsIndex = this.getFireEventIndex();
-      if (this.simulation.time < this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot.startTime) {
-        return;
-      }
-      const currentSnapshot = this.fireEventSnapshots[fireEventsIndex].fireEventSnapshot;
-      const newSnapshot = this.simulation.fireEventSnapshot();
-
-      this.fireEventSnapshots[fireEventsIndex] = {
-        fireEventSnapshot: {
-          startTime: currentSnapshot.startTime,
-          endTime: newSnapshot.endTime,
-          climateChangeEnabled: newSnapshot.climateChangeEnabled,
-          droughtLevel: newSnapshot.droughtLevel,
-          wind: { ...newSnapshot.wind },
-          sparks: currentSnapshot.sparks,
-          simulationSnapshot: newSnapshot.simulationSnapshot
-        }
-      };
-    }
+  public isFireEventSnapshot(snapshot: ISnapshot | null): boolean {
+    return !!snapshot && snapshot.simulationSnapshot.sparks.length > 0;
   }
 
-  @action.bound public onYearChange() {
-    if (this.simulation.timeInYears > this.maxYear) {
-      this.maxYear = this.simulation.timeInYears;
-    }
-    // We only take a snapshot every 3 years, and only if the vegetation statistics have changed
-    // Otherwise, we just store undefined. This should improve performance.
-    if (this.simulation.timeInYears % SNAPSHOT_INTERVAL !== 0) {
-      if (this.simulation.yearlyVegetationStatistics.length > 1) {
-        const arrayIndex = this.snapshots.length;
-        const currentYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 1];
-        const previousYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 2];
-        if (!deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
-          this.snapshots[arrayIndex] = {
-            simulationSnapshot: this.simulation.snapshot()
-          };
-        } else {
-          this.snapshots[arrayIndex] = {
-            simulationSnapshot: undefined
-          };
-        }
+  public findClosestSnapshot(year: number): ISnapshot | null {
+    let minDiff = Infinity;
+    let closestSnapshot: ISnapshot | null = null;
+    for (const snapshot of this.snapshots) {
+      const snapshotYear = snapshot.simulationSnapshot.time / yearInMinutes;
+      const diff = Math.abs(year - snapshotYear);
+      if (diff <= minDiff) {
+        minDiff = diff;
+        closestSnapshot = snapshot;
       }
     }
+    return closestSnapshot;
   }
 
-  public restoreSnapshot(year: number) {
-    const timeInMinutes = year * yearInMinutes;
-    const timeRangeStart = timeInMinutes - yearInMinutes;
-    const timeRangeEnd = timeInMinutes + yearInMinutes;
-    const eventSnapshot = this.fireEventSnapshots.slice().reverse()
-    .find(snapshot =>
-      (snapshot.fireEventSnapshot.startTime <= timeRangeEnd && snapshot.fireEventSnapshot.startTime >= timeRangeStart) ||
-      (snapshot.fireEventSnapshot.endTime <= timeRangeEnd && snapshot.fireEventSnapshot.endTime >= timeRangeStart)
-    );
-    if (eventSnapshot) {
-      this.simulation.stop();
-      this.simulation.restoreFireEventSnapshot(eventSnapshot?.fireEventSnapshot);
-      this.simulation.updateCellsStateFlag();
-      this.simulation.updateCellsElevationFlag();
-    } else {
-      const arrayIndex = year > 1 ? Math.floor(year) - 1 : 0;
-      // Find the first previous snapshot that is not undefined
-      let previousSnapshotIndex = -1;
-      for (let i = arrayIndex - 1; i >= 0; i--) {
-        if (this.snapshots[i].simulationSnapshot) {
-          previousSnapshotIndex = i;
-          break;
-        }
-      }
-      if (previousSnapshotIndex !== -1) {
-        const snapshot = this.snapshots[previousSnapshotIndex].simulationSnapshot;
-        if (snapshot !== undefined) {
-          this.simulation.stop();
-          this.simulation.restoreSnapshot(snapshot);
-          this.simulation.updateCellsStateFlag();
-          this.simulation.updateCellsElevationFlag();
-        }
-      }
-    }
+  public saveSnapshot(existingCellSnapshots?: ISimulationSnapshot["cellSnapshots"]) {
+    const snapshot = this.simulation.snapshot(existingCellSnapshots);
+    this.snapshots.push({ simulationSnapshot: snapshot });
   }
 
-  public restoreLastSnapshot() {
-    const arrayIndex = this.snapshots.length - 1;
-    const snapshot = this.snapshots[arrayIndex].simulationSnapshot ?? (this.snapshots.slice().reverse().find(s => s.simulationSnapshot))?.simulationSnapshot;
-    if (!snapshot) {
-      return;
-    }
-    this.simulation.stop();
-    this.simulation.restoreSnapshot(snapshot);
-    this.simulation.updateCellsStateFlag();
-  }
-
-  public restoreLastFireEventSnapshot() {
-    const arrayIndex = this.fireEventSnapshots.length - 1;
-    const snapshot = this.fireEventSnapshots[arrayIndex] ?? (this.snapshots.slice().reverse().find(s => s.simulationSnapshot))?.simulationSnapshot;
-    if (!snapshot) {
-      return;
-    }
-    this.simulation.stop();
-    this.simulation.restoreFireEventSnapshot(snapshot.fireEventSnapshot);
+  public restoreSnapshot(snapshot: ISnapshot) {
+    this.simulation.restoreSnapshot(snapshot.simulationSnapshot);
     this.simulation.updateCellsStateFlag();
   }
 
   @action.bound public reset() {
     this.snapshots = [];
     this.maxYear = 0;
+  }
+
+  // Simulation event handlers:
+
+  @action.bound public onStart() {
+    this.maxYear = 0;
+    // Skip snapshot handling when a fire event is active. A snapshot will be taken at the end of the fire event.
+    if (this.simulation.isFireEventActive) {
+      return;
+    }
+    if (this.snapshots.length === 0) {
+      this.saveSnapshot();
+    }
+  }
+
+  @action.bound public onStop() {
+    // Skip snapshot handling when a fire event is active. A snapshot will be taken at the end of the fire event.
+    if (this.simulation.isFireEventActive) {
+      return;
+    }
+    this.saveSnapshot();
+  }
+
+  @action.bound public onResume() {
+    // Skip snapshot handling when a fire event is active. A snapshot will be taken at the end of the fire event.
+    if (this.simulation.isFireEventActive) {
+      return;
+    }
+    if (this.lastSnapshot && this.lastSnapshot.simulationSnapshot.time !== this.simulation.time) {
+      this.restoreSnapshot(this.lastSnapshot);
+    }
+    // Always remove snapshot taken onStop when resuming.
+    this.snapshots.pop();
+  }
+
+  @action.bound public onYearChange() {
+    // Skip snapshot handling when a fire event is active. A snapshot will be taken at the end of the fire event.
+    if (this.simulation.isFireEventActive) {
+      return;
+    }
+    if (this.simulation.timeInYears > this.maxYear) {
+      this.maxYear = this.simulation.timeInYears;
+    }
+    const currentYear = Math.floor(this.simulation.timeInYears);
+    // Don't take snapshot if it's too close to the last snapshot. That can only happen if the last snapshot was
+    // taken during a fire event.
+    if (currentYear % SNAPSHOT_INTERVAL === 0 && !this.tooCloseToLastSnapshot(currentYear)) {
+      let existingCellSnapshots = undefined;
+      const lastSnapshotYear = this.lastSnapshotYear;
+      if (lastSnapshotYear != null && this.simulation.yearlyVegetationStatistics[lastSnapshotYear]) {
+        // Vegetation stats are used as a proxy to determine if the cell snapshots are the same. The same stats don't
+        // guarantee the same cell snapshots, but this is a good enough heuristic in practice.
+        const currentYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(currentYear);
+        const previousYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(lastSnapshotYear);
+        if (previousYearlyVegetationStats && deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
+          // Copy reference to the existing cell snapshots to save memory and time.
+          existingCellSnapshots = this.snapshots[this.snapshots.length - 1].simulationSnapshot.cellSnapshots;
+        }
+      }
+      this.saveSnapshot(existingCellSnapshots);
+    }
+  }
+
+  @action.bound public onFireEventEnded() {
+    if (!this.isFireEventSnapshot(this.lastSnapshot) && this.tooCloseToLastSnapshot(this.simulation.timeInYears)) {
+      // Remove previous regular snapshot if it's too close to the fire event snapshot. This will help users to
+      // snap to the fire event snapshot when scrubbing the timeline.
+      this.snapshots.pop();
+    }
+    this.saveSnapshot();
   }
 }

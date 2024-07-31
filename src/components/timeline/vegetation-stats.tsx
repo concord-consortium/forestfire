@@ -20,11 +20,11 @@ export const VegetationStats: React.FC = observer(function WrappedComponent() {
           // Left position theoretically is not necessary, but it ensures that the cumulative error of bar positioning
           // won't appear. Otherwise, the last bar might not line up with the end of the timeline.
           <div key={i} className={css.bar} style={{ width: statsBarWidth, left: `${100 * i / endYear}%` }}>
-            <div className={css.burned} style={{height: `${stats.burned * 100}%`}} />
-            <div className={css.coniferous} style={{height: `${stats[Vegetation.ConiferousForest] * 100}%`}} />
-            <div className={css.deciduous} style={{height: `${stats[Vegetation.DeciduousForest] * 100}%`}} />
-            <div className={css.shrub} style={{height: `${stats[Vegetation.Shrub] * 100}%`}} />
-            <div className={css.grass} style={{height: `${stats[Vegetation.Grass] * 100}%`}} />
+            <div className={css.burned} style={{ height: `${stats.burned * 100}%` }} />
+            <div className={css.coniferous} style={{ height: `${stats[Vegetation.ConiferousForest] * 100}%` }} />
+            <div className={css.deciduous} style={{ height: `${stats[Vegetation.DeciduousForest] * 100}%` }} />
+            <div className={css.shrub} style={{ height: `${stats[Vegetation.Shrub] * 100}%` }} />
+            <div className={css.grass} style={{ height: `${stats[Vegetation.Grass] * 100}%` }} />
           </div>
         ))
       }
