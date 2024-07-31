@@ -15,16 +15,18 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const { simulation, snapshotsManager } = useStores();
   const timeoutId = useRef(0);
   const [val, setVal] = useState(simulation.timeInYears);
-  const [disabled, setDisabled] = useState(true);
   const [timeProgress, setTimeProgress] = useState("0%");
 
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
   const marks = ticks.map((tick) => ({ value: tick, label: tick }));
 
-  useEffect(() => {
-    setDisabled(!simulation.simulationStarted || (simulation.simulationRunning && !simulation.simulationEnded));
-  }, [simulation.simulationStarted, simulation.simulationRunning, simulation.simulationEnded]);
+  // disable the slider when the simulation is running, or when a fire event is active. It'd be possible to support
+  // scrubbing the timeline while a fire event is active, but it would require some additional logic to handle the
+  // state of the Fire Engine (FireEngine .snapshot and .restoreSnapshot methods would need to be implemented).
+  const disabled = !simulation.simulationStarted
+    || (simulation.simulationRunning && !simulation.simulationEnded)
+    || simulation.isFireEventActive;
 
   // if user has scrubbed back on the timeline, and then starts the sim again
   // we need to restore the last snapshot and move the timeline scrubber to the max year
