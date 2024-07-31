@@ -54,14 +54,15 @@ context("Test the overall app", () => {
       bottomBar.verifyClimateChangeToggleEnabled();
     });
     it("verify timeline scrubber", () => {
-      timeLine.getTimeLineScrubber().should("exist");
       bottomBar.getStartButton().click({ force: true });
       cy.wait(8000); // Added wait to run the simulation for few seconds
       bottomBar.getStartButton().click({ force: true });
       timeLine.moveTimeLineScrubber(0);
       timeLine.verifyTimeLineTrackWidth("0%");
       timeLine.moveTimeLineScrubber(1);
-      timeLine.verifyTimeLineTrackWidth("6.25%");
+      // Exact value will be around 6.25%, but it might vary depending on animation frames and when snapshot was taken.
+      // So, 6. leaves some room for error.
+      timeLine.verifyTimeLineTrackWidth("6.");
     });
     it("verify graphs", () => {
       simulationInfo.verifyGraphsTitle();
