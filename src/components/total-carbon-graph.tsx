@@ -145,7 +145,7 @@ export const TotalCarbonGraph: React.FC<IProps> = observer(({ allData, recentDat
 
   const data = {
     labels,
-    datasets: [ dataset ]
+    datasets: [dataset]
   };
 
   const options = {

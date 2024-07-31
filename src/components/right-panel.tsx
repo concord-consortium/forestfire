@@ -73,7 +73,7 @@ export const RightPanel = observer(() => {
               </div>
             }
           </div>
-          <Button className={css.allDataBtn} onClick={handleShowAllData}>{allData ? "Show Recent Data" : "Show All Data"}</Button>
+          <Button className={css.allDataBtn} onClick={handleShowAllData}>{ allData ? "Show Recent Data" : "Show All Data" }</Button>
         </div>
       </div>
       <div className={css.rightPanelTabs}>

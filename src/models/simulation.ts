@@ -19,11 +19,13 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start";
+export type Event = "start" | "stop" | "resume" | "restart" | "yearChange" | "fireEventEnded";
 
 export interface ISimulationSnapshot {
   time: number;
-  droughtLevel: number;
+  droughtLevel: DroughtLevel; // in fact that's average temperature
+  wind: IWindProps;
+  sparks: ISpark[];
   cellSnapshots: ICellSnapshot[];
 }
 
@@ -63,6 +65,7 @@ export class SimulationModel {
   @observable public cellsStateFlag = 0;
   @observable public cellsElevationFlag = 0;
   private emitter = new EventEmitter();
+  private prevWind: IWindProps = { direction: 0, speed: 0 };
 
   constructor(presetConfig: Partial<ISimulationConfig>) {
     makeObservable(this);
@@ -303,6 +306,9 @@ export class SimulationModel {
     }
     if (!this.simulationStarted) {
       this.simulationStarted = true;
+      this.emit("start");
+    } else {
+      this.emit("resume");
     }
     if (this.sparks.length > 0 && !this.fireEngine) {
       this.fireEngine = new FireEngine(this.cells, this.wind, this.config);
@@ -318,7 +324,10 @@ export class SimulationModel {
   }
 
   @action.bound public stop() {
-    this.simulationRunning = false;
+    if (this.simulationRunning) {
+      this.simulationRunning = false;
+      this.emit("stop");
+    }
   }
 
   @action.bound public restart() {
@@ -416,11 +425,14 @@ export class SimulationModel {
       this.updateCellsStateFlag();
       this.isFireActive = !this.fireEngine.fireDidStop;
       if (!this.isFireActive) {
+        // Emit fire event before resetting model properties, so it's possible to save the state of the model
+        // that includes fire event properties.
+        this.emit("fireEventEnded");
         this.fireEngine = null;
         // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger to default values.
-        this.sparks.length = 0;
         this.setWindDirection(this.config.windDirection);
         this.setWindSpeed(this.config.windSpeed);
+        this.sparks.length = 0;
       }
     }
 
@@ -464,7 +476,7 @@ export class SimulationModel {
 
   @action.bound public addSpark(x: number, y: number) {
     if (this.canAddSpark) {
-      this.sparks.push({ position: new Vector2(x, y), locked: false });
+      this.sparks.push({ time: this.time, position: new Vector2(x, y), locked: false });
     }
   }
 
@@ -484,6 +496,7 @@ export class SimulationModel {
   @action.bound public addFireEvent() {
     this.stop();
     // Wind is randomly updated at the beginning of each fire event.
+    this.prevWind = { ...this.wind };
     this.setWindDirection(Math.random() * 360);
     const minWind = 0.666;
     const maxWind = 2.000;
@@ -497,20 +510,35 @@ export class SimulationModel {
       // Fire event was just added and not started yet, so it's still safe to cancel it.
       this.fireEvents.pop();
       this.sparks.length = 0;
+      this.setWindDirection(this.prevWind?.direction || 0);
+      this.setWindSpeed(this.prevWind?.speed || 0);
     }
   }
 
-  public snapshot(): ISimulationSnapshot {
+  public vegetationStatisticsForYear(year: number) {
+    // First vegetation statistic are calculated for year 1, so we need to subtract 1 from the year.
+    return this.yearlyVegetationStatistics[year - 1];
+  }
+
+  // Calculating cell snapshots is expensive, so we don't want to do it every time we need to save a snapshot.
+  // Sometimes it's possible to reuse previous snapshot when cells did not change in the meantime.
+  public snapshot(existingCellSnapshots?: ICellSnapshot[]): ISimulationSnapshot {
     return {
       time: this.time,
       droughtLevel: this.droughtLevel,
-      cellSnapshots: this.cells.map(c => c.snapshot())
+      wind: { ...this.wind },
+      sparks: [...this.sparks],
+      cellSnapshots: existingCellSnapshots ?? this.cells.map(c => c.snapshot())
     };
   }
 
   public restoreSnapshot(snapshot: ISimulationSnapshot) {
     this.time = snapshot.time;
     this.setDroughtLevel(snapshot.droughtLevel);
+    this.setWindDirection(snapshot.wind.direction);
+    this.setWindSpeed(snapshot.wind.speed);
+    this.windDidChange = true;
+    this.sparks = snapshot.sparks;
     snapshot.cellSnapshots.forEach((cellSnapshot, idx) => {
       this.cells[idx].restoreSnapshot(cellSnapshot);
     });

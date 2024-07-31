@@ -94,7 +94,7 @@ export const getImageData = (
   const imgage = document.createElement("img");
   imgage.src = imgSrc;
   if (imgage.complete) {
-    imageLoaded({target: imgage});
+    imageLoaded({ target: imgage });
   } else {
     imgage.addEventListener("load", imageLoaded);
     imgage.addEventListener("error", () => {
