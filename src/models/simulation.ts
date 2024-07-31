@@ -19,7 +19,7 @@ const DEFAULT_ZONE_DIVISION = {
   ]
 };
 
-export type Event = "yearChange" | "restart" | "start" | "stop" | "fireEventAdded" | "fireEventRemoved" | "sparkAdded" | "fireEventEnded";
+export type Event = "start" | "stop" | "resume" | "restart" | "yearChange" | "fireEventEnded";
 
 export interface ISimulationSnapshot {
   time: number;
@@ -149,11 +149,6 @@ export class SimulationModel {
   }
 
   public get droughtLevel() {
-    // When fire event is not active, we should return the initial drought level. Fire Danger is inactive and
-    // the arrow should point the lowest value.
-    if (!this.isFireEventActive) {
-      return DroughtLevel.NoDrought;
-    }
     // average drought level of all zones
     return this.zones.reduce((sum, zone) => sum + zone.droughtLevel, 0) / this.zones.length;
   }
@@ -312,6 +307,8 @@ export class SimulationModel {
     if (!this.simulationStarted) {
       this.simulationStarted = true;
       this.emit("start");
+    } else {
+      this.emit("resume");
     }
     if (this.sparks.length > 0 && !this.fireEngine) {
       this.fireEngine = new FireEngine(this.cells, this.wind, this.config);
@@ -327,8 +324,10 @@ export class SimulationModel {
   }
 
   @action.bound public stop() {
-    this.simulationRunning = false;
-    this.emit("stop");
+    if (this.simulationRunning) {
+      this.simulationRunning = false;
+      this.emit("stop");
+    }
   }
 
   @action.bound public restart() {
@@ -426,12 +425,14 @@ export class SimulationModel {
       this.updateCellsStateFlag();
       this.isFireActive = !this.fireEngine.fireDidStop;
       if (!this.isFireActive) {
+        // Emit fire event before resetting model properties, so it's possible to save the state of the model
+        // that includes fire event properties.
+        this.emit("fireEventEnded");
         this.fireEngine = null;
         // Fire event just ended. Remove all the spark markers. Reset Wind and Fire Danger to default values.
         this.setWindDirection(this.config.windDirection);
         this.setWindSpeed(this.config.windSpeed);
         this.sparks.length = 0;
-        this.emit("fireEventEnded");
       }
     }
 
@@ -476,7 +477,6 @@ export class SimulationModel {
   @action.bound public addSpark(x: number, y: number) {
     if (this.canAddSpark) {
       this.sparks.push({ time: this.time, position: new Vector2(x, y), locked: false });
-      this.emit("sparkAdded");
     }
   }
 
@@ -503,7 +503,6 @@ export class SimulationModel {
     this.setWindSpeed(minWind + Math.random() * (maxWind - minWind));
     this.windDidChange = true; // notify user wind has been updated
     this.fireEvents.push({ time: this.time });
-    this.emit("fireEventAdded");
   }
 
   @action.bound public cancelFireEventSetup() {
@@ -513,7 +512,6 @@ export class SimulationModel {
       this.sparks.length = 0;
       this.setWindDirection(this.prevWind?.direction || 0);
       this.setWindSpeed(this.prevWind?.speed || 0);
-      this.emit("fireEventRemoved");
     }
   }
 

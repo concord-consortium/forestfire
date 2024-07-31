@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { clsx } from "clsx";
 import { useStores } from "../use-stores";
 import { WindDial, degToCompass } from "./wind-dial";
-import { Vegetation } from "../types";
+import { DroughtLevel, Vegetation } from "../types";
 import { Thermometer } from "./thermometer";
 import { FireDanger } from "./fire-danger";
 
@@ -14,6 +14,10 @@ export const SimulationInfo = observer(function WrappedComponent() {
   const scaledWind = simulation.wind.speed / simulation.config.windScaleFactor;
   const stats = simulation.vegetationStatistics;
   const fireEventActive = simulation.isFireEventActive;
+
+  // When fire event is not active, we should return the initial drought level. Fire Danger is inactive and the arrow
+  // should point the lowest value.
+  const fireDangerDroughtLevel = simulation.isFireEventActive ? simulation.droughtLevel : DroughtLevel.NoDrought;
 
   const getStat = (vegetation: Vegetation | "burned") => `${Math.round(stats[vegetation] * 100)}%`;
 
@@ -40,7 +44,7 @@ export const SimulationInfo = observer(function WrappedComponent() {
 
       <div className={clsx(css.container, { [css.inactive]: !fireEventActive })} >
         <div className={css.header}>Fire Danger</div>
-        <FireDanger droughtLevel={simulation.droughtLevel} scaledWindSpeed={scaledWind} />
+        <FireDanger droughtLevel={fireDangerDroughtLevel} scaledWindSpeed={scaledWind} />
       </div>
 
       <div className={clsx(css.container, css.wind, { [css.windDidChange] : simulation.windDidChange, [css.inactive]: !fireEventActive })} >
