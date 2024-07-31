@@ -40,7 +40,7 @@ export const FireEvents: React.FC = observer(function WrappedComponent() {
             }
             <FireEventSpark />
             <div className={css.fireEventIdx}>
-              {i + 1}
+              { i + 1 }
             </div>
           </div>
         ))

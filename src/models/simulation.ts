@@ -65,7 +65,7 @@ export class SimulationModel {
   @observable public cellsStateFlag = 0;
   @observable public cellsElevationFlag = 0;
   private emitter = new EventEmitter();
-  private prevWind: IWindProps = {direction: 0, speed: 0};
+  private prevWind: IWindProps = { direction: 0, speed: 0 };
 
   constructor(presetConfig: Partial<ISimulationConfig>) {
     makeObservable(this);
@@ -528,7 +528,7 @@ export class SimulationModel {
     return {
       time: this.time,
       droughtLevel: this.droughtLevel,
-      wind: {...this.wind },
+      wind: { ...this.wind },
       sparks: [...this.sparks],
       cellSnapshots: existingCellSnapshots ?? this.cells.map(c => c.snapshot())
     };

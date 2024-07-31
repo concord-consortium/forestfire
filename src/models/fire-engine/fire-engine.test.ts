@@ -9,10 +9,10 @@ describe("nonburnableCellBetween", () => {
     const burnable = (bi: BurnIndex) => true;
     const nonburnable = (bi: BurnIndex) => false;
     const cells = [
-      {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable},
-      {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable},
-      {isBurnableForBI: burnable}, {isBurnableForBI: nonburnable}, {isBurnableForBI: nonburnable}, {isBurnableForBI: nonburnable},
-      {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable},
+      { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable },
+      { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable },
+      { isBurnableForBI: burnable }, { isBurnableForBI: nonburnable }, { isBurnableForBI: nonburnable }, { isBurnableForBI: nonburnable },
+      { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable },
     ] as Cell[];
     expect(nonburnableCellBetween(cells, 4, 0, 0, 0, 3, BurnIndex.Low)).toEqual(false);
     expect(nonburnableCellBetween(cells, 4, 0, 0, 0, 3, BurnIndex.Low)).toEqual(false);
@@ -34,10 +34,10 @@ describe("getGridCellNeighbors", () => {
     const burnable = (bi: BurnIndex) => true;
     const nonburnable = (bi: BurnIndex) => false;
     const cells = [
-      {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable},
-      {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable},
-      {isBurnableForBI: burnable}, {isBurnableForBI: nonburnable}, {isBurnableForBI: nonburnable}, {isBurnableForBI: nonburnable},
-      {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable}, {isBurnableForBI: burnable},
+      { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable },
+      { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable },
+      { isBurnableForBI: burnable }, { isBurnableForBI: nonburnable }, { isBurnableForBI: nonburnable }, { isBurnableForBI: nonburnable },
+      { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable }, { isBurnableForBI: burnable },
     ] as Cell[];
     expect(getGridCellNeighbors(cells, 0, 4, 4, 1.5, BurnIndex.Low).sort()).toEqual([1, 4, 5]);
     expect(getGridCellNeighbors(cells, 5, 4, 4, 1.5, BurnIndex.Low).sort()).toEqual([0, 1, 2, 4, 6, 8]);

@@ -43,11 +43,11 @@ export const FireDanger = ({ droughtLevel, scaledWindSpeed }: IProps) => {
   return (
     <div className={css.fireDangerContainer}>
       <div className={css.label}>
-        { fireDanger + 1}: { FIRE_DANGER_LABEL[fireDanger] }
+        { fireDanger + 1 }: { FIRE_DANGER_LABEL[fireDanger] }
       </div>
       <div className={css.fireDanger}>
         <FireDangerMeterSVG width="99px" height="54px" />
-        <div className={css.arrow} style={{transform: `rotate(${arrowAngle}deg)`}}>
+        <div className={css.arrow} style={{ transform: `rotate(${arrowAngle}deg)` }}>
           <FireDangerMeterArrowSVG width="99px" height="99px" />
         </div>
       </div>

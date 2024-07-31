@@ -28,7 +28,7 @@ export const Thermometer = ({ droughtLevel, climateChangeEnabled }: IProps) => {
     <div className={css.thermometerContainer}>
       <div className={css.thermometer}>
         <ThermometerSVG />
-        <div className={css.temperatureStem} style={{height: stemHeight}} />
+        <div className={css.temperatureStem} style={{ height: stemHeight }} />
       </div>
       <div className={css.label}>
         { label }

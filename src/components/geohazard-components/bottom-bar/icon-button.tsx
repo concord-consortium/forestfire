@@ -22,9 +22,9 @@ export const IconButton = ({ className, icon, highlightIcon, onClick, disabled, 
     disabled={disabled}
   >
     <span>
-      <span className={clsx(css.icon, css.iconButtonHighlightSvg)}>{highlightIcon}</span>
-      <span className={css.icon}>{icon}</span>
-      <span className={css.iconButtonText}>{buttonText}</span>
+      <span className={clsx(css.icon, css.iconButtonHighlightSvg)}>{ highlightIcon }</span>
+      <span className={css.icon}>{ icon }</span>
+      <span className={css.iconButtonText}>{ buttonText }</span>
     </span>
   </Button>
 );

@@ -2,7 +2,7 @@ import * as React from "react";
 
 export const Copyright = ({ licenseUrl }: { licenseUrl: string }) => (
   <p style={{ fontSize: "0.8em" }}>
-    <b>Copyright © {(new Date()).getFullYear()}</b>&nbsp;
+    <b>Copyright © { (new Date()).getFullYear() }</b>&nbsp;
     <a href="http://concord.org" target="_blank" rel="noreferrer">
       The Concord Consortium
     </a>. All rights reserved. The software is licensed under the&nbsp;

@@ -10,8 +10,8 @@ const colorArrayToRGBA = (colorArray: number[]) =>
 export const FireIntensityScale = () => (
   <div className={clsx(css.scaleContainer, css.fireIntensity)}>
     <div className={css.barsContainer}>
-      <div className={css.bar1} style={{backgroundColor: colorArrayToRGBA(BURN_INDEX_LOW) }} />
-      <div className={css.bar2} style={{backgroundColor: colorArrayToRGBA(BURN_INDEX_HIGH) }} />
+      <div className={css.bar1} style={{ backgroundColor: colorArrayToRGBA(BURN_INDEX_LOW) }} />
+      <div className={css.bar2} style={{ backgroundColor: colorArrayToRGBA(BURN_INDEX_HIGH) }} />
     </div>
     <div className={css.labels}>
       <div>Low</div>
@@ -25,7 +25,7 @@ export const FireHistoryScale = () => (
     <div className={css.barsContainer}>
       <div
         className={css.bar}
-        style={{background: `linear-gradient(to right, ${colorArrayToRGBA(FIRE_HISTORY_BACKGROUND)} 0%, ${colorArrayToRGBA(FIRE_HISTORY_OVERLAY)} 100%)` }}
+        style={{ background: `linear-gradient(to right, ${colorArrayToRGBA(FIRE_HISTORY_BACKGROUND)} 0%, ${colorArrayToRGBA(FIRE_HISTORY_OVERLAY)} 100%)` }}
       />
     </div>
     <div className={css.labels}>

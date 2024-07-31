@@ -13,7 +13,7 @@ export const useDraggingOverPlaneInteraction = (
   dragPlane?: RefObject<THREE.Mesh>
 ) => {
   const { simulation, ui } = useStores();
-  const [ hovered, setHover ] = useState(false);
+  const [hovered, setHover] = useState(false);
   const { dragged, startDragging } = useDragging({
     useOffset: true,
     dragPlane,
