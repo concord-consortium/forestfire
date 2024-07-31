@@ -15,11 +15,12 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
   const { simulation, snapshotsManager } = useStores();
   const timeoutId = useRef(0);
   const [val, setVal] = useState(simulation.timeInYears);
-  const [timeProgress, setTimeProgress] = useState("0%");
 
   const tickDiff = simulation.config.simulationEndYear / TICK_COUNT;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i * tickDiff);
   const marks = ticks.map((tick) => ({ value: tick, label: tick }));
+
+  const timeProgress = `${snapshotsManager.maxYear / simulation.config.simulationEndYear * 100}%`;
 
   // disable the slider when the simulation is running, or when a fire event is active. It'd be possible to support
   // scrubbing the timeline while a fire event is active, but it would require some additional logic to handle the
@@ -28,19 +29,10 @@ export const Timeline: React.FC = observer(function WrappedComponent() {
     || (simulation.simulationRunning && !simulation.simulationEnded)
     || simulation.isFireEventActive;
 
-  // This useEffect is to update the timeline scrubber when the simulation is running
-  // progress bar and regrowth of vegetation
   useLayoutEffect(() => {
-    if (simulation.simulationRunning) {
-      if (snapshotsManager.maxYear > val) {
-        setVal(snapshotsManager.maxYear);
-        setTimeProgress(`${snapshotsManager.maxYear / simulation.config.simulationEndYear * 100}%`);
-      }
-    } else if (!simulation.simulationStarted) { // if the simulation is reloaded, reset the timeline
-      setVal(0);
-      setTimeProgress("0%");
-    }
-  }, [simulation.simulationStarted, simulation.simulationRunning, snapshotsManager.maxYear, simulation.timeInYears, simulation, val]);
+    // Update handle when simulation is updated.
+    setVal(simulation.timeInYears);
+  }, [simulation.timeInYears, simulation]);
 
   const handleSliderChange = (e: Event, value: number) => {
     if (simulation.simulationRunning) {
