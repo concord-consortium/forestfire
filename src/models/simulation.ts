@@ -149,6 +149,11 @@ export class SimulationModel {
   }
 
   public get droughtLevel() {
+    // When fire event is not active, we should return the initial drought level. Fire Danger is inactive and
+    // the arrow should point the lowest value.
+    if (!this.isFireEventActive) {
+      return DroughtLevel.NoDrought;
+    }
     // average drought level of all zones
     return this.zones.reduce((sum, zone) => sum + zone.droughtLevel, 0) / this.zones.length;
   }
