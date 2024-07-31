@@ -5,7 +5,7 @@ import { deepEqual } from "../utils";
 export const SNAPSHOT_INTERVAL = 3; // years
 
 export interface ISnapshot {
-  simulationSnapshot: ISimulationSnapshot | undefined
+  simulationSnapshot: ISimulationSnapshot
 }
 
 export class SnapshotsManager {
@@ -15,8 +15,6 @@ export class SnapshotsManager {
 
   private simulation: SimulationModel;
   private lastSnapshotYear: number | null = null;
-  private fireEventDidEnd = false;
-  private snapshotOnPause = false;
 
   constructor(simulation: SimulationModel) {
     makeObservable(this);
@@ -81,7 +79,6 @@ export class SnapshotsManager {
       }
     }
     this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
-    this.fireEventDidEnd = true;
   }
 
   @action.bound public onStart() {
@@ -90,7 +87,6 @@ export class SnapshotsManager {
       this.snapshots.push({simulationSnapshot: this.simulation.snapshot()});
       this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
     }
-    this.snapshotOnPause = true;
   }
 
   @action.bound public onStop() {
@@ -104,42 +100,37 @@ export class SnapshotsManager {
       this.maxYear = this.simulation.timeInYears;
     }
     const currentYear = Math.floor(this.simulation.timeInYears);
-    if (this.lastSnapshotYear !== null) {
-      const yearsSinceLastSnapshot = currentYear - this.lastSnapshotYear;
-      if (yearsSinceLastSnapshot >= SNAPSHOT_INTERVAL) {
-        if (this.simulation.yearlyVegetationStatistics.length > 1) {
-          const currentYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 1];
-          const previousYearlyVegetationStats = this.simulation.yearlyVegetationStatistics[this.simulation.yearlyVegetationStatistics.length - 2];
-          if (!deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
-            this.snapshots.push({ simulationSnapshot: this.simulation.snapshot() });
-          } else {
-            this.snapshots.push({ simulationSnapshot: undefined });
-          }
+    const yearsSinceLastSnapshot = currentYear - (this.lastSnapshotYear ?? 0);
+    if (yearsSinceLastSnapshot >= SNAPSHOT_INTERVAL) {
+      let existingCellSnapshots = undefined;
+      const previousSnapshotYear = currentYear - SNAPSHOT_INTERVAL;
+      if (this.simulation.yearlyVegetationStatistics[previousSnapshotYear]) {
+        // Vegetation stats are used as a proxy to determine if the cell snapshots are the same. The same stats don't
+        // guarantee the same cell snapshots, but this is a good enough heuristic in practice.
+        const currentYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(currentYear);
+        const previousYearlyVegetationStats = this.simulation.vegetationStatisticsForYear(previousSnapshotYear);
+        if (previousYearlyVegetationStats && deepEqual(currentYearlyVegetationStats, previousYearlyVegetationStats)) {
+          // Copy reference to the existing cell snapshots to save memory and time.
+          existingCellSnapshots = this.snapshots[this.snapshots.length - 1].simulationSnapshot.cellSnapshots;
         }
-        this.lastSnapshotYear = Math.floor(this.simulation.timeInYears);
       }
+      const simulationSnapshot = this.simulation.snapshot(existingCellSnapshots);
+      this.snapshots.push({ simulationSnapshot });
+      this.lastSnapshotYear = currentYear;
     }
   }
 
   public restoreSnapshot(year: number) {
-    const arrayIndex = year > 1 ? Math.floor(year/SNAPSHOT_INTERVAL) : 0;
-    // Find the first previous snapshot that is not undefined
-    let previousSnapshotIndex = -1;
-    for (let i = arrayIndex; i >= 0; i--) {
-      if (this.snapshots[i].simulationSnapshot) {
-        previousSnapshotIndex = i;
-        break;
-      }
+    const arrayIndex = Math.floor(year / SNAPSHOT_INTERVAL);
+    const snapshot = this.snapshots[arrayIndex].simulationSnapshot;
+    if (!snapshot) {
+      // This should not happen in practice. Log a warning if it does so we can investigate.
+      console.warn(`Snapshot for year ${year} not found`);
+      return;
     }
-    if (previousSnapshotIndex !== -1) {
-      const snapshot = this.snapshots[previousSnapshotIndex].simulationSnapshot;
-      if (snapshot !== undefined) {
-        this.simulation.stop();
-        this.simulation.restoreSnapshot(snapshot);
-        this.simulation.updateCellsStateFlag();
-        this.simulation.updateCellsElevationFlag();
-      }
-    }
+    this.simulation.stop();
+    this.simulation.restoreSnapshot(snapshot);
+    this.simulation.updateCellsStateFlag();
   }
 
   public restoreLastSnapshot() {

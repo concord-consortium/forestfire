@@ -69,12 +69,10 @@ export interface CellOptions {
 }
 
 export interface ICellSnapshot {
-  zone: Zone;
-  zoneIdx?: number;
   fireIdx: number | null;
   fireHistory: IFireHistory[];
   fireState: FireState;
-  vegetation: Vegetation;
+  _vegetation: Vegetation;
 }
 
 const FIRE_LINE_DEPTH = 2000;
@@ -99,7 +97,7 @@ export class Cell {
   public helitackDropCount = 0;
   public fireIdx: number | null = null;
   public fireHistory: IFireHistory[] = [];
-  private _vegetation: Vegetation = Vegetation.Grass;
+  public _vegetation: Vegetation = Vegetation.Grass;
 
   constructor(props: CellOptions) {
     Object.assign(this, props);
@@ -256,12 +254,10 @@ export class Cell {
 
   public snapshot(): ICellSnapshot {
     return {
-      zone: this.zone,
-      zoneIdx: this.zoneIdx,
       fireIdx: this.fireIdx,
       fireHistory: [...this.fireHistory],
       fireState: this.fireState,
-      vegetation: this.vegetation,
+      _vegetation: this._vegetation,
     };
   }
 

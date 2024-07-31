@@ -1,4 +1,4 @@
-import { SnapshotsManager } from "./snapshots-manager";
+import { SNAPSHOT_INTERVAL, SnapshotsManager } from "./snapshots-manager";
 import { SimulationModel } from "./simulation";
 
 const getSimpleSimulation = async () => {
@@ -28,17 +28,17 @@ describe("SnapshotsManager", () => {
   it("should create a snapshot on year change", async () => {
     const simulation = await getSimpleSimulation();
     const snapshotsManager = new SnapshotsManager(simulation);
-    while (simulation.timeInYears < 2) {
+    while (simulation.timeInYears < SNAPSHOT_INTERVAL) {
       simulation.tick(timeStep);
     }
 
-    expect(Math.floor(snapshotsManager.maxYear)).toBe(2);
+    expect(Math.floor(snapshotsManager.maxYear)).toBe(SNAPSHOT_INTERVAL);
     expect(snapshotsManager.snapshots).toHaveLength(1);
-    while (simulation.timeInYears < 5) {
+    while (simulation.timeInYears < 3 * SNAPSHOT_INTERVAL) {
       simulation.tick(timeStep);
     }
 
-    expect(Math.floor(snapshotsManager.maxYear)).toBe(5);
-    expect(snapshotsManager.snapshots).toHaveLength(4);
+    expect(Math.floor(snapshotsManager.maxYear)).toBe(3 * SNAPSHOT_INTERVAL);
+    expect(snapshotsManager.snapshots).toHaveLength(3);
   });
 });
