@@ -5,7 +5,7 @@ import { yearInMinutes } from "../types";
 
 
 export const SNAPSHOT_INTERVAL = 3; // years
-export const MIN_DISTANCE_TO_FIRE_EVENT = 2; // years
+export const MIN_DISTANCE_TO_FIRE_EVENT = 1; // year
 
 export interface ISnapshot {
   simulationSnapshot: ISimulationSnapshot
