@@ -38,7 +38,7 @@ Boreal Forest Fire Explorer's About and Share dialogs get the same license and T
 - **R10. Top-bar buttons**:
   - **Reload, Share and About are each a `<button type="button">`**, looking as before: Share and About in the bar's 17px text, Reload as MUI's 24px Refresh icon, all `#797979` with `#434343` on hover, in the same places, with no button border, background or padding. They keep `data-testid="reload"`, `"share"` and `"about"`, Reload's `TopBarReloadButtonClicked` log and reload, and the `ShareDialogOpened` and `AboutDialogOpened` logs.
   - **Reload is named "Reload"** by `aria-label`, with a matching `title` tooltip, as in the other Geo apps.
-  - Each shows a visible focus ring on keyboard focus, drawn inset so all four sides fall inside the 22px top bar.
+  - Each shows a visible focus ring on keyboard focus, drawn 1px outside the button so it clears the text, with all four sides inside the 22px top bar.
   - **Tab visits them in their on-screen order**, left to right: Reload, Share, About.
 
 ### Dialog behavior
@@ -81,7 +81,7 @@ Boreal Forest Fire Explorer's About and Share dialogs get the same license and T
 - **Where the code lives**: the copy, `ExternalLink` and the link constants in `src/components/license/`, as in WM-67 and FM-5; the buttons in `src/components/geohazard-components/top-bar/top-bar.tsx`; the dialog in `.../top-bar/dialog.tsx`; the `focusRing($offset)` mixin in `.../geohazard-components/common.scss` (which names its dark gray `$controlText`, where Flood's names it `$controlLabel`); the layout checks in `cypress/e2e/top-bar.cy.ts`.
 - **Dialog name**: `aria-labelledby` passed to `MuiDialog` lands on the paper, pointing at the `<h2>`'s `React.useId()` id. FM-5 used `aria-label` because `useId` renumbered Flood's react-tabs ids that its Cypress page objects select; forestfire's Cypress specs select only `data-testid`s and class names.
 - **Focus on open**: the Fade transition's `onEnter` (through `TransitionProps`) focuses Close on every enter; `autoFocus` misses a reopen during MUI's exit fade, since the dialog stays mounted. MUI returns focus to the opener on close; the About and Share click handlers call `event.currentTarget.focus()` first so a mouse open in Safari or Firefox still has an opener to return to.
-- **Focus ring**: 2px solid `$controlText` on `:focus-visible`; `-2px` (inset) in the top bar, `2px` around Close. Reload's icon is `display: block` with `margin: -1.5px 0`, so its button is 21px tall like Share and About (0.5 to 21.5px in the 22px bar) and the icon stays where master drew it. `.topBar .textButton:hover` (0,3,0) outranks `.topBar button.textButton { color: inherit }` (0,2,1), so hover stays `#434343`.
+- **Focus ring**: 2px solid `$controlText` on `:focus-visible` (`$focusOutlineWidth` in the geohazard `common.scss`); 1px outside the buttons in the top bar, as in Wildfire and Hurricane, and 2px around Close. The top-bar buttons get `line-height: $buttonHeight` (15px: the 22px bar less the 2px ring and 1px offset on each side, less 1px for the text's half-pixel baseline offset), so the ring falls at 0.5 to 21.5px. Reload's 24px icon is centered on that 15px box by a negative margin. With nothing focused, the top bar is pixel-identical to master in Chromium and Firefox. `.topBar .textButton:hover` (0,3,0) outranks `.topBar button.textButton { color: inherit }` (0,2,1), so hover stays `#434343`.
 - **Enter in Jest**: user-event 14 activates a native `<button>` on Enter in jsdom and not a `<div role="button">`, so the Enter tests fail if a button goes back to a non-button. Cypress 13 cannot send a real Tab or Enter without a new dependency (`cypress-real-events`), so keyboard activation is tested in Jest and by hand rather than in Cypress, which the story's AI instructions had suggested.
 - **Test isolation**: the Jest config sets neither `clearMocks` nor `resetMocks`, so the top-bar test file clears its `log` mock in a top-level `beforeEach`; without it, the log checks pass on calls left by earlier tests.
 - **Logging**: no new log events.
@@ -93,7 +93,7 @@ Boreal Forest Fire Explorer's About and Share dialogs get the same license and T
 - From the story: a third-party library acknowledgements list, changing the software license, and localizing the legal copy.
 - The existing credit links in the About dialog and their `rel`.
 - The Share dialog's "Suggested citation" line, including its "Forest Fire Explorer" name and 2023 date.
-- Switching CI and the release workflow to OIDC (DEV-193), and the other outdated CI actions (`actions/checkout@v2`, `actions/setup-node@v2`, `codecov/codecov-action@v1`).
+- Switching CI and the release workflow to OIDC (DEV-193), and the other outdated CI actions (`actions/setup-node@v2`, `codecov/codecov-action@v1`). `actions/checkout` moved to `@v4` in all three CI jobs after Ethan McElroy's code review.
 - The README's deployment section, which still describes Travis and a `production` branch.
 - The top-bar text color: `#797979` on white is about 4.35:1, under WCAG AA's 4.5:1 for 17px text; R10 keeps the existing look, as the other Geo apps did.
 - The release itself (WM-71).
@@ -110,13 +110,13 @@ Boreal Forest Fire Explorer's About and Share dialogs get the same license and T
 
 ---
 
-### Inset focus ring (FM-5) or a shorter button with an outside ring (WM-67)?
-**Context**: R10 needs all four sides of the ring inside the 22px bar.
+### Inset focus ring (FM-5, Tectonic) or a shorter button with an outside ring (WM-67, Hurricane)?
+**Context**: R10 needs all four sides of the ring inside the 22px bar. The Geo apps differ: Flood and Tectonic draw it inset, Wildfire and Hurricane 1px outside the text, Seismic at offset 0.
 **Options considered**:
-- A) `outline-offset: -2px` on the unchanged 21px buttons, as FM-5.
-- B) WM-67's `$buttonHeight` line-height arithmetic with a 1px outside offset.
+- A) `outline-offset: -2px` on the unchanged 21px buttons, as Flood and Tectonic.
+- B) WM-67's `$buttonHeight` line-height arithmetic with a 1px outside offset, as Wildfire and Hurricane.
 
-**Decision**: A. Forestfire's `top-bar.scss` was Flood's starting file line for line, the buttons keep their boxes, and the later Geo reviews settled on the inset ring. Measured in Chromium at 1400 × 1000, the top bar matches master to the hundredth of a pixel.
+**Decision**: B (Doug, 2026-11-23). The inset ring shipped first, and Ethan McElroy's code review found it sat too tight on the Share and About text. B keeps the ring off the text while matching existing Geo apps, and WM-67 is the story's template. The unfocused top bar is pixel-identical to master in Chromium and Firefox.
 
 ---
 
