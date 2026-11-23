@@ -9,8 +9,14 @@ jest.mock("@concord-consortium/lara-interactive-api", () => ({ log: jest.fn() })
 type User = ReturnType<typeof userEvent.setup>;
 
 describe("TopBar component", () => {
+  const originalLocation = window.location;
+
   beforeEach(() => {
     jest.mocked(log).mockClear();
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, "location", { configurable: true, writable: true, value: originalLocation });
   });
 
   describe("Reload button", () => {
