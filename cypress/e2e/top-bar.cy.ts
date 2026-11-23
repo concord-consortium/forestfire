@@ -1,5 +1,4 @@
-// Layout checks for the top bar and its dialogs. jsdom applies no stylesheet, so
-// computed sizes and on-screen positions are observable only here.
+// jsdom applies no stylesheet, so these layout checks run in Cypress.
 
 describe("Top bar and dialog layout", () => {
   beforeEach(() => {
