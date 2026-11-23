@@ -6,8 +6,10 @@ import { Dialog } from "./dialog";
 describe("Dialog component", () => {
   it("is a modal dialog named by its title", () => {
     render(<Dialog open={true} onClose={jest.fn()} title="About: Boreal Forest Fire Explorer" />);
-    expect(screen.getByRole("dialog", { name: "About: Boreal Forest Fire Explorer" })).toHaveAttribute("aria-modal", "true");
-    expect(screen.getByRole("heading", { level: 2, name: "About: Boreal Forest Fire Explorer" })).toBeInTheDocument();
+    const dialog = screen.getByRole("dialog", { name: "About: Boreal Forest Fire Explorer" });
+    const heading = screen.getByRole("heading", { level: 2, name: "About: Boreal Forest Fire Explorer" });
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(dialog).toHaveAttribute("aria-labelledby", heading.id);
   });
 
   it("moves focus to its Close button when it opens", () => {
