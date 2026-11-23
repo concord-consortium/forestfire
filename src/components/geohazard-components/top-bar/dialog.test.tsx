@@ -1,10 +1,35 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { Dialog } from "./dialog";
 
 describe("Dialog component", () => {
-  it("renders Material UI Dialog component", () => {
-    render(<Dialog open={true} onClose={jest.fn()} />);
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  it("is a modal dialog named by its title", () => {
+    render(<Dialog open={true} onClose={jest.fn()} title="About: Boreal Forest Fire Explorer" />);
+    const dialog = screen.getByRole("dialog", { name: "About: Boreal Forest Fire Explorer" });
+    const heading = screen.getByRole("heading", { level: 2, name: "About: Boreal Forest Fire Explorer" });
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(dialog).toHaveAttribute("aria-labelledby", heading.id);
+  });
+
+  it("moves focus to its Close button when it opens", () => {
+    render(<Dialog open={true} onClose={jest.fn()} title="About: Boreal Forest Fire Explorer" />);
+    expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
+  });
+
+  it("closes from its Close button", async () => {
+    const onClose = jest.fn();
+    render(<Dialog open={true} onClose={onClose} title="About: Boreal Forest Fire Explorer" />);
+    const close = screen.getByRole("button", { name: "Close" });
+    expect(close).toHaveAttribute("type", "button");
+    await userEvent.click(close);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes on Escape", async () => {
+    const onClose = jest.fn();
+    render(<Dialog open={true} onClose={onClose} title="About: Boreal Forest Fire Explorer" />);
+    await userEvent.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

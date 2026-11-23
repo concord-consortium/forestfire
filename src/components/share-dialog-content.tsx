@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Copyright } from "./geohazard-components/top-bar/copyright";
+import { LicenseCopy } from "./license/license-copy";
 
 const getURL = () => {
   return window.location.href;
@@ -23,6 +23,6 @@ export const ShareDialogContent = () => (
     <p>
       Suggested citation: Forest Fire Explorer [Computer software]. (2023). Concord, MA: The Concord Consortium.
     </p>
-    <Copyright licenseUrl="https://github.com/concord-consortium/forestfire/blob/master/LICENSE" />
+    <LicenseCopy />
   </div>
 );

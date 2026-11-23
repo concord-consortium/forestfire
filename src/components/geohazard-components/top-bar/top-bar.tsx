@@ -21,11 +21,14 @@ export const TopBar: React.FC<IProps> = ({ projectName, aboutContent, shareConte
     // so we don't have to wait for network request.
     setTimeout(() => window.location.reload(), 100);
   };
-  const handleShareOpen = () => {
+  // macOS Safari and Firefox do not focus a button on click, so focus it here for the dialog to restore focus to on close.
+  const handleShareOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.currentTarget.focus();
     setShareOpen(true);
     log("ShareDialogOpened");
   };
-  const handleAboutOpen = () => {
+  const handleAboutOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.currentTarget.focus();
     setAboutOpen(true);
     log("AboutDialogOpened");
   };
@@ -34,10 +37,23 @@ export const TopBar: React.FC<IProps> = ({ projectName, aboutContent, shareConte
 
   return (
     <div className={css.topBar}>
-      <span className={css.textButton} data-testid="reload" onClick={handleReload}><RefreshIcon /></span>
+      <button
+        type="button"
+        data-testid="reload"
+        className={`${css.textButton} ${css.iconButton}`}
+        aria-label="Reload"
+        title="Reload"
+        onClick={handleReload}
+      >
+        <RefreshIcon />
+      </button>
       <span>
-        <span data-testid="share" className={css.textButton} onClick={handleShareOpen}>Share</span>
-        <span data-testid="about" className={css.textButton} onClick={handleAboutOpen}>About</span>
+        <button type="button" data-testid="share" className={css.textButton} onClick={handleShareOpen}>
+          Share
+        </button>
+        <button type="button" data-testid="about" className={css.textButton} onClick={handleAboutOpen}>
+          About
+        </button>
       </span>
       <Dialog
         onClose={handleAboutClose}
