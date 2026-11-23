@@ -5,6 +5,7 @@
 }
 
 .title {
+  margin: 0;
   font-size: 1.2em;
   font-weight: 600;
 }
@@ -13,11 +14,16 @@
   position: absolute;
   top: 8px;
   right: 8px;
+  display: flex;
+  padding: 0;
+  border: none;
+  background: none;
   color: #797979;
   cursor: pointer;
   &:hover {
     color: $controlText;
   }
+  @include focusRing;
 }
 
 .content {

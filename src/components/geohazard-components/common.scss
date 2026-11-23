@@ -8,3 +8,10 @@ $bottomBarWidgetGroupSpacing: 10px;
 $overflowHeight: 11px;
 $controlText: #434343;
 $hoverColor: #dfdfdf;
+
+@mixin focusRing($offset: 2px) {
+  &:focus-visible {
+    outline: 2px solid $controlText;
+    outline-offset: $offset;
+  }
+}
