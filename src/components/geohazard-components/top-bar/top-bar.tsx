@@ -40,7 +40,7 @@ export const TopBar: React.FC<IProps> = ({ projectName, aboutContent, shareConte
       <button
         type="button"
         data-testid="reload"
-        className={css.textButton}
+        className={`${css.textButton} ${css.iconButton}`}
         aria-label="Reload"
         title="Reload"
         onClick={handleReload}

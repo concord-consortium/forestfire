@@ -9,9 +9,11 @@ $overflowHeight: 11px;
 $controlText: #434343;
 $hoverColor: #dfdfdf;
 
+$focusOutlineWidth: 2px;
+
 @mixin focusRing($offset: 2px) {
   &:focus-visible {
-    outline: 2px solid $controlText;
+    outline: $focusOutlineWidth solid $controlText;
     outline-offset: $offset;
   }
 }
