@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Copyright } from "./geohazard-components/top-bar/copyright";
+import { LicenseCopy } from "./license/license-copy";
 
 export const AboutDialogContent = () => (
   <div>
@@ -34,6 +34,6 @@ export const AboutDialogContent = () => (
       </a> (DRL-1812362) and Collaborative Research: The Past, Present, and Future of Boreal Fire Feedbacks
       (ANS-2215118).
     </p>
-    <Copyright licenseUrl="https://github.com/concord-consortium/forestfire/blob/master/LICENSE" />
+    <LicenseCopy />
   </div>
 );
